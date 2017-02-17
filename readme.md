@@ -10,6 +10,6 @@ contundente pausa, al Líder se le ilumina la cara y le dice a Lorem: – Ese ho
 
 Bocetos
 
-![Screenshot](https://github.com/unrealmitch/UnrealFFT/blob/master/Screenshots/S2.jpg)
+![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Boceto-Dino.jpg?raw=true)
 
-![Screenshot](https://github.com/unrealmitch/UnrealFFT/blob/master/Screenshots/S3.jpg)
+![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Boceto-Piratas.jpg?raw=true)
