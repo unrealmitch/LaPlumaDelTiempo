@@ -13,8 +13,6 @@ import random,math
 # -------------------------------------------------
 # -------------------------------------------------
 
-VELOCIDAD_SOL = 0.1 # Pixeles por milisegundo
-
 # Los bordes de la pantalla para hacer scroll horizontal
 MINIMO_X_JUGADOR = ANCHO_PANTALLA  / 4
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
@@ -37,50 +35,31 @@ class Fase(Escena):
 		# Primero invocamos al constructor de la clase padre
 		Escena.__init__(self, director)
 
-		#Aux
-		fH = ALTO_PANTALLA/800.
+		fH = ALTO_PANTALLA/800.	#!Factor de escala Y, para posicionar bien en este eje si se escala el decorado
+
 		# Creamos el decorado y el fondo
 		self.decorado = Decorado()
-		self.fondo = Cielo()
 		self.sea = Sea()
 
 		# Que parte del decorado estamos visualizando
 		self.scrollx = 0
 		self.scrolly = 0.
-		self.scrolly_speed = 0.01
-		#  En ese caso solo hay scroll horizontal
-		#  Si ademas lo hubiese vertical, seria self.scroll = (0, 0)
+		self.scrolly_speed = 0.01	#!Velocidad scroll Vertial
 
 		# Creamos los sprites de los jugadores
 		self.jugador1 = Jugador()
-		#self.jugador2 = Jugador()
 		self.grupoJugadores = pygame.sprite.Group( self.jugador1 )
 
 		# Ponemos a los jugadores en sus posiciones iniciales
 		self.jugador1.establecerPosicion((300, fH*555))
-		#self.jugador2.establecerPosicion((400, 551))
 
-		# Creamos las plataformas del decorado
-
+		#! Creamos las plataformas del decorado cargando un fichero de configuracióm
 		file_plataformas = GestorRecursos.CargarMapaPlataformas("plat-piratas.txt")
 		plataformas = []
 		self.grupoPlataformas = pygame.sprite.Group()
 
 		for elem in file_plataformas:
 			self.grupoPlataformas.add(Plataforma(pygame.Rect(elem[0], fH*elem[1], elem[2], elem[3])))
-
-
-		# La plataforma que conforma todo el suelo
-		'''
-		pl1 = Plataforma(pygame.Rect(0, fH*500, 332, 100))
-		pl2= Plataforma(pygame.Rect(344, fH*568, 200, 100))
-		pl3= Plataforma(pygame.Rect(512, fH*623, 544, 100))
-		pl4= Plataforma(pygame.Rect(1000, fH*555, 6161,50))
-		'''
-		# La plataforma del techo del edificio
-		#plataformaCasa = Plataforma(pygame.Rect(870, 417, 200, 10))
-		# y el grupo con las mismas
-		
 
 		# Y los enemigos que tendran en este decorado
 		#enemigo1 = Sniper()
@@ -89,9 +68,13 @@ class Fase(Escena):
 		# Creamos un grupo con los enemigos
 		#self.grupoEnemigos = pygame.sprite.Group( enemigo1 )
 
+		self.barcobg1 = BarcoBg(100,275)
+
+		self.grupoEscenario = pygame.sprite.Group(self.barcobg1)
 		# Creamos un grupo con los Sprites que se mueven
 		#  En este caso, solo los personajes, pero podría haber más (proyectiles, etc.)
 		self.grupoSpritesDinamicos = pygame.sprite.Group( self.jugador1 )
+		self.grupoSpritesDinamicos.add()
 		# Creamos otro grupo con todos los Sprites
 		self.grupoSprites = pygame.sprite.Group( self.jugador1 )
 		self.grupoSprites.add(self.grupoPlataformas)
@@ -205,20 +188,22 @@ class Fase(Escena):
   
 		# Actualizamos el fondo:
 		#  la posicion del sol y el color del cielo
-		self.fondo.update(tiempo)
-
+		self.barcobg1.update(tiempo, self.scrollx/2.562)
 		
 	def dibujar(self, pantalla):
 		# Ponemos primero el fondo
-		self.fondo.dibujar(pantalla)
 		# Despues, las animaciones que haya detras
 		#for animacion in self.animacionesDetras:
 		#    animacion.dibujar(pantalla)
 		# Después el decorado
 		self.sea.dibujar(pantalla)
+		self.barcobg1.draw(pantalla)
 		self.decorado.dibujar(pantalla)
 		# Luego los Sprites
 		self.grupoSprites.draw(pantalla)
+
+		for elem in self.grupoPlataformas.sprites():
+			elem.draw(pantalla)
 		# Y por ultimo, dibujamos las animaciones por encima del decorado
 		#for animacion in self.animacionesDelante:
 		#    animacion.dibujar(pantalla)
@@ -250,39 +235,44 @@ class Plataforma(MiSprite):
 		# En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
 		self.image = pygame.Surface((0, 0))
 
+	def draw(self, pantalla):
+		#pantalla.blit(self.image, self.rect, (10,10))
+		pygame.draw.rect(pantalla,(255,255,255), self.rect)
 
 # -------------------------------------------------
-# Clase Cielo
+# Clase BarcoBg
 
-class Cielo:
-	def __init__(self):
-		self.sol = GestorRecursos.CargarImagen('sol.png', -1)
-		#self.sol = pygame.transform.scale(self.sol, (300, 200))
+class BarcoBg(MiSprite):
+	def __init__(self,x,y):
+		MiSprite.__init__(self)
+		self.imagen = GestorRecursos.CargarImagen('pirate-ship1.png', -1)
+		self.image = self.imagen
+		#self.image = pygame.transform.scale(self.image,(150,150))
+		self.size = self.image.get_size()
+		self.rect = self.image.get_rect()
+		self.rect.left = x
+		self.rect.top = y
+		self.scrollx = 0
+		self.scrolly = 10
 
-		#self.rect = self.sol.get_rect()
-		#self.posicionx = 0 # El lado izquierdo de la subimagen que se esta visualizando
-		self.update(0)
-
-	def update(self, tiempo):
+	def update(self,tiempo, scrollx):
 		'''
-		self.posicionx += VELOCIDAD_SOL * tiempo
-		if (self.posicionx - self.rect.width >= ANCHO_PANTALLA):
-			self.posicionx = 0
-		self.rect.right = self.posicionx
-		# Calculamos el color del cielo
-		if self.posicionx >= ((self.rect.width + ANCHO_PANTALLA) / 2):
-			ratio = 2 * ((self.rect.width + ANCHO_PANTALLA) - self.posicionx) / (self.rect.width + ANCHO_PANTALLA)
-		else:
-			ratio = 2 * self.posicionx / (self.rect.width + ANCHO_PANTALLA)
-		self.colorCielo = (100*ratio, 200*ratio, 255)
+		self.scrollx += 0.8
+		self.scrolly += 0.001
+		self.rect.left = self.scrollx - scrollx
+		self.rect.top = 0
+		size = int(self.scrolly*50)
+		self.image = pygame.transform.scale(self.imagen,(size,size))
 		'''
+		self.scrollx += 0.8
+		self.scrolly += 0.01
+		self.rect.left = self.scrollx - scrollx
+		self.rect.top = 275 + self.scrolly/10
+		size = int(self.scrolly*self.scrolly)
+		self.image = pygame.transform.scale(self.imagen,(size,size))
 
-	def dibujar(self,pantalla):
-		# Dibujamos el color del cielo
-		pantalla.fill((0,0,0))
-		# Y ponemos el sol
-		#pantalla.blit(self.sol, self.rect)
-
+	def draw(self, pantalla):
+		pantalla.blit(self.image, self.rect)
 
 # -------------------------------------------------
 # Clase Sea
@@ -304,6 +294,7 @@ class Sea:
 
 	def dibujar(self, pantalla):
 		pantalla.blit(self.imagen, self.rect, self.rectSubimagen)
+		
 
 # Clase Decorado
 
