@@ -12,7 +12,9 @@ class Director():
 
     def __init__(self):
         # Inicializamos la pantalla y el modo grafico
-        self.screen = pygame.display.set_mode((ANCHO_PANTALLA, ALTO_PANTALLA))
+        self.screen = pygame.display.set_mode((ANCHO_PANTALLA, ALTO_PANTALLA), pygame.FULLSCREEN)
+        pygame.mixer.pre_init(44100, 16, 2, 4096)
+        pygame.mixer.init()
         pygame.display.set_caption("Piratas!")
         # Pila de escenas
         self.pila = []
@@ -20,6 +22,11 @@ class Director():
         self.salir_escena = False
         # Reloj
         self.reloj = pygame.time.Clock()
+
+        self.screen.fill((0,0,0))
+        tipoLetra = pygame.font.SysFont('arial', 48)
+        texto = tipoLetra.render('#Loading mision 1...', True, (255,255,255), (0,0,0))
+        self.screen.blit(texto, (400,400,300,300))
 
 
     def bucle(self, escena):

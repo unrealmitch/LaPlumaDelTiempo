@@ -59,3 +59,21 @@ class AnimacionHumo(Animacion):
                                         ('imagenes/smoke_puff_0008.png', 0.2),
                                         ('imagenes/smoke_puff_0009.png', 0.2),
                                         ('imagenes/smoke_puff_0010.png', 0.2)])
+
+#Animación de una ola
+class AnimacionOla(Animacion):
+    def __init__(self):
+        array_animation = []
+        for i in range(1,106):
+            array_animation.append(('animations/wave_alpha/frame (' + str(i) + ').gif', 0.1))
+
+        pyganim.PygAnimation.__init__(self,array_animation)
+        
+
+class AnimacionOla2(Animacion):
+    def __init__(self):
+        array_animation = []
+        for i in range(1,50):
+            array_animation.append(('animations/wave_alpha_short/frame (' + str(i) + ').gif', 0.1))
+
+        pyganim.PygAnimation.__init__(self,array_animation)
