@@ -1,0 +1,10 @@
+# Ignora los binarios. No se deben subir a un repositorio.
+Piratas/*.pyc
+
+# Ignora elementos creados por virtualenv, la herramienta para crear entornos
+# python aislados
+Piratas/bin/
+Piratas/include/
+Piratas/lib/
+Piratas/local/
+Piratas/pip-selfcheck.json
