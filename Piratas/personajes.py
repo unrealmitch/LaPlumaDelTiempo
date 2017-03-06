@@ -3,8 +3,8 @@
 import pygame, sys, os
 from pygame.locals import *
 from escena import *
-from gestorRecursos import *
 from miSprite import *
+from gestorRecursos import *
 
 # -------------------------------------------------
 # -------------------------------------------------
@@ -25,7 +25,7 @@ SPRITE_ANDANDO = 1
 SPRITE_SALTANDO = 2
 
 # Velocidades de los distintos personajes
-VELOCIDAD_JUGADOR = 0.2 # Pixeles por milisegundo
+VELOCIDAD_JUGADOR = 0.6 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
 RETARDO_ANIMACION_JUGADOR = 5 # updates que durará cada imagen del personaje
 							  # debería de ser un valor distinto para cada postura
@@ -43,6 +43,12 @@ GRAVEDAD = 0.0003 # Píxeles / ms2
 # Clases de los objetos del juego
 # -------------------------------------------------
 # -------------------------------------------------
+
+
+# -------------------------------------------------
+
+
+
 
 # -------------------------------------------------
 # Clases Personaje
@@ -81,7 +87,7 @@ class Personaje(MiSprite):
 			self.coordenadasHoja.append([])
 			tmp = self.coordenadasHoja[linea]
 			for postura in range(1, numImagenes[linea]+1):
-				tmp.append(pygame.Rect((int(datos[cont]), int(datos[cont+1])), (int(datos[cont+2]), int(datos[cont+3]))))
+				tmp.append(pygame.Rect((int(int(datos[cont])*ESCALA), int(int(datos[cont+1])*ESCALA)), (int(int(datos[cont+2])*ESCALA), int(int(datos[cont+3])*ESCALA))))
 				cont += 4
 
 		# El retardo a la hora de cambiar la imagen del Sprite (para que no se mueva demasiado rápido)
@@ -94,7 +100,7 @@ class Personaje(MiSprite):
 		self.rect = pygame.Rect(100,100,self.coordenadasHoja[self.numPostura][self.numImagenPostura][2],self.coordenadasHoja[self.numPostura][self.numImagenPostura][3])
 
 		# Las velocidades de caminar y salto
-		self.velocidadCarrera = velocidadCarrera
+		self.velocidadCarrera = velocidadCarrera 
 		self.velocidadSalto = velocidadSalto
 
 		# El retardo en la animacion del personaje (podria y deberia ser distinto para cada postura)
@@ -135,7 +141,6 @@ class Personaje(MiSprite):
 			#  Si no, si mira a la derecha, invertimos esa imagen
 			elif self.mirando != DERECHA:
 				self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
-
 
 	def update(self, grupoPlataformas, tiempo):
 
@@ -181,6 +186,7 @@ class Personaje(MiSprite):
 		if self.numPostura == SPRITE_ANDANDO:
 			plataformas =  pygame.sprite.spritecollide(self, grupoPlataformas, False)
 			for elem in plataformas:
+				
 				if((self.rect.bottom-3) > elem.rect.top):
 					if (((self.rect.left-10) < elem.rect.right) and (self.rect.left > elem.rect.left) and self.mirando == IZQUIERDA) or (((self.rect.right-10) > elem.rect.left) and (self.rect.right < elem.rect.right) and self.mirando == DERECHA):
 						#print('Jl:' + str(self.rect.left) + ' Jr: ' + str(self.rect.right) + ' Pl ' + str(elem.rect.left) + ' Pr ' + str(elem.rect.right))
@@ -191,6 +197,41 @@ class Personaje(MiSprite):
 
 		elif self.numPostura == SPRITE_SALTANDO:
 
+			'''
+			plataformas =  pygame.sprite.spritecollide(self, grupoPlataformas, False)
+			plataforma = None
+
+			if plataformas == None :
+				velocidady += GRAVEDAD * tiempo
+
+			else:
+				for elem in plataformas:
+					if elem.rect.top < plataforma.rect.top and (velocidady>0) and (plataforma.rect.bottom>self.rect.bottom):
+						plataforma = elem
+					else:
+						velocidady += GRAVEDAD * tiempo
+
+				self.establecerPosicion((self.posicion[0], plataforma.posicion[1]-plataforma.rect.height+1))
+				self.numPostura = SPRITE_QUIETO
+				velocidady = 0
+
+			'''
+
+			plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
+			plataformas = pygame.sprite.spritecollide(self, grupoPlataformas,False)
+
+			if (plataforma != None) and (velocidady>0) and (plataforma.rect.bottom>self.rect.bottom or plataforma.rect.bottom>self.rect.bottom):
+				for elem in plataformas:
+					if elem.rect.top > plataforma.rect.top:
+						plataforma = elem
+
+				self.establecerPosicion((self.posicion[0], plataforma.posicion[1]-plataforma.rect.height+1))
+				self.numPostura = SPRITE_QUIETO
+				velocidady = 0
+
+			else:
+				velocidady += GRAVEDAD * tiempo
+			'''
 			# Miramos a ver si hay que parar de caer: si hemos llegado a una plataforma
 			#  Para ello, miramos si hay colision con alguna plataforma del grupo
 			plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
@@ -209,7 +250,7 @@ class Personaje(MiSprite):
 			# Si no caemos en una plataforma, aplicamos el efecto de la gravedad
 			else:
 				velocidady += GRAVEDAD * tiempo
-
+			'''
 		# Actualizamos la imagen a mostrar
 		self.actualizarPostura()
 
@@ -222,8 +263,6 @@ class Personaje(MiSprite):
 		
 		return
 
-
-
 # -------------------------------------------------
 # Clase Jugador
 
@@ -231,7 +270,7 @@ class Jugador(Personaje):
 	"Cualquier personaje del juego"
 	def __init__(self):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
-		Personaje.__init__(self,'Player.png','coordPlayer.txt', [6, 6, 5], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR);
+		Personaje.__init__(self,'Player4.png','coordPlayer2.txt', [6, 6, 5], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR);
 
 
 	def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha):

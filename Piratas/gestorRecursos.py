@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pygame, sys, os
+from escena import *
 from pygame.locals import *
 
 
@@ -10,7 +11,7 @@ from pygame.locals import *
 # En este caso se implementa como una clase vacía, solo con métodos de clase
 class GestorRecursos(object):
 	recursos = {}
-			
+
 	@classmethod
 	def CargarImagen(cls, nombre, colorkey=None):
 		# Si el nombre de archivo está entre los recursos ya cargados
@@ -20,7 +21,7 @@ class GestorRecursos(object):
 		# Si no ha sido cargado anteriormente
 		else:
 			# Se carga la imagen indicando la carpeta en la que está
-			fullname = os.path.join('imagenes', nombre)
+			fullname = os.path.join('images', nombre)
 			try:
 				imagen = pygame.image.load(fullname)
 			except pygame.error, message:
@@ -32,6 +33,36 @@ class GestorRecursos(object):
 					colorkey = imagen.get_at((0,0))
 				imagen.set_colorkey(colorkey, RLEACCEL)
 			# Se almacena
+			imagen = pygame.transform.scale(imagen, (int(imagen.get_size()[0]*ESCALA), int(imagen.get_size()[1]*ESCALA)))
+			cls.recursos[nombre] = imagen
+			# Se devuelve
+			return imagen
+			
+	@classmethod
+	def CargarImagenAlpha(cls, nombre, colorkey=None):
+		# Si el nombre de archivo está entre los recursos ya cargados
+		if nombre in cls.recursos:
+			# Se devuelve ese recurso
+			return cls.recursos[nombre]
+		# Si no ha sido cargado anteriormente
+		else:
+			# Se carga la imagen indicando la carpeta en la que está
+			fullname = os.path.join('images', nombre)
+			try:
+				imagen = pygame.image.load(fullname)
+			except pygame.error, message:
+				print 'Cannot load image:', fullname
+				raise SystemExit, message	
+			if colorkey is not None:
+				if colorkey is -2:
+					imagen = imagen.convert_alpha()
+				else:
+					imagen.convert()
+					if colorkey is -1:
+						colorkey = imagen.get_at((0,0))
+					imagen.set_colorkey(colorkey, RLEACCEL)
+			# Se almacena
+			imagen = pygame.transform.scale(imagen, (int(imagen.get_size()[0]*ESCALA), int(imagen.get_size()[1]*ESCALA)))
 			cls.recursos[nombre] = imagen
 			# Se devuelve
 			return imagen
@@ -45,7 +76,7 @@ class GestorRecursos(object):
 		# Si no ha sido cargado anteriormente
 		else:
 			# Se carga el recurso indicando el nombre de su carpeta
-			fullname = os.path.join('imagenes', nombre)
+			fullname = os.path.join('images', nombre)
 			pfile=open(fullname,'r')
 			datos=pfile.read()
 			pfile.close()

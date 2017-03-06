@@ -1,4 +1,4 @@
-import pygame
+import pygame, escena
 from pygame.locals import *
 from gestorRecursos import *
 
@@ -14,15 +14,15 @@ class MiSprite(pygame.sprite.Sprite):
 
 	def establecerPosicion(self, posicion):
 		self.posicion = posicion
-		self.rect.left = self.posicion[0] - self.scroll[0]
-		self.rect.bottom = self.posicion[1] - self.scroll[1]
+		self.rect.left = int(self.posicion[0] - self.scroll[0]*ESCALA)
+		self.rect.bottom = int(self.posicion[1]- self.scroll[1]*ESCALA)
 
 	def establecerPosicionPantalla(self, scrollDecorado):
-		self.scroll = scrollDecorado;
+		self.scroll = (int(scrollDecorado[0]), int(scrollDecorado[1]*ESCALA));
 		(scrollx, scrolly) = self.scroll;
 		(posx, posy) = self.posicion;
-		self.rect.left = posx - scrollx;
-		self.rect.bottom = posy - scrolly;
+		self.rect.left = int(posx - scrollx*ESCALA);
+		self.rect.bottom = int(posy - scrolly*ESCALA);
 
 	def incrementarPosicion(self, incremento):
 		(posx, posy) = self.posicion
@@ -30,29 +30,33 @@ class MiSprite(pygame.sprite.Sprite):
 		self.establecerPosicion((posx+incrementox, posy+incrementoy))
 
 	def update(self, tiempo):
-		incrementox = self.velocidad[0]*tiempo
-		incrementoy = self.velocidad[1]*tiempo
+		incrementox = self.velocidad[0]*ESCALA*tiempo
+		incrementoy = self.velocidad[1]*ESCALA*tiempo
 		self.incrementarPosicion((incrementox, incrementoy))
+
+
+	def draw(self, pantalla):
+		pantalla.blit(self.image, self.rect)
 
 
 # -------------------------------------------------
 # Clase autonomeSprite: Sprite with autonome movement and scale
 # [move/scale]: [startX,startY,endX,endY,speedX,speedY]
 class autonomeSprite(pygame.sprite.Sprite):
-	def __init__(self,file,move,scale=(1,1,1,1,0,0),scrollspeed=(1,1)):
+	def __init__(self,file,move,scale=(1,1,1,1,0,0),scrollspeed=(1.,1.)):
 		pygame.sprite.Sprite.__init__(self)
-		self.file = GestorRecursos.CargarImagen(file, -1)
+		self.file = GestorRecursos.CargarImagenAlpha(file, -1)
 
-		self.posicion = (move[0], move[1])
-		self.pos_max = (move[2], move[3])
-		self.pos_speed = (move[4], move[5])
+		self.posicion = (move[0]*ESCALA, move[1]*ESCALA)
+		self.pos_max = (move[2]*ESCALA, move[3]*ESCALA)
+		self.pos_speed = (move[4]*ESCALA, move[5]*ESCALA)
 
 		self.scale = (scale[0], scale[1])
 		self.scale_max = (scale[2], scale[3])
 		self.scale_speed = (scale[4], scale[5])
 
 		self.scroll = (0,0)
-		self.scrollspeed = scrollspeed
+		self.scrollspeed = (scrollspeed[0]*ESCALA, scrollspeed[1]*ESCALA)
 		self.autoscale()
 		self.establecerPosicion()
 
@@ -82,5 +86,9 @@ class autonomeSprite(pygame.sprite.Sprite):
 		self.scroll = scrollDecorado;
 		(scrollx, scrolly) = self.scroll;
 		(posx, posy) = self.posicion;
-		self.rect.left = posx - scrollx*self.scrollspeed[0];
-		self.rect.top = posy - scrolly*self.scrollspeed[1];
+		self.rect.left = int(posx - scrollx*self.scrollspeed[0]);
+		self.rect.top = int(posy - scrolly*self.scrollspeed[1]);
+
+	def draw(self, pantalla):
+		pantalla.blit(self.image, self.rect)
+
