@@ -1,6 +1,9 @@
 # Ignora los binarios. No se deben subir a un repositorio.
 Piratas/*.pyc
 
+# Ignora los temporales del editor vim
+*.swp
+
 # Ignora elementos creados por virtualenv, la herramienta para crear entornos
 # python aislados
 Piratas/bin/
