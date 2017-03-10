@@ -1,5 +1,5 @@
 # Ignora los binarios. No se deben subir a un repositorio.
-Piratas/*.pyc
+*.pyc
 
 # Ignora los temporales del editor vim
 *.swp
