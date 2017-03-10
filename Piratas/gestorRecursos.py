@@ -143,6 +143,7 @@ class GestorRecursos(object):
 					if colorkey is -1:
 						colorkey = imagen.get_at((0,0))
 					imagen.set_colorkey(colorkey, RLEACCEL)
+				imagen = pygame.transform.scale(imagen, (int(imagen.get_size()[0]*ESCALA), int(imagen.get_size()[1]*ESCALA)))
 				gif.append(imagen)
 				# Se almacena
 			cls.recursos[folder] = gif

@@ -40,7 +40,7 @@ class StaticScenario(pygame.sprite.Sprite):
 		self.scrollspeed = (scrollspeed[0]*ESCALA, scrollspeed[1]*ESCALA)
 
 	def update(self, scroll):
-		self.establecerPosicionPantalla(scroll)
+		'''self.establecerPosicionPantalla(scroll)'''
 
 	def establecerPosicionPantalla(self, scroll):
 		self.rectSubimage.left = scroll[0] * self.scrollspeed[0]
@@ -63,7 +63,7 @@ class DynamicScenario(pygame.sprite.Sprite):
 		self.rectSubimage = pygame.Rect(0, 0, ANCHO_PANTALLA, ALTO_PANTALLA)
 		self.rectSubimage.left = 0
 		self.rectSubimage.top = 0
-		self.scrollspeed = scrollspeed
+		self.scrollspeed = (scrollspeed[0]*ESCALA, scrollspeed[1]*ESCALA)
 
 		self.gif_frame_max = frames - 1
 		self.gif_frame = 0
@@ -90,6 +90,7 @@ class DynamicScenario(pygame.sprite.Sprite):
 					self.gif_asc = True
 					self.time = -self.time_stop
 			self.image = self.gif[self.gif_frame]
+			self.rect = self.image.get_rect()
 
 
 
@@ -100,4 +101,4 @@ class DynamicScenario(pygame.sprite.Sprite):
 	def draw(self, pantalla):
 		rect_rescale = pygame.Rect((int(self.rect[0]*ESCALA), int(self.rect[1]*ESCALA)), (int(self.rect[2]*ESCALA), int(self.rect[3]*ESCALA)))
 		rectSub_rescale = pygame.Rect((int(self.rectSubimage[0]*ESCALA), int(self.rectSubimage[1]*ESCALA)), (int(self.rectSubimage[2]*ESCALA), int(self.rectSubimage[3]*ESCALA)))
-		pantalla.blit(self.image, rect_rescale, rectSub_rescale)
+		pantalla.blit(self.image, self.rect, self.rectSubimage)

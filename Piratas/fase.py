@@ -16,7 +16,7 @@ import random,math
 # -------------------------------------------------
 
 # Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = True
+DEBUG = False
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -32,14 +32,14 @@ class Fase(Escena):
 		if DEBUG:
 			self.background = StaticScenario('Fondo.png',(0.3,0))
 		else:
-			self.background = DynamicScenario("animations\\fondo_pirata",21,0,(0.35,0))
+			self.background = DynamicScenario("animations/fondo_pirata",21,0,(0.3,0))
 
 		self.decorado = StaticScenario('barco.png',(1,1))
 		
-
-		barco1 = autonomeSprite('Ship-Pirate-Alpha.png',(100,50,3000,0,0.01,0.005),(0.25,0.25,0.5,0.5,0.000005,0.000005),(0.5,-0.5))
-		barco2 = autonomeSprite('Ship-Pirate-Alpha.png',(700,200,2000,0,0.002,0.001),(0.15,0.15,0.25,0.25,0.000001,0.000001),(0.5,0.25))
-		barco3 = autonomeSprite('Ship-2.png',(1000,150,2000,0,0.01,0),(0.8,0.8,1,1,0,0),(0.5,0.25))
+		# autonomeSprite(image, (startX, startY, maxX, maxY, velX, velY), (startScaleX, startScaleY, maxScaleX, maxScaley, velScaleX, velScaleY), (velScrollX, velScrollY))
+		barco1 = autonomeSprite('Ship-Pirate-Alpha.png',(100,50,3000,0,0.01,0.005),(0.25,0.25,0.5,0.5,0.000005,0.000005),(0.3,-0.5))
+		barco2 = autonomeSprite('Ship-Pirate-Alpha.png',(700,200,2000,0,0.002,0.001),(0.15,0.15,0.25,0.25,0.000001,0.000001),(0.3,0.25))
+		barco3 = autonomeSprite('Ship-2.png',(1000,150,2000,0,0.01,0),(0.8,0.8,1,1,0,0),(0.3,0.25))
 		
 		self.grupoEscenario = pygame.sprite.Group(barco3,barco1,barco2)
 		
@@ -82,7 +82,7 @@ class Fase(Escena):
 		### Sonido ###
 		sound_bso = GestorRecursos.CargarSonido('bso.ogg')
 		sound_ambient = GestorRecursos.CargarSonido('test.ogg')
-		channel_bso = sound_bso.play(-1)
+		#channel_bso = sound_bso.play(-1)
 		channel_ambient = sound_ambient.play(-1)
 
 	def actualizarScrollOrdenados(self, jugador):
@@ -136,10 +136,11 @@ class Fase(Escena):
 
 	def update(self, tiempo):
 
-		self.background.update(self.virtual_scroll)
+		self.background.update(tiempo)
 		self.grupoSpritesDinamicos.update(self.grupoPlataformas,tiempo)
 		self.grupoEscenario.update(tiempo)
 		self.actualizarScroll(self.jugador1)
+		self.background.establecerPosicionPantalla(self.virtual_scroll)
 
 		
 	def dibujar(self, pantalla):
