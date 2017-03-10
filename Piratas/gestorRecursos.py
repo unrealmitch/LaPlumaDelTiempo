@@ -133,7 +133,7 @@ class GestorRecursos(object):
 			gif = []
 			for i in range(frames):
 				try:
-					fullname = os.path.join(folder, 'frame (' + str(i+1) + ').png')
+					fullname = os.path.join(folder, 'frame (' + str(i+1) + ').jpg')
 					imagen = pygame.image.load(fullname)
 				except pygame.error, message:
 					print 'Cannot load image:', fullname
