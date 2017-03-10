@@ -59,7 +59,7 @@ class Fase(Escena):
 		self.grupoPlataformas = pygame.sprite.Group()
 
 		for elem in file_plataformas:
-			self.grupoPlataformas.add(Plataforma(pygame.Rect(elem[0], elem[1], elem[2], elem[3])))
+			self.grupoPlataformas.add(Plataforma(pygame.Rect(elem[0], elem[1], elem[2], elem[3]),elem[4]))
 
 		self.grupoSpritesDinamicos = pygame.sprite.Group( self.jugador1 )
 		self.grupoSpritesDinamicos.add()
@@ -81,9 +81,10 @@ class Fase(Escena):
 
 		### Sonido ###
 		sound_bso = GestorRecursos.CargarSonido('bso.ogg')
-		sound_ambient = GestorRecursos.CargarSonido('test.ogg')
-		#channel_bso = sound_bso.play(-1)
-		channel_ambient = sound_ambient.play(-1)
+		sound_ambient = GestorRecursos.CargarSonido('ambient.ogg')
+		self.channel_bso = sound_bso.play(-1)
+		self.channel_bso.set_volume(0)
+		self.channel_ambient = sound_ambient.play(-1)
 
 	def actualizarScrollOrdenados(self, jugador):
 		if (jugador.rect.left<MINIMO_X_JUGADOR):
@@ -133,6 +134,8 @@ class Fase(Escena):
 		for sprite in iter(self.grupoSprites):
 			sprite.establecerPosicionPantalla(self.virtual_scroll)
 
+		sound_lvl = float(self.scroll[0])/float(self.background.rect.width)/2
+		self.channel_bso.set_volume(sound_lvl)
 
 	def update(self, tiempo):
 
