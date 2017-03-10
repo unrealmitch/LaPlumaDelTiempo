@@ -93,9 +93,17 @@ class GestorRecursos(object):
 		
 		while True: 
 			linea = file.readline().split()
-			if not linea: 
+			if not linea:
 				break
-			linea = [int(i) for i in linea]
+			if linea[0][0] == '#' or len(linea)<4:
+				continue 
+			try:
+				linea = [int(i) for i in linea]
+			except Exception:
+				print('Mira el fichero, imbecil!')
+				continue
+			if len(linea) == 4:
+				linea.append(0)
 			lista.append(linea)
 		file.close()
 		return lista

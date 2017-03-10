@@ -8,13 +8,16 @@ from miSprite import *
 
 #class Plataforma(pygame.sprite.Sprite):
 class Plataforma(MiSprite):
-	def __init__(self,rectangulo):
+	def __init__(self,rectangulo,tipo):
+		'''
+		@params:
+			rectangulo(left,top,ancho,alto)
+			tipo: 0-> suelo 1-> muro 2->rampa
+		'''
 		# Primero invocamos al constructor de la clase padre
 		MiSprite.__init__(self)
 		# Rectangulo con las coordenadas en pantalla que ocupara
 		self.rect = pygame.Rect((int(rectangulo[0]*ESCALA), int(rectangulo[1])*ESCALA), (int(rectangulo[2]*ESCALA), int(rectangulo[3]*ESCALA)))
-		#self.rect = rectangulo
-		#self.rect = rectangulo
 		# Y lo situamos de forma global en esas coordenadas
 		self.establecerPosicion((self.rect.left, self.rect.bottom))
 		# En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
