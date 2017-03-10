@@ -4,6 +4,7 @@ import pygame, escena
 from escena import *
 from personajes import *
 from escenario import *
+from capa import *
 from pygame.locals import *
 from animacionesPygame import *
 import random,math
@@ -36,13 +37,13 @@ class Fase(Escena):
 
 		self.decorado = StaticScenario('barco.png',(1,1))
 		
+		self.capaEscenario = Capa(self.background)
+		
 		# autonomeSprite(image, (startX, startY, maxX, maxY, velX, velY), (startScaleX, startScaleY, maxScaleX, maxScaley, velScaleX, velScaleY), (velScrollX, velScrollY))
-		barco1 = autonomeSprite('Ship-Pirate-Alpha.png',(100,50,3000,0,0.01,0.005),(0.25,0.25,0.5,0.5,0.000005,0.000005),(0.3,-0.5))
-		barco2 = autonomeSprite('Ship-Pirate-Alpha.png',(700,200,2000,0,0.002,0.001),(0.15,0.15,0.25,0.25,0.000001,0.000001),(0.3,0.25))
-		barco3 = autonomeSprite('Ship-2.png',(1000,150,2000,0,0.01,0),(0.8,0.8,1,1,0,0),(0.3,0.25))
-		
-		self.grupoEscenario = pygame.sprite.Group(barco3,barco1,barco2)
-		
+		self.capaEscenario.add(autonomeSprite('Ship-2.png',(1000,150,2000,0,0.01,0),(0.8,0.8,1,1,0,0),(0.3,0.25)))
+		self.capaEscenario.add(autonomeSprite('Ship-Pirate-Alpha.png',(700,200,2000,0,0.002,0.001),(0.15,0.15,0.25,0.25,0.000001,0.000001),(0.3,0.25)))
+		self.capaEscenario.add(autonomeSprite('Ship-Pirate-Alpha.png',(100,50,3000,0,0.01,0.005),(0.25,0.25,0.5,0.5,0.000005,0.000005),(0.3,-0.5)))
+
 		# Que parte del decorado estamos visualizando
 		self.scroll = (0,0.)
 		self.virtual_scroll = (0.,0.)
@@ -128,8 +129,7 @@ class Fase(Escena):
 		for sprite in iter(self.grupoSprites):
 			sprite.establecerPosicionPantalla(self.virtual_scroll)
 
-		for sprite in iter(self.grupoEscenario):
-			sprite.establecerPosicionPantalla(self.virtual_scroll)
+		self.capaEscenario.establecerPosicionPantalla(self.virtual_scroll)
 
 		for sprite in iter(self.grupoSprites):
 			sprite.establecerPosicionPantalla(self.virtual_scroll)
@@ -139,9 +139,9 @@ class Fase(Escena):
 
 	def update(self, tiempo):
 
-		self.background.update(tiempo)
+		self.capaEscenario.update(tiempo)
+		self.decorado.update(tiempo)
 		self.grupoSpritesDinamicos.update(self.grupoPlataformas,tiempo)
-		self.grupoEscenario.update(tiempo)
 		self.actualizarScroll(self.jugador1)
 		self.background.establecerPosicionPantalla(self.virtual_scroll)
 
@@ -149,10 +149,8 @@ class Fase(Escena):
 	def dibujar(self, pantalla):
 		pantalla.fill((0,0,0))
 
-		self.background.draw(pantalla)
-		self.grupoEscenario.draw(pantalla)
+		self.capaEscenario.draw(pantalla)
 		self.decorado.draw(pantalla)
-		
 		# Luego los Sprites
 		self.grupoSprites.draw(pantalla)
 		self.jugador1.draw(pantalla)
