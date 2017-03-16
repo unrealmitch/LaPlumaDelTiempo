@@ -6,11 +6,12 @@
 
 # Ignora elementos creados por virtualenv, la herramienta para crear entornos
 # python aislados
-Piratas/bin/
-Piratas/include/
-Piratas/lib/
-Piratas/local/
-Piratas/pip-selfcheck.json
+*/bin/
+*/include/
+*/lib/
+*/local/
+*/pip-selfcheck.json
 
 # Ignora cosas nazis de Mitch
 BackUp
+
