@@ -38,6 +38,7 @@ class EscenaCarga(Escena):
 
     def dibujar(self, pantalla):
         # Mostrar mensaje de espera
+        pantalla.fill((0,0,0))
         pantalla.blit(self.texto, (ANCHO_PANTALLA/3-200,ALTO_PANTALLA/2-50,300,300))
 
     def eventos(self, lista_eventos):
