@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import random,math
 import pygame, escena
+
 from escena import *
 from personajes import *
 from escenario import *
 from capa import *
 from pygame.locals import *
 from animacionesPygame import *
-import random,math
-
 
 # -------------------------------------------------
 # -------------------------------------------------
@@ -22,9 +22,9 @@ MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
 # -------------------------------------------------
-# Clase Fase
+# Clase Piratas
 
-class Fase(Escena):
+class Piratas(Escena):
 	def __init__(self, director):
 
 		Escena.__init__(self, director)

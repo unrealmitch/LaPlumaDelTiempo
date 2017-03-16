@@ -17,7 +17,7 @@ class Director():
         
         pygame.mixer.pre_init(44100, 16, 2, 4096)
         pygame.mixer.init()
-        pygame.display.set_caption("Piratas!")
+        pygame.display.set_caption("La pluma del tiempo...")
 
         # Pila de escenas
         self.pila = []
@@ -26,11 +26,11 @@ class Director():
         # Reloj
         self.reloj = pygame.time.Clock()
 
-        self.screen.fill((0,0,0))
-        tipoLetra = pygame.font.SysFont('arial', 48)
-        texto = tipoLetra.render('#Loading mision 1...', True, (255,255,255), (0,0,0))
-        self.screen.blit(texto, (ANCHO_PANTALLA/2-200,ALTO_PANTALLA/2-50,300,300))
-        pygame.display.flip()
+        #self.screen.fill((0,0,0))
+        #tipoLetra = pygame.font.SysFont('arial', 48)
+        #texto = tipoLetra.render('#Loading mision 1...', True, (255,255,255), (0,0,0))
+        #self.screen.blit(texto, (ANCHO_PANTALLA/2-200,ALTO_PANTALLA/2-50,300,300))
+        #pygame.display.flip()
 
 
     def bucle(self, escena):

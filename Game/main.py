@@ -5,7 +5,7 @@
 import pygame
 import director
 from director import *
-from fase import Fase
+from escenaCarga import EscenaCarga
 
 if __name__ == '__main__':
 
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     # Creamos el director
     director = Director()
     # Creamos la escena con la pantalla inicial
-    escena = Fase(director)
+    escena = EscenaCarga(director, "piratas.conf")
     # Le decimos al director que apile esta escena
     director.apilarEscena(escena)
     # Y ejecutamos el juego
