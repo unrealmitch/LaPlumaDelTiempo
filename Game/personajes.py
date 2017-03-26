@@ -303,29 +303,44 @@ class NoJugador(Personaje):
 		return
 
 # -------------------------------------------------
-# Clase Sniper
+# Clase Pirata
 
-class Sniper(NoJugador):
-	"El enemigo 'Sniper'"
+class Pirata(NoJugador):
+	"El enemigo 'Pirata'"
 	def __init__(self):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
-		NoJugador.__init__(self,'Sniper.png','coordSniper.txt', [5, 10, 6], VELOCIDAD_SNIPER, VELOCIDAD_SALTO_SNIPER, RETARDO_ANIMACION_SNIPER);
+		NoJugador.__init__(self,'Pirate.gif','pirate.txt', [10, 10, 11], VELOCIDAD_SNIPER, VELOCIDAD_SALTO_SNIPER, RETARDO_ANIMACION_SNIPER);
+		
+	def actualizarPostura(self):
+		self.retardoMovimiento -= 1
+		# Miramos si ha pasado el retardo para dibujar una nueva postura
+		if (self.retardoMovimiento < 0):
+			self.retardoMovimiento = self.retardoAnimacion
+			# Si ha pasado, actualizamos la postura
+			self.numImagenPostura += 1
+			if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
+				self.numImagenPostura = 0;
+			if self.numImagenPostura < 0:
+				self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
+			self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
 
+			# Se invierte el if con respecto a la superclase
+			if self.mirando != DERECHA:
+				self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+			#  Si no, si mira a la izq, invertimos esa imagen
+			elif self.mirando != IZQUIERDA:
+				self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
+	
 	# Aqui vendria la implementacion de la IA segun las posiciones de los jugadores
 	# La implementacion de la inteligencia segun este personaje particular
-	def mover_cpu(self, jugador1, jugador2):
+	def mover_cpu(self, jugador1):
 
 		# Movemos solo a los enemigos que esten en la pantalla
 		if self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA:
 
-			# Por ejemplo, intentara acercarse al jugador mas cercano en el eje x
-			# Miramos cual es el jugador mas cercano
-			if abs(jugador1.posicion[0]-self.posicion[0])<abs(jugador2.posicion[0]-self.posicion[0]):
-				jugadorMasCercano = jugador1
-			else:
-				jugadorMasCercano = jugador2
+			
 			# Y nos movemos andando hacia el
-			if jugadorMasCercano.posicion[0]<self.posicion[0]:
+			if jugador1.posicion[0]<self.posicion[0]:
 				Personaje.mover(self,IZQUIERDA)
 			else:
 				Personaje.mover(self,DERECHA)

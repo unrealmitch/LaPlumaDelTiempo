@@ -61,11 +61,27 @@ class Piratas(Escena):
 
 		for elem in file_plataformas:
 			self.grupoPlataformas.add(Plataforma(pygame.Rect(elem[0], elem[1], elem[2], elem[3]),elem[4]))
+		
+		### ENEMIGOS ###
+		enemigo1 = Pirata()
+		enemigo1.establecerPosicion((1500*ESCALA, 555*ESCALA))
+		enemigo2 = Pirata()
+		enemigo2.establecerPosicion((2500*ESCALA, 555*ESCALA))
+		enemigo3 = Pirata()
+		enemigo3.establecerPosicion((3500*ESCALA, 500*ESCALA))
+		enemigo4 = Pirata()
+		enemigo4.establecerPosicion((5200*ESCALA, 720*ESCALA))
 
+		# Creamos un grupo con los enemigos
+		self.grupoEnemigos = pygame.sprite.Group( enemigo1, enemigo2, enemigo3, enemigo4 )
+
+		
 		self.grupoSpritesDinamicos = pygame.sprite.Group( self.jugador1 )
+		self.grupoSpritesDinamicos.add(self.grupoEnemigos)
 		self.grupoSpritesDinamicos.add()
 
 		self.grupoSprites = pygame.sprite.Group( self.jugador1 )
+		self.grupoSprites.add(self.grupoEnemigos)
 		self.grupoSprites.add(self.grupoPlataformas)
 
 		### ANIMACIONES ###
@@ -141,7 +157,18 @@ class Piratas(Escena):
 
 		self.capaEscenario.update(tiempo)
 		self.decorado.update(tiempo)
+		# Primero, se indican las acciones que van a hacer los enemigos segun como esten los jugadores
+		for enemigo in iter(self.grupoEnemigos):
+			enemigo.mover_cpu(self.jugador1)
+		
 		self.grupoSpritesDinamicos.update(self.grupoPlataformas,tiempo)
+		# Comprobamos si hay colision entre algun jugador y algun enemigo
+        # Se comprueba la colision entre ambos grupos
+        # Si la hay, indicamos que se ha finalizado la fase
+		if pygame.sprite.groupcollide(self.grupoJugadores, self.grupoEnemigos, False, False)!={}:
+			# Se le dice al director que salga de esta escena y ejecute la siguiente en la pila
+			self.director.salirEscena()
+		
 		self.actualizarScroll(self.jugador1)
 		self.background.establecerPosicionPantalla(self.virtual_scroll)
 
