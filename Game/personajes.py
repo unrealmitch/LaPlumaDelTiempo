@@ -272,6 +272,8 @@ class Jugador(Personaje):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
 		Personaje.__init__(self,'pirata_Player.png','pirata_Player.txt', [6, 6, 5], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR);
 
+		self.vida = 6
+
 
 	def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha):
 		# Indicamos la acción a realizar segun la tecla pulsada para el jugador
@@ -283,6 +285,12 @@ class Jugador(Personaje):
 			Personaje.mover(self,DERECHA)
 		else:
 			Personaje.mover(self,QUIETO)
+
+	def actualizarVida(self):
+		self.vida -= 1
+		if (self.vida == 0):
+			self.vida = 6
+		return self.vida
 
 
 # -------------------------------------------------

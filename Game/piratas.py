@@ -7,6 +7,7 @@ from escena import *
 from personajes import *
 from escenario import *
 from capa import *
+from lifeBar import *
 from pygame.locals import *
 from animacionesPygame import *
 
@@ -53,6 +54,7 @@ class Piratas(Escena):
 		self.jugador1 = Jugador()
 		self.jugador1.establecerPosicion((300*ESCALA, 555*ESCALA))
 		self.grupoJugadores = pygame.sprite.Group( self.jugador1 )
+		self.lifebar = LifeBar()
 
 		### PLATAFORMAS ###
 		file_plataformas = GestorRecursos.CargarMapaPlataformas("pirata_plataform.txt")
@@ -162,12 +164,15 @@ class Piratas(Escena):
 			enemigo.mover_cpu(self.jugador1)
 		
 		self.grupoSpritesDinamicos.update(self.grupoPlataformas,tiempo)
+
 		# Comprobamos si hay colision entre algun jugador y algun enemigo
         # Se comprueba la colision entre ambos grupos
         # Si la hay, indicamos que se ha finalizado la fase
 		if pygame.sprite.groupcollide(self.grupoJugadores, self.grupoEnemigos, False, False)!={}:
 			# Se le dice al director que salga de esta escena y ejecute la siguiente en la pila
-			self.director.salirEscena()
+			vida = self.jugador1.actualizarVida()
+			self.lifebar.actualizarVida(vida)
+			
 		
 		self.actualizarScroll(self.jugador1)
 		self.background.establecerPosicionPantalla(self.virtual_scroll)
@@ -181,6 +186,8 @@ class Piratas(Escena):
 		# Luego los Sprites
 		self.grupoSprites.draw(pantalla)
 		self.jugador1.draw(pantalla)
+		#screen.blit(self.lifebar.image, self.lifebar.rect)
+		self.lifebar.draw(pantalla)
 		
 		if DEBUG:
 			for elem in self.grupoPlataformas.sprites():
