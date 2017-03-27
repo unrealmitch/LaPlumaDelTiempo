@@ -161,6 +161,8 @@ class Menu(Escena):
             if evento.type == KEYDOWN:
                 if evento.key == K_ESCAPE:
                     self.salirPrograma()
+                if evento.key == K_F1:
+                    pygame.display.toggle_fullscreen()
             elif evento.type == pygame.QUIT:
                 self.director.salirPrograma()
 

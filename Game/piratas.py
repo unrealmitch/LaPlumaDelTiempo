@@ -192,8 +192,11 @@ class Piratas(Escena):
 
 	def eventos(self, lista_eventos):
 		for evento in lista_eventos:
-			if evento.type == KEYDOWN and evento.key == K_ESCAPE:
-				self.director.salirPrograma()
+			if evento.type == KEYDOWN:
+				if evento.key == K_ESCAPE:
+					self.director.salirPrograma()
+				if evento.key == K_F1:
+					pygame.display.toggle_fullscreen()
 			if evento.type == pygame.QUIT:
 				self.director.salirPrograma()
 
