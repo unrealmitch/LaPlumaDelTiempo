@@ -49,13 +49,15 @@ class Boton(ElementoGUI):
 
 class BotonJugar(Boton):
     def __init__(self, pantalla):
-        Boton.__init__(self, pantalla, 'menu_boton_verde.png', (ANCHO_PANTALLA*0.7 ,ALTO_PANTALLA*0.85))
+        Boton.__init__(self, pantalla, 'menu_boton_verde.png', 
+            (ANCHO_PANTALLA*0.7 ,ALTO_PANTALLA*0.85))
     def accion(self):
         self.pantalla.menu.ejecutarJuego()
 
 class BotonSalir(Boton):
     def __init__(self, pantalla):
-        Boton.__init__(self, pantalla, 'menu_boton_rojo.png', (ANCHO_PANTALLA*0.7,ALTO_PANTALLA*0.9))
+        Boton.__init__(self, pantalla, 'menu_boton_rojo.png', 
+            (ANCHO_PANTALLA*0.7,ALTO_PANTALLA*0.9))
     def accion(self):
         self.pantalla.menu.salirPrograma()
 
@@ -73,19 +75,24 @@ class TextoGUI(ElementoGUI):
     def dibujar(self, pantalla):
         pantalla.blit(self.imagen, self.rect)
 
+# ¡Ojo con el tamaño de las fuentes! Casi con total seguridad internamente el
+# tamaño se indexa comentando en 0, como los arrays.
+# Una vez cargada la fuente, si se usa el método fuente.get_height() nos devuelve
+# height-1 respento a los valores del constructor.
 class TextoJugar(TextoGUI):
     def __init__(self, pantalla):
-        # La fuente la debería cargar el estor de recursos
-        fuente = pygame.font.SysFont('arial', 20);
-        TextoGUI.__init__(self, pantalla, fuente, (0, 0, 0), 'Empezar', (ANCHO_PANTALLA*0.74, ALTO_PANTALLA*0.85))
+        fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 25)
+        TextoGUI.__init__(self, pantalla, fuente, (0, 0, 0), 'Comenzar', 
+            (ANCHO_PANTALLA*0.33, ALTO_PANTALLA*0.85))
     def accion(self):
         self.pantalla.menu.ejecutarJuego()
 
 class TextoSalir(TextoGUI):
     def __init__(self, pantalla):
         # La fuente la debería cargar el estor de recursos
-        fuente = pygame.font.SysFont('arial', 20);
-        TextoGUI.__init__(self, pantalla, fuente, (0, 0, 0), 'Finalizar', (ANCHO_PANTALLA*0.74, ALTO_PANTALLA*0.9))
+        fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 25-1)
+        TextoGUI.__init__(self, pantalla, fuente, (0, 0, 0), 'Salir', 
+            (ANCHO_PANTALLA*0.33, ALTO_PANTALLA*0.9))
     def accion(self):
         self.pantalla.menu.salirPrograma()
 

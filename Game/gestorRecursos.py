@@ -129,6 +129,27 @@ class GestorRecursos(object):
 			return sound
 
 	@classmethod
+	def CargarFuente(cls, nombre, height):
+		# Si el nombre de archivo está entre los recursos ya cargados
+		if nombre in cls.recursos and height == cls.recursos[nombre].get_height():
+			# Se devuelve ese recurso
+                        return cls.recursos[nombre]
+		# Si no ha sido cargado anteriormente
+		else:
+			# Se carga la imagen indicando la carpeta en la que está
+			fullname = os.path.join('fonts', nombre)
+                        print fullname
+			try:
+				font = pygame.font.Font(fullname, height)
+			except pygame.error, message:
+				raise SystemExit, message
+			# Se almacena
+			cls.recursos[nombre] = font
+			# Se devuelve
+                        print "Nueva fuente devuelta"
+			return font
+
+	@classmethod
 	def CargarGif(cls, folder, frames, colorkey=None):
 		# Si el nombre de archivo está entre los recursos ya cargados
 		nombre = 'gif-' + folder
@@ -151,7 +172,9 @@ class GestorRecursos(object):
 					if colorkey is -1:
 						colorkey = imagen.get_at((0,0))
 					imagen.set_colorkey(colorkey, RLEACCEL)
-				imagen = pygame.transform.scale(imagen, (int(imagen.get_size()[0]*ESCALA), int(imagen.get_size()[1]*ESCALA)))
+				imagen = pygame.transform.scale(imagen, 
+                                    (int(imagen.get_size()[0]*ESCALA), 
+                                    int(imagen.get_size()[1]*ESCALA)))
 				gif.append(imagen)
 				# Se almacena
 			cls.recursos[folder] = gif
