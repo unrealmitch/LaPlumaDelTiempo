@@ -18,7 +18,7 @@ from animacionesPygame import *
 # -------------------------------------------------
 
 # Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = False
+DEBUG = True
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -209,4 +209,5 @@ class Piratas(Escena):
 
 		# Indicamos la acción a realizar segun la tecla pulsada para cada jugador
 		teclasPulsadas = pygame.key.get_pressed()
-		self.jugador1.mover(teclasPulsadas, K_UP, K_DOWN, K_LEFT, K_RIGHT)
+		teclasConfig = {ARRIBA: K_UP, ABAJO: K_DOWN, IZQUIERDA: K_LEFT, DERECHA: K_RIGHT, ATAQUE1: K_SPACE}
+		self.jugador1.mover(teclasPulsadas, teclasConfig)

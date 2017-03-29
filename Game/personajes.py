@@ -18,11 +18,13 @@ IZQUIERDA = 1
 DERECHA = 2
 ARRIBA = 3
 ABAJO = 4
+ATAQUE1 = 5
 
 #Posturas
-SPRITE_QUIETO = 0
-SPRITE_ANDANDO = 1
-SPRITE_SALTANDO = 2
+P_QUIETO = 0
+P_ANDANDO = 1
+P_SALTANDO = 2
+P_ATACANDO1 = 3
 
 # Velocidades de los distintos personajes
 VELOCIDAD_JUGADOR = 0.6 # Pixeles por milisegundo
@@ -73,6 +75,8 @@ class Personaje(MiSprite):
 		self.hoja = self.hoja.convert_alpha()
 		# El movimiento que esta realizando
 		self.movimiento = QUIETO
+		self.movimientos = {QUIETO:False,IZQUIERDA:False,DERECHA:False,ARRIBA:False,ABAJO:False,ATAQUE1:False}
+		self.posturas = {P_QUIETO: True, P_ANDANDO: False, P_SALTANDO: False, P_ATACANDO1: False}
 		# Lado hacia el que esta mirando
 		self.mirando = DERECHA
 
@@ -110,17 +114,11 @@ class Personaje(MiSprite):
 		self.actualizarPostura()
 
 
-	# Metodo base para realizar el movimiento: simplemente se le indica cual va a hacer, y lo almacena
-	def mover(self, movimiento):
-		if movimiento == ARRIBA:
-			# Si estamos en el aire y el personaje quiere saltar, ignoramos este movimiento
-			if self.numPostura == SPRITE_SALTANDO:
-				self.movimiento = QUIETO
-			else:
-				self.movimiento = ARRIBA
-		else:
-			self.movimiento = movimiento
-
+	# Metodo base para realizar el movimiento: simplemente se le indica cual va a hacer, y lo almacena,
+	# Solo actualizamos los dados en los argumentos, los otros quedan igual.
+	def mover(self, movimientos):
+		for key,value in movimientos.items():
+			self.movimientos[key] = value
 
 	def actualizarPostura(self):
 		self.retardoMovimiento -= 1
@@ -148,109 +146,67 @@ class Personaje(MiSprite):
 		(velocidadx, velocidady) = self.velocidad
 
 		# Si vamos a la izquierda o a la derecha        
-		if (self.movimiento == IZQUIERDA) or (self.movimiento == DERECHA):
+		if (self.movimientos[IZQUIERDA] != self.movimientos[DERECHA]):	#XOR! No se mueve si se pulsa izq y der
 			# Esta mirando hacia ese lado
-			self.mirando = self.movimiento
-
-			# Si vamos a la izquierda, le ponemos velocidad en esa dirección
-			if self.movimiento == IZQUIERDA:
+			if self.movimientos[IZQUIERDA]:
+				self.mirando = IZQUIERDA
 				velocidadx = -self.velocidadCarrera
-			# Si vamos a la derecha, le ponemos velocidad en esa dirección
-			else:
+			else: 
+				self.mirando = DERECHA
 				velocidadx = self.velocidadCarrera
 
-			# Si no estamos en el aire
-			if self.numPostura != SPRITE_SALTANDO:
-				# La postura actual sera estar caminando
-				self.numPostura = SPRITE_ANDANDO
-				# Ademas, si no estamos encima de ninguna plataforma, caeremos
-				if pygame.sprite.spritecollideany(self, grupoPlataformas) == None:
-					self.numPostura = SPRITE_SALTANDO
-
-		# Si queremos saltar
-		elif self.movimiento == ARRIBA:
-			# La postura actual sera estar saltando
-			self.numPostura = SPRITE_SALTANDO
-			# Le imprimimos una velocidad en el eje y
-			velocidady = -self.velocidadSalto
-
-		# Si no se ha pulsado ninguna tecla
-		elif self.movimiento == QUIETO:
-			# Si no estamos saltando, la postura actual será estar quieto
-			if not self.numPostura == SPRITE_SALTANDO:
-				self.numPostura = SPRITE_QUIETO
+			self.posturas[P_ANDANDO] = True
+		else:
+			self.posturas[P_ANDANDO] = False
 			velocidadx = 0
 
+		plataformas = pygame.sprite.spritecollide(self, grupoPlataformas, False)
 
-		# Además, si estamos en el aire
-		if self.numPostura == SPRITE_ANDANDO:
-			plataformas =  pygame.sprite.spritecollide(self, grupoPlataformas, False)
-			for elem in plataformas:
-				
-				if((self.rect.bottom-3) > elem.rect.top):
-					if (((self.rect.left-10) < elem.rect.right) and (self.rect.left > elem.rect.left) and self.mirando == IZQUIERDA) or (((self.rect.right-10) > elem.rect.left) and (self.rect.right < elem.rect.right) and self.mirando == DERECHA):
-						#print('Jl:' + str(self.rect.left) + ' Jr: ' + str(self.rect.right) + ' Pl ' + str(elem.rect.left) + ' Pr ' + str(elem.rect.right))
-						if(self.rect.bottom > (elem.rect.top-5)):
-							self.establecerPosicion((self.posicion[0], (elem.rect.y)))
-						else:
-							velocidadx = 0
+		#self.posturas[P_SALTANDO] = True
+		#COLISIONES
+		floor_detected = False
+		for plataforma in plataformas:
+			if plataforma.tipo != 1: #Suelos & Rampas
+				if( (self.rect.bottom-3) < plataforma.rect.bottom): #Sobre una plataforma
+					if(self.rect.centerx > plataforma.rect.left and self.rect.centerx < plataforma.rect.right): #Plataforma sobre la que estamos
+						self.posturas[P_SALTANDO] = False
+						if (plataforma.tipo == 0):	#Suelo
+							self.establecerPosicion((self.posicion[0], plataforma.posicion[1]-plataforma.rect.height+1))							
+						else:	#Rampa
+							percent_ramp = (float(self.rect.centerx) - float(plataforma.rect.left))/float(plataforma.rect.width);
+							if(plataforma.tipo == 2):
+								new_y = plataforma.rect.bottom - float(percent_ramp)*plataforma.rect.height
+							else:
+								new_y = plataforma.rect.top + float(percent_ramp)*plataforma.rect.height
+							self.establecerPosicion((self.posicion[0], (new_y)))
 
-		elif self.numPostura == SPRITE_SALTANDO:
+			elif(self.rect.bottom > plataforma.rect.top + 15): #Paredes [No atravesarlas]
+				if( self.mirando == DERECHA and self.rect.right > plataforma.rect.left and self.rect.left < plataforma.rect.left): velocidadx = 0
+				elif( self.mirando == IZQUIERDA and self.rect.left < plataforma.rect.right and self.rect.right > plataforma.rect.right): velocidadx = 0
 
-			'''
-			plataformas =  pygame.sprite.spritecollide(self, grupoPlataformas, False)
-			plataforma = None
+		# Si queremos saltar
+		if self.movimientos[ARRIBA]:
+			# La postura actual sera estar saltando
+			if not self.posturas[P_SALTANDO] : velocidady = -self.velocidadSalto
+			self.posturas[P_SALTANDO] = True
+			# Le imprimimos una velocidad en el eje y
+			
+		elif(pygame.sprite.spritecollideany(self, grupoPlataformas) == None):
+			self.posturas[P_SALTANDO] = True
 
-			if plataformas == None :
-				velocidady += GRAVEDAD * tiempo
+		if self.posturas[P_SALTANDO]: 
+			velocidady += GRAVEDAD * tiempo 
+		else: 
+			velocidady = 0
 
-			else:
-				for elem in plataformas:
-					if elem.rect.top < plataforma.rect.top and (velocidady>0) and (plataforma.rect.bottom>self.rect.bottom):
-						plataforma = elem
-					else:
-						velocidady += GRAVEDAD * tiempo
+		self.numPostura = QUIETO
+		for postura,value in self.posturas.items():
+			if value: self.numPostura = postura
 
-				self.establecerPosicion((self.posicion[0], plataforma.posicion[1]-plataforma.rect.height+1))
-				self.numPostura = SPRITE_QUIETO
-				velocidady = 0
+		if self.numPostura == QUIETO: 
+			self.numPostura = QUIETO
 
-			'''
-
-			plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
-			plataformas = pygame.sprite.spritecollide(self, grupoPlataformas,False)
-
-			if (plataforma != None) and (velocidady>0) and (plataforma.rect.bottom>self.rect.bottom or plataforma.rect.bottom>self.rect.bottom):
-				for elem in plataformas:
-					if elem.rect.top > plataforma.rect.top:
-						plataforma = elem
-
-				self.establecerPosicion((self.posicion[0], plataforma.posicion[1]-plataforma.rect.height+1))
-				self.numPostura = SPRITE_QUIETO
-				velocidady = 0
-
-			else:
-				velocidady += GRAVEDAD * tiempo
-			'''
-			# Miramos a ver si hay que parar de caer: si hemos llegado a una plataforma
-			#  Para ello, miramos si hay colision con alguna plataforma del grupo
-			plataforma = pygame.sprite.spritecollideany(self, grupoPlataformas)
-			#  Ademas, esa colision solo nos interesa cuando estamos cayendo
-			#  y solo es efectiva cuando caemos encima, no de lado, es decir,
-			#  cuando nuestra posicion inferior esta por encima de la parte de abajo de la plataforma
-			if (plataforma != None) and (velocidady>0) and (plataforma.rect.bottom>self.rect.bottom):
-				# Lo situamos con la parte de abajo un pixel colisionando con la plataforma
-				#  para poder detectar cuando se cae de ella
-				self.establecerPosicion((self.posicion[0], plataforma.posicion[1]-plataforma.rect.height+1))
-				# Lo ponemos como quieto
-				self.numPostura = SPRITE_QUIETO
-				# Y estará quieto en el eje y
-				velocidady = 0
-
-			# Si no caemos en una plataforma, aplicamos el efecto de la gravedad
-			else:
-				velocidady += GRAVEDAD * tiempo
-			'''
+		#velocidady = 0
 		# Actualizamos la imagen a mostrar
 		self.actualizarPostura()
 
@@ -271,20 +227,17 @@ class Jugador(Personaje):
 	def __init__(self):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
 		Personaje.__init__(self,'pirata_Player.png','pirata_Player.txt', [6, 6, 5], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR);
-
 		self.vida = 6
 
 
-	def mover(self, teclasPulsadas, arriba, abajo, izquierda, derecha):
-		# Indicamos la acción a realizar segun la tecla pulsada para el jugador
-		if teclasPulsadas[arriba]:
-			Personaje.mover(self,ARRIBA)
-		elif teclasPulsadas[izquierda]:
-			Personaje.mover(self,IZQUIERDA)
-		elif teclasPulsadas[derecha]:
-			Personaje.mover(self,DERECHA)
-		else:
-			Personaje.mover(self,QUIETO)
+	def mover(self, teclasPulsadas, teclasConfig):
+		#Miramos si la tecla para cada movimiento esta pulsada o no
+		movimientos = {}
+		for key,value in teclasConfig.items():
+			movimientos.update({key: teclasPulsadas[value]})
+
+		Personaje.mover(self,movimientos)
+
 
 	def actualizarVida(self):
 		self.vida -= 1
@@ -342,7 +295,8 @@ class Pirata(NoJugador):
 	# Aqui vendria la implementacion de la IA segun las posiciones de los jugadores
 	# La implementacion de la inteligencia segun este personaje particular
 	def mover_cpu(self, jugador1):
-
+		'Por Actualizar'
+		'''
 		# Movemos solo a los enemigos que esten en la pantalla
 		if self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA:
 
@@ -356,4 +310,4 @@ class Pirata(NoJugador):
 		# Si este personaje no esta en pantalla, no hara nada
 		else:
 			Personaje.mover(self,QUIETO)
-
+		'''

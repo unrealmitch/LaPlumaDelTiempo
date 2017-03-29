@@ -22,6 +22,7 @@ class Plataforma(MiSprite):
 		self.establecerPosicion((self.rect.left, self.rect.bottom))
 		# En el caso particular de este juego, las plataformas no se van a ver, asi que no se carga ninguna imagen
 		self.image = pygame.Surface((0, 0))
+		self.tipo = tipo
 
 	def draw(self, pantalla):
 		rect_rescale = pygame.Rect((int(self.rect[0]), int(self.rect[1])), (int(self.rect[2]*ESCALA), int(self.rect[3]*ESCALA)))
