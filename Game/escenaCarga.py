@@ -15,8 +15,8 @@ from piratas import Piratas
 class EscenaCarga(Escena):
     def __init__(self, director, recursos):
         Escena.__init__(self, director)
-        self.tipoLetra = pygame.font.SysFont('arial', 48)
-        self.texto = self.tipoLetra.render('#Loading mision 1...', True, (255,255,255), (0,0,0))
+        self.tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 40)
+        self.texto = self.tipoLetra.render('#Loading mision 1...', True, (0,238,255), (0,0,0))
 
         self.conf_file = open (recursos, "r")
         self.conf_lines = self.conf_file.readlines ()
