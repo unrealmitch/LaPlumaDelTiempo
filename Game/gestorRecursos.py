@@ -138,7 +138,6 @@ class GestorRecursos(object):
 		else:
 			# Se carga la imagen indicando la carpeta en la que está
 			fullname = os.path.join('fonts', nombre)
-                        print fullname
 			try:
 				font = pygame.font.Font(fullname, height)
 			except pygame.error, message:
@@ -146,7 +145,6 @@ class GestorRecursos(object):
 			# Se almacena
 			cls.recursos[nombre] = font
 			# Se devuelve
-                        print "Nueva fuente devuelta"
 			return font
 
 	@classmethod

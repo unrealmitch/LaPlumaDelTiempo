@@ -49,15 +49,15 @@ class Boton(ElementoGUI):
 
 class BotonJugar(Boton):
     def __init__(self, pantalla):
-        Boton.__init__(self, pantalla, 'menu_boton_verde.png', 
-            (ANCHO_PANTALLA*0.7 ,ALTO_PANTALLA*0.85))
+        Boton.__init__(self, pantalla, 'menu_boton_comenzar.png', 
+            (ANCHO_PANTALLA*0.5 ,ALTO_PANTALLA*0.90))
     def accion(self):
         self.pantalla.menu.ejecutarJuego()
 
 class BotonSalir(Boton):
     def __init__(self, pantalla):
-        Boton.__init__(self, pantalla, 'menu_boton_rojo.png', 
-            (ANCHO_PANTALLA*0.7,ALTO_PANTALLA*0.9))
+        Boton.__init__(self, pantalla, 'menu_boton_salir.png', 
+            (ANCHO_PANTALLA*0.5,ALTO_PANTALLA*0.97))
     def accion(self):
         self.pantalla.menu.salirPrograma()
 
@@ -81,18 +81,18 @@ class TextoGUI(ElementoGUI):
 # height-1 respento a los valores del constructor.
 class TextoJugar(TextoGUI):
     def __init__(self, pantalla):
-        fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 25)
-        TextoGUI.__init__(self, pantalla, fuente, (0, 0, 0), 'Comenzar', 
-            (ANCHO_PANTALLA*0.33, ALTO_PANTALLA*0.85))
+        fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 29)
+        TextoGUI.__init__(self, pantalla, fuente, (0, 238, 255), 'Comenzar', 
+            (ANCHO_PANTALLA*0.37, ALTO_PANTALLA*0.87))
     def accion(self):
         self.pantalla.menu.ejecutarJuego()
 
 class TextoSalir(TextoGUI):
     def __init__(self, pantalla):
         # La fuente la debería cargar el estor de recursos
-        fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 25-1)
-        TextoGUI.__init__(self, pantalla, fuente, (0, 0, 0), 'Salir', 
-            (ANCHO_PANTALLA*0.33, ALTO_PANTALLA*0.9))
+        fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 29-1)
+        TextoGUI.__init__(self, pantalla, fuente, (0, 238, 255), 'Salir', 
+            (ANCHO_PANTALLA*0.43, ALTO_PANTALLA*0.94))
     def accion(self):
         self.pantalla.menu.salirPrograma()
 
