@@ -27,7 +27,7 @@ P_SALTANDO = 2
 P_ATACANDO1 = 3
 
 # Velocidades de los distintos personajes
-VELOCIDAD_JUGADOR = 0.6 # Pixeles por milisegundo
+VELOCIDAD_JUGADOR = 0.3 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
 RETARDO_ANIMACION_JUGADOR = 5 # updates que durará cada imagen del personaje
 							  # debería de ser un valor distinto para cada postura
@@ -75,7 +75,7 @@ class Personaje(MiSprite):
 		self.hoja = self.hoja.convert_alpha()
 		# El movimiento que esta realizando
 		self.movimiento = QUIETO
-		self.movimientos = {QUIETO:False,IZQUIERDA:False,DERECHA:False,ARRIBA:False,ABAJO:False,ATAQUE1:False}
+		self.movimientos = {IZQUIERDA:False,DERECHA:False,ARRIBA:False,ABAJO:False,ATAQUE1:False}
 		self.posturas = {P_QUIETO: True, P_ANDANDO: False, P_SALTANDO: False, P_ATACANDO1: False}
 		# Lado hacia el que esta mirando
 		self.mirando = DERECHA
@@ -238,6 +238,11 @@ class Jugador(Personaje):
 
 		Personaje.mover(self,movimientos)
 
+	def avanzar(self):
+		for key,value in self.movimientos.items():
+			value = False
+
+		self.movimientos[DERECHA] = True
 
 	def actualizarVida(self):
 		self.vida -= 1

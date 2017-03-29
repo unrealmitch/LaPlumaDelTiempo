@@ -18,7 +18,7 @@ from animacionesPygame import *
 # -------------------------------------------------
 
 # Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = True
+DEBUG = False
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -29,6 +29,10 @@ class Piratas(Escena):
 	def __init__(self, director):
 
 		Escena.__init__(self, director)
+
+		#Atenuado
+		self.fade = 250
+		self.time_fade = pygame.time.get_ticks()
 
 		### ESCENARIO ###
 		if DEBUG:
@@ -52,7 +56,7 @@ class Piratas(Escena):
 
 		### JUGADORES ###
 		self.jugador1 = Jugador()
-		self.jugador1.establecerPosicion((300*ESCALA, 555*ESCALA))
+		self.jugador1.establecerPosicion((0, 555*ESCALA))
 		self.grupoJugadores = pygame.sprite.Group( self.jugador1 )
 		self.lifebar = LifeBar()
 
@@ -105,6 +109,11 @@ class Piratas(Escena):
 		self.channel_bso.set_volume(0)
 		self.channel_ambient = sound_ambient.play(-1)
 
+	def salir(self,complete):
+		pygame.mixer.stop();
+		#if(complete):
+		self.director.salirEscena();
+
 	def actualizarScrollOrdenados(self, jugador):
 		if (jugador.rect.left<MINIMO_X_JUGADOR):
 			desplazamiento = (MINIMO_X_JUGADOR - jugador.rect.left)
@@ -120,9 +129,12 @@ class Piratas(Escena):
 		if (jugador.rect.right >MAXIMO_X_JUGADOR):
 			desplazamiento = (jugador.rect.right - MAXIMO_X_JUGADOR)
 
-			if (self.scroll[0]*ESCALA + ANCHO_PANTALLA*ESCALA) >= self.decorado.rect.right:
+			if (self.scroll[0]*ESCALA + ANCHO_PANTALLA) >= self.decorado.rect.right:
+				if self.fade == 0: self.fade = -250
+				if self.jugador1.rect.centerx > ANCHO_PANTALLA + 100: self.salir(True)
+				self.channel_bso.set_volume(float(self.fade)/-250.0)
 				#self.scroll = (self.decorado.rect.right*ESCALA - ANCHO_PANTALLA, self.scroll[1])
-				jugador.establecerPosicion((self.scroll[0]*ESCALA + MAXIMO_X_JUGADOR*ESCALA, jugador.posicion[1]))
+				#jugador.establecerPosicion((self.scroll[0]*ESCALA + MAXIMO_X_JUGADOR*ESCALA, jugador.posicion[1]))
 				return False;
 			else:
 				self.scroll = (self.scroll[0] + desplazamiento, self.scroll[1]);
@@ -152,8 +164,9 @@ class Piratas(Escena):
 		for sprite in iter(self.grupoSprites):
 			sprite.establecerPosicionPantalla(self.virtual_scroll)
 
-		sound_lvl = float(self.scroll[0])/float(self.background.rect.width)/2
-		self.channel_bso.set_volume(sound_lvl)
+		if(self.fade == 0):
+			sound_lvl = float(self.scroll[0])/float(self.background.rect.width)/2
+			self.channel_bso.set_volume(sound_lvl)
 
 	def update(self, tiempo):
 
@@ -177,6 +190,8 @@ class Piratas(Escena):
 		self.actualizarScroll(self.jugador1)
 		self.background.establecerPosicionPantalla(self.virtual_scroll)
 
+		if (self.jugador1.rect.bottom > ALTO_PANTALLA): self.salir(True)
+
 		
 	def dibujar(self, pantalla):
 		pantalla.fill((0,0,0))
@@ -185,6 +200,7 @@ class Piratas(Escena):
 		self.decorado.draw(pantalla)
 		# Luego los Sprites
 		self.grupoSprites.draw(pantalla)
+
 		self.jugador1.draw(pantalla)
 		#screen.blit(self.lifebar.image, self.lifebar.rect)
 		self.lifebar.draw(pantalla)
@@ -195,7 +211,27 @@ class Piratas(Escena):
 
 		for animacion in self.animacionOlas:
 			animacion.dibujar(pantalla)
-		
+
+		if(self.fade != 0):
+			time = pygame.time.get_ticks()
+			if(time > self.time_fade + 1):
+				self.time_fade = time
+
+				s = pygame.Surface((ANCHO_PANTALLA,ALTO_PANTALLA))
+				s.fill((0,0,0))
+
+				if(self.fade>0):
+					self.fade-=10
+					s.set_alpha(self.fade)
+					pantalla.blit(s, (0,0))
+				else:
+					if(self.fade < -10):
+						self.fade+=8
+					else:
+						self.fade=-1
+					s.set_alpha(255+self.fade)
+					pantalla.blit(s, (0,0))
+					#pygame.draw.rect(pantalla,(255,255,255, ), (0,0,ANCHO_PANTALLA,ALTO_PANTALLA))
 
 	def eventos(self, lista_eventos):
 		for evento in lista_eventos:
@@ -208,6 +244,10 @@ class Piratas(Escena):
 				self.director.salirPrograma()
 
 		# Indicamos la acción a realizar segun la tecla pulsada para cada jugador
-		teclasPulsadas = pygame.key.get_pressed()
-		teclasConfig = {ARRIBA: K_UP, ABAJO: K_DOWN, IZQUIERDA: K_LEFT, DERECHA: K_RIGHT, ATAQUE1: K_SPACE}
-		self.jugador1.mover(teclasPulsadas, teclasConfig)
+		if(self.fade == 0):
+			teclasPulsadas = pygame.key.get_pressed()
+			teclasConfig = {ARRIBA: K_UP, ABAJO: K_DOWN, IZQUIERDA: K_LEFT, DERECHA: K_RIGHT, ATAQUE1: K_SPACE}
+			self.jugador1.mover(teclasPulsadas, teclasConfig)
+		else:
+			if(self.fade < 0):
+				self.jugador1.avanzar()

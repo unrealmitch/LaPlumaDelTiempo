@@ -7,7 +7,6 @@ import sys
 from escena import *
 from pygame.locals import *
 
-
 class Director():
 
     def __init__(self):
@@ -54,6 +53,8 @@ class Director():
 
             # Se dibuja en pantalla
             escena.dibujar(self.screen)
+
+
             pygame.display.flip()
 
 
