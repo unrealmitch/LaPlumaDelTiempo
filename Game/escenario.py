@@ -26,8 +26,15 @@ class Plataforma(MiSprite):
 
 	def draw(self, pantalla):
 		rect_rescale = pygame.Rect((int(self.rect[0]), int(self.rect[1])), (int(self.rect[2]*ESCALA), int(self.rect[3]*ESCALA)))
-		
-		pygame.draw.rect(pantalla,(255,255,255), self.rect)
+		if self.tipo == 1:
+			pygame.draw.rect(pantalla,(255,0,0), self.rect)
+		elif self.tipo == 2:
+			pygame.draw.rect(pantalla,(255,255,0), self.rect)
+		elif self.tipo == 3:
+			pygame.draw.rect(pantalla,(255,127,0), self.rect)
+		else:
+			pygame.draw.rect(pantalla,(255,255,255), self.rect)
+
 # -------------------------------------------------
 
 class StaticScenario(pygame.sprite.Sprite):

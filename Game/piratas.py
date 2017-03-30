@@ -18,7 +18,7 @@ from animacionesPygame import *
 # -------------------------------------------------
 
 # Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = False
+DEBUG = True
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -45,9 +45,16 @@ class Piratas(Escena):
 		self.capaEscenario = Capa(self.background)
 		
 		# autonomeSprite(image, (startX, startY, maxX, maxY, velX, velY), (startScaleX, startScaleY, maxScaleX, maxScaley, velScaleX, velScaleY), (velScrollX, velScrollY))
-		self.capaEscenario.add(autonomeSprite('pirata_barco2.png',(1000,150,2000,0,0.01,0),(0.8,0.8,1,1,0,0),(0.3,0.25)))
+		#self.capaEscenario.add(autonomeSprite('pirata_barco2.png',(1000,150,2000,0,0.01,0),(0.8,0.8,1,1,0,0),(0.3,0.25)))
+		
+		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/2,280,4000,0,0.0001,0),(0.3,0.3,1,1,0,0),(0.1,0.1)))
+
 		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(700,200,2000,0,0.002,0.001),(0.15,0.15,0.25,0.25,0.000001,0.000001),(0.3,0.25)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(100,50,3000,0,0.01,0.005),(0.25,0.25,0.5,0.5,0.000005,0.000005),(0.3,-0.5)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(100,50,3000,0,0.01,-0.005),(0.25,0.25,0.5,0.5,0.000005,0.000005),(0.3,-0.5)))
+
+		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5400,240,0,0,0,0),(0.7,0.7,0,0,0,0),(0.86,0.86)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5300,250,0,0,0,0),(0.75,0.75,0,0,0,0),(0.88,0.88)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5200,250,0,0,0,0),(0.8,0.8,0,0,0,0),(0.9,0.9)))
 
 		# Que parte del decorado estamos visualizando
 		self.scroll = (0,0.)

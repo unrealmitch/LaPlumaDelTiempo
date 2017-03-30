@@ -65,7 +65,7 @@ class Personaje(MiSprite):
 	#  Numero de imagenes en cada postura
 	#  Velocidad de caminar y de salto
 	#  Retardo para mostrar la animacion del personaje
-	def __init__(self, archivoImagen, archivoCoordenadas, numImagenes, velocidadCarrera, velocidadSalto, retardoAnimacion):
+	def __init__(self, archivoImagen, archivoCoordenadas, numImagenes, velocidadCarrera, velocidadSalto, retardoAnimacion, delayAtaque = 400):
 
 		# Primero invocamos al constructor de la clase padre
 		MiSprite.__init__(self);
@@ -79,6 +79,10 @@ class Personaje(MiSprite):
 		self.posturas = {P_QUIETO: True, P_ANDANDO: False, P_SALTANDO: False, P_ATACANDO1: False}
 		# Lado hacia el que esta mirando
 		self.mirando = DERECHA
+
+		#Ataques
+		self.ataque_clock = 0
+		self.ataque_retardo = delayAtaque
 
 		# Leemos las coordenadas de un archivo de texto
 		datos = GestorRecursos.CargarArchivoCoordenadas(archivoCoordenadas)
@@ -202,7 +206,7 @@ class Personaje(MiSprite):
 			velocidady = 0
 
 		# Si queremos atacar
-		if self.movimientos[ATAQUE1] and not self.posturas[P_ATACANDO1]:
+		if self.movimientos[ATAQUE1] and (not self.posturas[P_ATACANDO1]):
 			self.posturas[P_ATACANDO1] = True
 			self.numPostura = 0
 
