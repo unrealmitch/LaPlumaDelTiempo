@@ -72,6 +72,7 @@ class TextoGUI(ElementoGUI):
         ElementoGUI.__init__(self, pantalla, self.imagen.get_rect())
         # Se coloca el rectangulo en su posicion
         self.establecerPosicion(posicion)
+        self.rect.centerx = ANCHO_PANTALLA*0.5+10
     def dibujar(self, pantalla):
         pantalla.blit(self.imagen, self.rect)
 
@@ -83,7 +84,7 @@ class TextoJugar(TextoGUI):
     def __init__(self, pantalla):
         fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 29)
         TextoGUI.__init__(self, pantalla, fuente, (0, 238, 255), 'Comenzar', 
-            (ANCHO_PANTALLA*0.37, ALTO_PANTALLA*0.87))
+            (ANCHO_PANTALLA*0.5, ALTO_PANTALLA*0.87))
     def accion(self):
         self.pantalla.menu.ejecutarJuego()
 
@@ -92,7 +93,7 @@ class TextoSalir(TextoGUI):
         # La fuente la debería cargar el estor de recursos
         fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 29-1)
         TextoGUI.__init__(self, pantalla, fuente, (0, 238, 255), 'Salir', 
-            (ANCHO_PANTALLA*0.43, ALTO_PANTALLA*0.94))
+            (ANCHO_PANTALLA*0.5, ALTO_PANTALLA*0.94))
     def accion(self):
         self.pantalla.menu.salirPrograma()
 

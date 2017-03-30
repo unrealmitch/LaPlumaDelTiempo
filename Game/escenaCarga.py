@@ -17,7 +17,8 @@ class EscenaCarga(Escena):
         Escena.__init__(self, director)
         self.tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 40)
         self.texto = self.tipoLetra.render('#Loading mision 1...', True, (0,238,255), (0,0,0))
-
+        self.rect = self.texto.get_rect()
+        self.rect.center = (ANCHO_PANTALLA/2, ALTO_PANTALLA/2)
         self.conf_file = open (recursos, "r")
         self.conf_lines = self.conf_file.readlines ()
         self.it = iter (self.conf_lines)
@@ -39,7 +40,7 @@ class EscenaCarga(Escena):
     def dibujar(self, pantalla):
         # Mostrar mensaje de espera
         pantalla.fill((0,0,0))
-        pantalla.blit(self.texto, (ANCHO_PANTALLA/3-200,ALTO_PANTALLA/2-50,300,300))
+        pantalla.blit(self.texto, self.rect)
 
     def eventos(self, lista_eventos):
         for evento in lista_eventos:

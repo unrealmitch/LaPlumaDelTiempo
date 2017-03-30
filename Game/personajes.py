@@ -29,7 +29,7 @@ P_ATACANDO1 = 3
 # Velocidades de los distintos personajes
 VELOCIDAD_JUGADOR = 0.3 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
-RETARDO_ANIMACION_JUGADOR = 5 # updates que durará cada imagen del personaje
+RETARDO_ANIMACION_JUGADOR = 1 # updates que durará cada imagen del personaje
 							  # debería de ser un valor distinto para cada postura
 
 VELOCIDAD_SNIPER = 0.12 # Pixeles por milisegundo
@@ -87,7 +87,7 @@ class Personaje(MiSprite):
 		self.numImagenPostura = 0;
 		cont = 0;
 		self.coordenadasHoja = [];
-		for linea in range(0, 3):
+		for linea in range(0, len(numImagenes)):
 			self.coordenadasHoja.append([])
 			tmp = self.coordenadasHoja[linea]
 			for postura in range(1, numImagenes[linea]+1):
@@ -129,8 +129,10 @@ class Personaje(MiSprite):
 			self.numImagenPostura += 1
 			if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
 				self.numImagenPostura = 0;
+				if self.numPostura == P_ATACANDO1: self.posturas[P_ATACANDO1] = False
 			if self.numImagenPostura < 0:
 				self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
+
 			self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
 
 			# Si esta mirando a la izquiera, cogemos la porcion de la hoja
@@ -199,6 +201,11 @@ class Personaje(MiSprite):
 		else: 
 			velocidady = 0
 
+		# Si queremos atacar
+		if self.movimientos[ATAQUE1] and not self.posturas[P_ATACANDO1]:
+			self.posturas[P_ATACANDO1] = True
+			self.numPostura = 0
+
 		self.numPostura = QUIETO
 		for postura,value in self.posturas.items():
 			if value: self.numPostura = postura
@@ -226,7 +233,7 @@ class Jugador(Personaje):
 	"Cualquier personaje del juego"
 	def __init__(self):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
-		Personaje.__init__(self,'pirata_Player.png','pirata_Player.txt', [6, 6, 5], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR);
+		Personaje.__init__(self,'pirata_Player_v3.png','pirata_Player_v3.txt', [6, 7, 5, 7], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR);
 		self.vida = 6
 
 
