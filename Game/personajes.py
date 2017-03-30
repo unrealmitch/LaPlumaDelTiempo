@@ -12,6 +12,10 @@ from gestorRecursos import *
 # -------------------------------------------------
 # -------------------------------------------------
 
+#Tipo Personaje
+PLAYER = 0
+EPIRATA1 = 1
+
 # Movimientos
 QUIETO = 0
 IZQUIERDA = 1
@@ -25,6 +29,7 @@ P_QUIETO = 0
 P_ANDANDO = 1
 P_SALTANDO = 2
 P_ATACANDO1 = 3
+P_MURIENDO = 4
 
 # Velocidades de los distintos personajes
 VELOCIDAD_JUGADOR = 0.3 # Pixeles por milisegundo
@@ -32,9 +37,9 @@ VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
 RETARDO_ANIMACION_JUGADOR = 1 # updates que durará cada imagen del personaje
 							  # debería de ser un valor distinto para cada postura
 
-VELOCIDAD_SNIPER = 0.12 # Pixeles por milisegundo
-VELOCIDAD_SALTO_SNIPER = 0.27 # Pixeles por milisegundo
-RETARDO_ANIMACION_SNIPER = 5 # updates que durará cada imagen del personaje
+VELOCIDAD_EPIRATA = 0.12 # Pixeles por milisegundo
+VELOCIDAD_SALTO_EPIRATA = 0.27 # Pixeles por milisegundo
+RETARDO_ANIMACION_EPIRATA = 1 # updates que durará cada imagen del personaje
 							 # debería de ser un valor distinto para cada postura
 # El Sniper camina un poco más lento que el jugador, y salta menos
 
@@ -65,24 +70,29 @@ class Personaje(MiSprite):
 	#  Numero de imagenes en cada postura
 	#  Velocidad de caminar y de salto
 	#  Retardo para mostrar la animacion del personaje
-	def __init__(self, archivoImagen, archivoCoordenadas, numImagenes, velocidadCarrera, velocidadSalto, retardoAnimacion, delayAtaque = 400):
+	def __init__(self, tipo, archivoImagen, archivoCoordenadas, numImagenes, velocidadCarrera, velocidadSalto, retardoAnimacion, delayAtaque, vida):
 
 		# Primero invocamos al constructor de la clase padre
 		MiSprite.__init__(self);
 
+		self.tipo = tipo
 		# Se carga la hoja
 		self.hoja = GestorRecursos.CargarImagen(archivoImagen,-1)
 		self.hoja = self.hoja.convert_alpha()
 		# El movimiento que esta realizando
 		self.movimiento = QUIETO
 		self.movimientos = {IZQUIERDA:False,DERECHA:False,ARRIBA:False,ABAJO:False,ATAQUE1:False}
-		self.posturas = {P_QUIETO: True, P_ANDANDO: False, P_SALTANDO: False, P_ATACANDO1: False}
+		self.posturas = {P_QUIETO: True, P_ANDANDO: False, P_SALTANDO: False, P_ATACANDO1: False, P_MURIENDO:False}
 		# Lado hacia el que esta mirando
 		self.mirando = DERECHA
 
 		#Ataques
+		self.vida = vida
 		self.ataque_clock = 0
 		self.ataque_retardo = delayAtaque
+
+		self.invulnerable_clock = 0
+		self.invulnerable_delay = 400
 
 		# Leemos las coordenadas de un archivo de texto
 		datos = GestorRecursos.CargarArchivoCoordenadas(archivoCoordenadas)
@@ -124,7 +134,16 @@ class Personaje(MiSprite):
 		for key,value in movimientos.items():
 			self.movimientos[key] = value
 
-	def actualizarPostura(self):
+	#Pone todo a false y luego cambia
+	def mover_wreset(self, movimientos):
+		temp = {IZQUIERDA:False,DERECHA:False,ARRIBA:False,ABAJO:False,ATAQUE1:False}
+
+		for key,value in movimientos.items():
+			temp[key] = value
+
+		self.movimientos = temp
+
+	def actualizarPostura(self, is_enemy=False):
 		self.retardoMovimiento -= 1
 		# Miramos si ha pasado el retardo para dibujar una nueva postura
 		if (self.retardoMovimiento < 0):
@@ -132,21 +151,52 @@ class Personaje(MiSprite):
 			# Si ha pasado, actualizamos la postura
 			self.numImagenPostura += 1
 			if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
-				self.numImagenPostura = 0;
 				if self.numPostura == P_ATACANDO1: self.posturas[P_ATACANDO1] = False
+				if self.numPostura == P_MURIENDO:
+					self.numImagenPostura -= 1
+					self.kill()
+				else:
+					self.numImagenPostura = 0;
 			if self.numImagenPostura < 0:
 				self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
 
 			self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
 
-			# Si esta mirando a la izquiera, cogemos la porcion de la hoja
-			if self.mirando != IZQUIERDA:
-				self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
-			#  Si no, si mira a la derecha, invertimos esa imagen
-			elif self.mirando != DERECHA:
-				self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
+			if (self.tipo == PLAYER):
+				if  self.mirando != IZQUIERDA:
+					self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+				elif self.mirando != DERECHA:
+					self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
+			else:
+				if  self.mirando != DERECHA:
+					self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
+				elif self.mirando != IZQUIERDA:
+					self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
+
+	def actualizarVida(self):
+		time = pygame.time.get_ticks()
+		if(time > self.invulnerable_clock + self.invulnerable_delay):
+			self.invulnerable_clock = time
+			if (self.vida == 1):
+				self.vida = 0
+				self.posturas[P_MURIENDO] = True
+				self.numPostura = P_MURIENDO
+				self.numImagenPostura = 0
+			elif(self.vida>0):
+				self.vida-=1
+
+		return self.vida
 
 	def update(self, grupoPlataformas, tiempo):
+
+		# Si no tenemos vida, no podemos realziar movimientos
+		if self.vida <= 0:
+			self.mover_wreset({})
+
+		# Si caemos, morimos
+		if self.rect.top > ALTO_PANTALLA:
+			self.vida = 0 
+			self.kill()
 
 		# Las velocidades a las que iba hasta este momento
 		(velocidadx, velocidady) = self.velocidad
@@ -169,24 +219,33 @@ class Personaje(MiSprite):
 		plataformas = pygame.sprite.spritecollide(self, grupoPlataformas, False)
 
 		#self.posturas[P_SALTANDO] = True
-		#COLISIONES
-		floor_detected = False
-		for plataforma in plataformas:
-			if plataforma.tipo != 1: #Suelos & Rampas
-				if( (self.rect.bottom-3) < plataforma.rect.bottom): #Sobre una plataforma
-					if(self.rect.centerx > plataforma.rect.left and self.rect.centerx < plataforma.rect.right): #Plataforma sobre la que estamos
-						self.posturas[P_SALTANDO] = False
-						if (plataforma.tipo == 0):	#Suelo
-							self.establecerPosicion((self.posicion[0], plataforma.posicion[1]-plataforma.rect.height+1))							
-						else:	#Rampa
-							percent_ramp = (float(self.rect.centerx) - float(plataforma.rect.left))/float(plataforma.rect.width);
-							if(plataforma.tipo == 2):
-								new_y = plataforma.rect.bottom - float(percent_ramp)*plataforma.rect.height
-							else:
-								new_y = plataforma.rect.top + float(percent_ramp)*plataforma.rect.height
-							self.establecerPosicion((self.posicion[0], (new_y)))
 
-			elif(self.rect.bottom > plataforma.rect.top + 15): #Paredes [No atravesarlas]
+		#COLISIONES
+		floor_detected = None
+
+		for plataforma in plataformas:
+			if(plataforma.tipo != 1):
+				if( (self.rect.bottom-3) < plataforma.rect.bottom): #Sobre una plataforma
+					if(self.rect.centerx + 10 > plataforma.rect.left and self.rect.centerx - 10 < plataforma.rect.right): #Plataforma sobre la que estamos
+						self.posturas[P_SALTANDO] = False 	#Dejamos de saltar solo si estáos cayendo
+						if(floor_detected == None or floor_detected.rect.left > plataforma.rect.left):
+							floor_detected = plataforma
+							if (plataforma.tipo == 0): #Suelo
+									self.establecerPosicion((self.posicion[0], plataforma.posicion[1]-plataforma.rect.height+1))							
+							else:	#Rampa
+								percent_ramp = (float(self.rect.centerx) - float(plataforma.rect.left))/float(plataforma.rect.width);
+								if percent_ramp < 0: 
+									percent_ramp = 0
+								elif percent_ramp > 1:
+									percent_ramp = 1
+
+								if(plataforma.tipo == 2):
+									new_y = plataforma.rect.bottom - float(percent_ramp)*plataforma.rect.height
+								else:
+									new_y = plataforma.rect.top + float(percent_ramp)*plataforma.rect.height
+								self.establecerPosicion((self.posicion[0], (new_y)))
+
+			elif(self.rect.bottom > plataforma.rect.top + 15 and plataforma.tipo == 1): #Paredes [No atravesarlas]
 				if( self.mirando == DERECHA and self.rect.right > plataforma.rect.left and self.rect.left < plataforma.rect.left): velocidadx = 0
 				elif( self.mirando == IZQUIERDA and self.rect.left < plataforma.rect.right and self.rect.right > plataforma.rect.right): velocidadx = 0
 
@@ -205,10 +264,14 @@ class Personaje(MiSprite):
 		else: 
 			velocidady = 0
 
-		# Si queremos atacar
-		if self.movimientos[ATAQUE1] and (not self.posturas[P_ATACANDO1]):
-			self.posturas[P_ATACANDO1] = True
-			self.numPostura = 0
+		# Si queremos atacar [Tenemos que comprobar que queremos atacar, pero también que ya no estemos atacando y que haya pasado el retardo desde el último ataque realizado]
+		if self.movimientos[ATAQUE1] and not self.posturas[P_ATACANDO1]:
+			time = pygame.time.get_ticks()
+			if (time > self.ataque_clock + self.ataque_retardo):
+				self.ataque_clock = time
+				self.posturas[P_ATACANDO1] = True
+				self.retardoMovimiento = -1
+				self.numImagenPostura = 0
 
 		self.numPostura = QUIETO
 		for postura,value in self.posturas.items():
@@ -227,7 +290,7 @@ class Personaje(MiSprite):
 		# Y llamamos al método de la superclase para que, según la velocidad y el tiempo
 		#  calcule la nueva posición del Sprite
 		MiSprite.update(self, tiempo)
-		
+
 		return
 
 # -------------------------------------------------
@@ -237,9 +300,7 @@ class Jugador(Personaje):
 	"Cualquier personaje del juego"
 	def __init__(self):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
-		Personaje.__init__(self,'pirata_Player_v3.png','pirata_Player_v3.txt', [6, 7, 5, 7], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR);
-		self.vida = 6
-
+		Personaje.__init__(self,PLAYER,'pirata_Player_v3.png','pirata_Player_v3.txt', [6, 7, 5, 7, 6], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR, 1000, 6);
 
 	def mover(self, teclasPulsadas, teclasConfig):
 		#Miramos si la tecla para cada movimiento esta pulsada o no
@@ -255,21 +316,15 @@ class Jugador(Personaje):
 
 		self.movimientos[DERECHA] = True
 
-	def actualizarVida(self):
-		self.vida -= 1
-		if (self.vida == 0):
-			self.vida = 6
-		return self.vida
-
 
 # -------------------------------------------------
-# Clase NoJugador
+# Clase NoJugador 
 
 class NoJugador(Personaje):
 	"El resto de personajes no jugadores"
-	def __init__(self, archivoImagen, archivoCoordenadas, numImagenes, velocidad, velocidadSalto, retardoAnimacion):
+	def __init__(self,tipo, archivoImagen, archivoCoordenadas, numImagenes, velocidad, velocidadSalto, retardoAnimacion, delayAtaque, vidas):
 		# Primero invocamos al constructor de la clase padre con los parametros pasados
-		Personaje.__init__(self, archivoImagen, archivoCoordenadas, numImagenes, velocidad, velocidadSalto, retardoAnimacion);
+		Personaje.__init__(self,tipo, archivoImagen, archivoCoordenadas, numImagenes, velocidad, velocidadSalto, retardoAnimacion, delayAtaque, vidas);
 
 	# Aqui vendria la implementacion de la IA segun las posiciones de los jugadores
 	# La implementacion por defecto, este metodo deberia de ser implementado en las clases inferiores
@@ -286,44 +341,27 @@ class Pirata(NoJugador):
 	"El enemigo 'Pirata'"
 	def __init__(self):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
-		NoJugador.__init__(self,'Pirate.gif','pirate.txt', [10, 10, 11], VELOCIDAD_SNIPER, VELOCIDAD_SALTO_SNIPER, RETARDO_ANIMACION_SNIPER);
-		
-	def actualizarPostura(self):
-		self.retardoMovimiento -= 1
-		# Miramos si ha pasado el retardo para dibujar una nueva postura
-		if (self.retardoMovimiento < 0):
-			self.retardoMovimiento = self.retardoAnimacion
-			# Si ha pasado, actualizamos la postura
-			self.numImagenPostura += 1
-			if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
-				self.numImagenPostura = 0;
-			if self.numImagenPostura < 0:
-				self.numImagenPostura = len(self.coordenadasHoja[self.numPostura])-1
-			self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
-
-			# Se invierte el if con respecto a la superclase
-			if self.mirando != DERECHA:
-				self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
-			#  Si no, si mira a la izq, invertimos esa imagen
-			elif self.mirando != IZQUIERDA:
-				self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
+		NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 3000, 3);
 	
 	# Aqui vendria la implementacion de la IA segun las posiciones de los jugadores
 	# La implementacion de la inteligencia segun este personaje particular
+
 	def mover_cpu(self, jugador1):
-		'Por Actualizar'
-		'''
+
 		# Movemos solo a los enemigos que esten en la pantalla
 		if self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA:
 
-			
-			# Y nos movemos andando hacia el
-			if jugador1.posicion[0]<self.posicion[0]:
-				Personaje.mover(self,IZQUIERDA)
+			# Y nos movemos andando hacia el protagonista, si estamos muy cerca atacamos
+			if jugador1.rect.right-5<self.rect.left:
+				Personaje.mover_wreset(self,{IZQUIERDA:True})
+			elif(jugador1.rect.left-5>self.rect.right):
+				Personaje.mover_wreset(self,{DERECHA:True})
 			else:
-				Personaje.mover(self,DERECHA)
+				Personaje.mover_wreset(self,{ATAQUE1:True})
+
+			# Si está por encima el prota, saltamos
+			if (jugador1.rect.bottom < self.rect.top): Personaje.mover(self,{ARRIBA:True})
 
 		# Si este personaje no esta en pantalla, no hara nada
 		else:
-			Personaje.mover(self,QUIETO)
-		'''
+			Personaje.mover_wreset(self,{})

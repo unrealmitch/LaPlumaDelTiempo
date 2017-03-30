@@ -185,13 +185,15 @@ class Piratas(Escena):
 		
 		self.grupoSpritesDinamicos.update(self.grupoPlataformas,tiempo)
 
-		# Comprobamos si hay colision entre algun jugador y algun enemigo
-        # Se comprueba la colision entre ambos grupos
-        # Si la hay, indicamos que se ha finalizado la fase
-		if pygame.sprite.groupcollide(self.grupoJugadores, self.grupoEnemigos, False, False)!={}:
-			# Se le dice al director que salga de esta escena y ejecute la siguiente en la pila
-			vida = self.jugador1.actualizarVida()
-			self.lifebar.actualizarVida(vida)
+		#Miramos todas las colision de los enemios con los jugadores, si uno de ellos está atacando, daña al otro
+		collitions = pygame.sprite.groupcollide(self.grupoJugadores, self.grupoEnemigos, False, False)
+		for player,enemys in collitions.items():
+			for enemy in enemys:
+				if enemy.posturas[P_ATACANDO1] == True: 
+					player.actualizarVida()
+					vida = self.jugador1.actualizarVida()
+					self.lifebar.actualizarVida(vida)
+				if player.posturas[P_ATACANDO1] == True : enemy.actualizarVida() 
 			
 		
 		self.actualizarScroll(self.jugador1)
@@ -208,7 +210,13 @@ class Piratas(Escena):
 		# Luego los Sprites
 		self.grupoSprites.draw(pantalla)
 
-		self.jugador1.draw(pantalla)
+		if(self.jugador1.alive()):
+			self.jugador1.draw(pantalla)
+		else:
+			if(self.fade == 0):
+				self.fade = -250
+			elif(self.fade >= -1):
+				self.salir(False)
 		#screen.blit(self.lifebar.image, self.lifebar.rect)
 		self.lifebar.draw(pantalla)
 		
@@ -219,6 +227,7 @@ class Piratas(Escena):
 		for animacion in self.animacionOlas:
 			animacion.dibujar(pantalla)
 
+		#Efecto fundido, para entrar a la escena, y para terminarla
 		if(self.fade != 0):
 			time = pygame.time.get_ticks()
 			if(time > self.time_fade + 1):
