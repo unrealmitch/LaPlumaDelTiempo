@@ -82,9 +82,12 @@ class Piratas(Escena):
 		random.seed()
 		self.grupoEnemigos = pygame.sprite.Group()
 
+		n_enemigos=16
+		dist_enemigos = self.decorado.rect.width/n_enemigos
 		piratas = []
-		for i in range(2,14):
-			piratas.append((500*ESCALA*i + random.randint(-100, 100), 500*ESCALA))
+
+		for i in range(1,n_enemigos):
+			piratas.append((dist_enemigos*ESCALA*(i+1) + random.randint(-100, 100), 500*ESCALA))
 
 		for posicion in piratas:
 			if random.randint(0,100) > 90:
@@ -97,9 +100,9 @@ class Piratas(Escena):
 			pirata.establecerPosicion(posicion)
 			self.grupoEnemigos.add(pirata)
 
-		final = pirata = Pirata(3)
-		final.establecerPosicion((7000*ESCALA, 400))
-		self.grupoEnemigos.add(final)
+		self.final = pirata = Pirata(3)
+		self.final.establecerPosicion((7000*ESCALA, 400))
+		self.grupoEnemigos.add(self.final)
 		### PLATAFORMAS ###
 		file_plataformas = GestorRecursos.CargarMapaPlataformas("pirata_plataform.txt")
 		plataformas = []
@@ -135,9 +138,8 @@ class Piratas(Escena):
 		self.channel_bso.set_volume(0)
 		self.channel_ambient = sound_ambient.play(-1)
 
-	def salir(self,complete):
+	def salir(self):
 		pygame.mixer.stop();
-		#if(complete):
 		self.director.salirEscena();
 
 	def actualizarScrollOrdenados(self, jugador):
@@ -146,19 +148,21 @@ class Piratas(Escena):
 
 			if self.scroll[0] <= 0:
 				self.scroll = (0, self.scroll[1])
-				jugador.establecerPosicion((MINIMO_X_JUGADOR, jugador.posicion[1]))
+				if jugador.rect.left < 0: jugador.establecerPosicion((0 , jugador.posicion[1]))
 				return False;
 			else:
 				self.scroll = (self.scroll[0] - desplazamiento, self.scroll[1])
 				return True;
 
-		if (jugador.rect.right >MAXIMO_X_JUGADOR):
+		if (jugador.rect.right > MAXIMO_X_JUGADOR):
 			desplazamiento = (jugador.rect.right - MAXIMO_X_JUGADOR)
 
-			if (self.scroll[0]*ESCALA + ANCHO_PANTALLA) >= self.decorado.rect.right:
-				if self.fade == 0: self.fade = -250
-				if self.jugador1.rect.centerx > ANCHO_PANTALLA + 100: self.salir(True)
-				self.channel_bso.set_volume(float(self.fade)/-250.0)
+			if self.scroll[0]*ESCALA + ANCHO_PANTALLA + 10 >= self.decorado.rect.right:
+				#if self.fade == 0: self.fade = -250
+				#if self.jugador1.rect.centerx > ANCHO_PANTALLA + 100: self.salir(True)
+				if self.fade == 0:
+					if self.jugador1.rect.right > self.decorado.rect.right: jugador.establecerPosicion((self.decorado.right-self.jugador1.rect.width, jugador.posicion[1]))
+
 				#self.scroll = (self.decorado.rect.right*ESCALA - ANCHO_PANTALLA, self.scroll[1])
 				#jugador.establecerPosicion((self.scroll[0]*ESCALA + MAXIMO_X_JUGADOR*ESCALA, jugador.posicion[1]))
 				return False;
@@ -197,7 +201,7 @@ class Piratas(Escena):
 		self.decorado.update(tiempo)
 		# Primero, se indican las acciones que van a hacer los enemigos segun como esten los jugadores
 		for enemigo in iter(self.grupoEnemigos):
-			enemigo.mover_cpu(self.jugador1)
+			enemigo.mover_cpu(self.jugador1, self.grupoPlataformas)
 		
 		self.grupoSpritesDinamicos.update(self.grupoPlataformas,tiempo)
 
@@ -205,19 +209,35 @@ class Piratas(Escena):
 		collitions = pygame.sprite.groupcollide(self.grupoJugadores, self.grupoEnemigos, False, False)
 		for player,enemys in collitions.items():
 			for enemy in enemys:
-				if enemy.posturas[P_ATACANDO1] == True: 
-					player.actualizarVida()
-					vida = self.jugador1.actualizarVida()
-					self.lifebar.actualizarVida(vida)
-				if player.posturas[P_ATACANDO1] == True : enemy.actualizarVida() 
+				if (enemy.posturas[P_ATACANDO1] and player.posturas[P_ATACANDO1]):
+					self.jugador1.quitarVida(0)
+					enemy.quitarVida(0)
+				else:
+					if enemy.posturas[P_ATACANDO1]: 
+						vida = self.jugador1.quitarVida(1)
+						self.lifebar.actualizarVida(vida)
+					if player.posturas[P_ATACANDO1]: enemy.quitarVida(1)
 			
 		
 		self.actualizarScroll(self.jugador1)
 		self.background.establecerPosicionPantalla(self.virtual_scroll)
 
-		if (self.jugador1.rect.bottom > ALTO_PANTALLA): self.salir(True)
+		#Cuando hacemos el fundido a negro
 
-		
+		if(not self.jugador1.alive()):
+			if(self.fade == 0): self.fade = -250
+
+		if ( not self.final.alive() ):
+			if self.fade == 0: self.fade = -250
+
+		if(self.fade < 0):
+			self.channel_bso.set_volume(self.channel_bso.get_volume()-0.01)
+			if(self.jugador1.alive()):
+				self.jugador1.avanzar(self.grupoPlataformas)
+
+			if(self.fade>-10):
+				self.salir()
+				
 	def dibujar(self, pantalla):
 		pantalla.fill((0,0,0))
 
@@ -226,13 +246,24 @@ class Piratas(Escena):
 		# Luego los Sprites
 		self.grupoSprites.draw(pantalla)
 
+		# Vida enemigos
+		corazon_img = GestorRecursos.CargarImagen("corazon.png")
+		corazon_rect = corazon_img.get_rect()
+
+		self.jugador1.draw(pantalla)
+		'''
+		for enemigo in self.grupoEnemigos:
+			for i in range(enemigo.vida):
+				corazon_rect.top = enemigo.rect.top + corazon_rect.height
+				corazon_rect.left = i*(corazon_rect.width*2)
+				pantalla.blit(corazon_img, corazon_rect)
+		'''
+
 		if(self.jugador1.alive()):
 			self.jugador1.draw(pantalla)
 		else:
-			if(self.fade == 0):
-				self.fade = -250
-			elif(self.fade >= -1):
-				self.salir(False)
+			if(self.fade == 0): self.fade = -250
+
 		#screen.blit(self.lifebar.image, self.lifebar.rect)
 		self.lifebar.draw(pantalla)
 		
@@ -280,6 +311,4 @@ class Piratas(Escena):
 			teclasPulsadas = pygame.key.get_pressed()
 			teclasConfig = {ARRIBA: K_UP, ABAJO: K_DOWN, IZQUIERDA: K_LEFT, DERECHA: K_RIGHT, ATAQUE1: K_SPACE}
 			self.jugador1.mover(teclasPulsadas, teclasConfig)
-		else:
-			if(self.fade < 0):
-				self.jugador1.avanzar()
+

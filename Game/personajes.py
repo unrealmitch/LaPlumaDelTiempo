@@ -15,6 +15,9 @@ from gestorRecursos import *
 #Tipo Personaje
 PLAYER = 0
 EPIRATA1 = 1
+EPIRATA2 = 2
+EPIRATA3 = 3
+EPIRATA4 = 4
 
 # Movimientos
 QUIETO = 0
@@ -41,7 +44,7 @@ RETARDO_ANIMACION_JUGADOR = 1 # updates que durará cada imagen del personaje
 
 VELOCIDAD_EPIRATA = 0.10 # Pixeles por milisegundo
 VELOCIDAD_SALTO_EPIRATA = 0.15 # Pixeles por milisegundo
-RETARDO_ANIMACION_EPIRATA = 2 # updates que durará cada imagen del personaje
+RETARDO_ANIMACION_EPIRATA = 1 # updates que durará cada imagen del personaje
 							 # debería de ser un valor distinto para cada postura
 # El Sniper camina un poco más lento que el jugador, y salta menos
 
@@ -97,7 +100,7 @@ class Personaje(MiSprite):
 		self.ataque_retardo = delayAtaque
 
 		self.invulnerable_clock = 0
-		self.invulnerable_delay = 400
+		self.invulnerable_delay = 500
 
 		###SONIDOS###
 		self.audio = {}
@@ -193,19 +196,23 @@ class Personaje(MiSprite):
 				elif self.mirando != IZQUIERDA:
 					self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
 
-	def actualizarVida(self):
+	def quitarVida(self,vida):
 		time = pygame.time.get_ticks()
 		if(time > self.invulnerable_clock + self.invulnerable_delay):
 			self.invulnerable_clock = time
-			if (self.vida == 1):
+			if vida == 0:
+				GestorRecursos.CargarSonido('espadas.ogg').play()
+			elif(self.vida == 1):
 				self.vida = 0
 				self.audio[P_MURIENDO].play()
 				self.posturas[P_MURIENDO] = True
 				self.numPostura = P_MURIENDO
 				self.numImagenPostura = 0
 			elif(self.vida>0):
-				self.vida-=1
+				self.vida-=vida
 				self.audio[P_HERIDO].play()
+
+			
 
 		return self.vida
 
@@ -323,7 +330,7 @@ class Jugador(Personaje):
 	"Cualquier personaje del juego"
 	def __init__(self):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
-		Personaje.__init__(self,PLAYER,'pirata_Player_v3.png','pirata_Player_v3.txt', [6, 7, 5, 7, 6], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR, 1000, 6);
+		Personaje.__init__(self,PLAYER,'pirata_Player_v3.png','pirata_Player_v3.txt', [6, 7, 5, 7, 6], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR, 1250, 6);
 
 	def mover(self, teclasPulsadas, teclasConfig):
 		#Miramos si la tecla para cada movimiento esta pulsada o no
@@ -333,11 +340,11 @@ class Jugador(Personaje):
 
 		Personaje.mover(self,movimientos)
 
-	def avanzar(self):
-		for key,value in self.movimientos.items():
-			value = False
-
-		self.movimientos[DERECHA] = True
+	def avanzar(self, grupoPlataformas):
+		Personaje.mover_wreset(self,{DERECHA:True})
+		plataformas = pygame.sprite.spritecollide(self, grupoPlataformas, False)
+		for plataforma in plataformas:
+			if(plataforma.tipo == 1): Personaje.mover(self,{ARRIBA:True})
 
 
 # -------------------------------------------------
@@ -365,19 +372,19 @@ class Pirata(NoJugador):
 	def __init__(self, clase=0):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
 		if clase == 0: 
-			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 5000, 2);
+			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 4000, 1);
 		elif clase == 1: 
-			NoJugador.__init__(self,EPIRATA1,'Pirate_r.png','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA+0.05, VELOCIDAD_SALTO_EPIRATA+0.05, RETARDO_ANIMACION_EPIRATA, 2500, 3);
+			NoJugador.__init__(self,EPIRATA2,'Pirate_r.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.05, VELOCIDAD_SALTO_EPIRATA+0.05, RETARDO_ANIMACION_EPIRATA, 3000, 2);
 		elif clase == 2: 
-			NoJugador.__init__(self,EPIRATA1,'Pirate_w.png','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA+0.1, VELOCIDAD_SALTO_EPIRATA+0.1, RETARDO_ANIMACION_EPIRATA, 1250, 4);
+			NoJugador.__init__(self,EPIRATA3,'Pirate_w.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.1, VELOCIDAD_SALTO_EPIRATA+0.08, RETARDO_ANIMACION_EPIRATA, 2000, 3);
 		elif clase == 3: 
-			NoJugador.__init__(self,EPIRATA1,'Pirate_b.png','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA+0.2, VELOCIDAD_SALTO_EPIRATA+0.2, RETARDO_ANIMACION_EPIRATA, 1000, 10);
+			NoJugador.__init__(self,EPIRATA4,'Pirate_b.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.15, VELOCIDAD_SALTO_EPIRATA+0.1, RETARDO_ANIMACION_EPIRATA, 1500, 4);
 		else:
-			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 5000, 2);
+			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 5000, 2);
 	# Aqui vendria la implementacion de la IA segun las posiciones de los jugadores
 	# La implementacion de la inteligencia segun este personaje particular
 
-	def mover_cpu(self, jugador1):
+	def mover_cpu(self, jugador1, grupoPlataformas):
 		# Movemos solo a los enemigos que esten en la pantalla
 		if self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA:
 
@@ -393,6 +400,11 @@ class Pirata(NoJugador):
 			if  abs(self.rect.centerx-jugador1.rect.centerx) < 150 :
 				if (jugador1.rect.bottom < self.rect.top): Personaje.mover(self,{ARRIBA:True})
 
+			# Si está contra una pared salta
+			if self.tipo != 1:
+				plataformas = pygame.sprite.spritecollide(self, grupoPlataformas, False)
+				for plataforma in plataformas:
+					if(plataforma.tipo == 1): Personaje.mover(self,{ARRIBA:True})
 		# Si este personaje no esta en pantalla, no hara nada
 		else:
 			Personaje.mover_wreset(self,{})

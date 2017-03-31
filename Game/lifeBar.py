@@ -32,8 +32,12 @@ class LifeBar(MiSprite):
 		self.rect = pygame.Rect(0,20,self.coordenadasHoja[0][6][2],self.coordenadasHoja[0][6][3])
 
 		self.image = self.hoja.subsurface(self.coordenadasHoja[0][6])
+		x,y=self.image.get_size()
+		self.image = pygame.transform.scale(self.image,(int(x*0.7), int(y*0.7)))
 
 	def actualizarVida(self, vida):
 
 		self.rect = pygame.Rect(0,20,self.coordenadasHoja[0][vida][2],self.coordenadasHoja[0][vida][3])
 		self.image = self.hoja.subsurface(self.coordenadasHoja[0][vida])
+		x,y=self.image.get_size()
+		self.image = pygame.transform.scale(self.image,(int(x*0.7), int(y*0.7)))
