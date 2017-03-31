@@ -47,11 +47,22 @@ class Piratas(Escena):
 		# autonomeSprite(image, (startX, startY, maxX, maxY, velX, velY), (startScaleX, startScaleY, maxScaleX, maxScaley, velScaleX, velScaleY), (velScrollX, velScrollY))
 		#self.capaEscenario.add(autonomeSprite('pirata_barco2.png',(1000,150,2000,0,0.01,0),(0.8,0.8,1,1,0,0),(0.3,0.25)))
 		
-		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/2,280,4000,0,0.0001,0),(0.3,0.3,1,1,0,0),(0.1,0.1)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/2,320,4000,0,0.005,0),(0.2,0.2,1,1,0,0),(0.17,0.07)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/1.75,320,4000,0,0.007,0),(0.25,0.25,1,1,0,0),(0.18,0.08)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/3,310,4000,0,0.01,0),(0.3,0.3,1,1,0,0),(0.19,0.09)))
 
 		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(700,200,2000,0,0.002,0.001),(0.15,0.15,0.25,0.25,0.000001,0.000001),(0.3,0.25)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(100,50,3000,0,0.01,-0.005),(0.25,0.25,0.5,0.5,0.000005,0.000005),(0.3,-0.5)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(100,50,3000,0,0.01,-0.01),(0.25,0.25,0.5,0.5,0.000005,0.000005),(0.33,-0.5)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(1000,230,2000,0,0.002,0.001),(0.18,0.18,0.25,0.25,0.000001,0.000001),(0.3,0.25)))
 
+		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(1800,250,5500,0,0,0.002),(0.1,0.1,0.15,0.15,0.000001,0.000001),(0.2,0.2)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(2200,130,5200,0,0,0.03),(0.27,0.27,0.4,0.4,0.000001,0.000001),(0.32,0.4)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(2000,100,5000,0,0,0.04),(0.3,0.3,0.4,0.4,0.000001,0.000001),(0.33,-0.5)))
+		
+		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(1700,300,0,0,0,0),(-0.6,0.6,0,0,0,0),(0.86,-0.86)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(1550,250,0,0,0,0),(-0.75,0.75,0,0,0,0),(0.88,-0.88)))
+		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(1400,200,0,0,0,0),(-0.9,0.9,0,0,0,0),(0.9,-0.9)))
+		
 		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5400,240,0,0,0,0),(0.7,0.7,0,0,0,0),(0.86,0.86)))
 		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5300,250,0,0,0,0),(0.75,0.75,0,0,0,0),(0.88,0.88)))
 		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5200,250,0,0,0,0),(0.8,0.8,0,0,0,0),(0.9,0.9)))
@@ -68,13 +79,27 @@ class Piratas(Escena):
 		self.lifebar = LifeBar()
 
 		### ENEMIGOS ###
+		random.seed()
 		self.grupoEnemigos = pygame.sprite.Group()
-		piratas = [(1500*ESCALA, 555*ESCALA), (2500*ESCALA, 555*ESCALA), (3500*ESCALA, 500*ESCALA), (5200*ESCALA, 720*ESCALA)]
+
+		piratas = []
+		for i in range(2,10):
+			piratas.append((500*ESCALA*i + random.randint(-100, 100), 500*ESCALA))
+
 		for posicion in piratas:
-			pirata = Pirata()
+			if random.randint(0,100) > 90:
+				pirata = Pirata(2)
+			elif random.randint(0,100) > 60:
+				pirata = Pirata(1)
+			else:
+				pirata = Pirata(0)
+
 			pirata.establecerPosicion(posicion)
 			self.grupoEnemigos.add(pirata)
 
+		final = pirata = Pirata(3)
+		final.establecerPosicion((7000*ESCALA), 400)
+		self.grupoEnemigos.add(final)
 		### PLATAFORMAS ###
 		file_plataformas = GestorRecursos.CargarMapaPlataformas("pirata_plataform.txt")
 		plataformas = []

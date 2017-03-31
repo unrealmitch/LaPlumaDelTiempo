@@ -46,12 +46,25 @@ class autonomeSprite(pygame.sprite.Sprite):
 	def __init__(self,file,move,scale=(1,1,1,1,0,0),scrollspeed=(1.,1.)):
 		pygame.sprite.Sprite.__init__(self)
 		self.file = GestorRecursos.CargarImagenAlpha(file, -1)
-
+		
 		self.posicion = (move[0]*ESCALA, move[1]*ESCALA)
 		self.pos_max = (move[2]*ESCALA, move[3]*ESCALA)
 		self.pos_speed = (move[4]*ESCALA, move[5]*ESCALA)
 
-		self.scale = (scale[0], scale[1])
+		#Si la escala es negativa, giramos la imagen
+		scalex = scale[0]
+		scaley = scale[1]
+
+		if (scalex < 0):
+			scalex = abs(scalex)
+			self.file = pygame.transform.flip(self.file, 1, 0)
+
+		if (scaley < 0):
+			scaley = abs(scaley)
+			self.file = pygame.transform.flip(self.file, 0, 1)
+
+
+		self.scale = (scalex, scaley)
 		self.scale_max = (scale[2], scale[3])
 		self.scale_speed = (scale[4], scale[5])
 
@@ -62,7 +75,9 @@ class autonomeSprite(pygame.sprite.Sprite):
 
 	def autoscale(self):
 		dimensions = self.file.get_size()
-		self.image = pygame.transform.scale(self.file,(int(dimensions[0]*self.scale[0]), int(dimensions[1]*self.scale[1])))
+
+
+		self.image = pygame.transform.scale(self.file,(int(dimensions[0]*self.scale[0]), int(dimensions[1]*self.scale[0])))
 		self.rect = self.image.get_rect()
 
 	def update(self,tiempo):

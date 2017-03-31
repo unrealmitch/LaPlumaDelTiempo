@@ -31,15 +31,17 @@ P_SALTANDO = 2
 P_ATACANDO1 = 3
 P_MURIENDO = 4
 
+P_HERIDO = 10
+
 # Velocidades de los distintos personajes
-VELOCIDAD_JUGADOR = 0.3 # Pixeles por milisegundo
+VELOCIDAD_JUGADOR = 0.25 # Pixeles por milisegundo
 VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
 RETARDO_ANIMACION_JUGADOR = 1 # updates que durará cada imagen del personaje
 							  # debería de ser un valor distinto para cada postura
 
-VELOCIDAD_EPIRATA = 0.12 # Pixeles por milisegundo
-VELOCIDAD_SALTO_EPIRATA = 0.27 # Pixeles por milisegundo
-RETARDO_ANIMACION_EPIRATA = 1 # updates que durará cada imagen del personaje
+VELOCIDAD_EPIRATA = 0.10 # Pixeles por milisegundo
+VELOCIDAD_SALTO_EPIRATA = 0.15 # Pixeles por milisegundo
+RETARDO_ANIMACION_EPIRATA = 2 # updates que durará cada imagen del personaje
 							 # debería de ser un valor distinto para cada postura
 # El Sniper camina un poco más lento que el jugador, y salta menos
 
@@ -75,18 +77,21 @@ class Personaje(MiSprite):
 		# Primero invocamos al constructor de la clase padre
 		MiSprite.__init__(self);
 
+		#Tipo de personaje
 		self.tipo = tipo
-		# Se carga la hoja
+
+		###SPRITE##
 		self.hoja = GestorRecursos.CargarImagen(archivoImagen,-1)
 		self.hoja = self.hoja.convert_alpha()
-		# El movimiento que esta realizando
+
+		###Movimiento###
 		self.movimiento = QUIETO
 		self.movimientos = {IZQUIERDA:False,DERECHA:False,ARRIBA:False,ABAJO:False,ATAQUE1:False}
 		self.posturas = {P_QUIETO: True, P_ANDANDO: False, P_SALTANDO: False, P_ATACANDO1: False, P_MURIENDO:False}
 		# Lado hacia el que esta mirando
 		self.mirando = DERECHA
 
-		#Ataques
+		###ATAQUE###
 		self.vida = vida
 		self.ataque_clock = 0
 		self.ataque_retardo = delayAtaque
@@ -94,7 +99,22 @@ class Personaje(MiSprite):
 		self.invulnerable_clock = 0
 		self.invulnerable_delay = 400
 
-		# Leemos las coordenadas de un archivo de texto
+		###SONIDOS###
+		self.audio = {}
+		self.audio_channels = {P_SALTANDO: None, P_ATACANDO1: None, P_MURIENDO: None, P_HERIDO: None}
+
+		if(self.tipo == 0):
+			self.audio.update({P_SALTANDO: GestorRecursos.CargarSonido('pirata_jump.ogg')})
+			self.audio.update({P_ATACANDO1: GestorRecursos.CargarSonido('pirata_attack.ogg')})
+			self.audio.update({P_HERIDO: GestorRecursos.CargarSonido('pirata_hurt.ogg')})
+			self.audio.update({P_MURIENDO: GestorRecursos.CargarSonido('pirata_die.ogg')})
+		else:
+			self.audio.update({P_SALTANDO: GestorRecursos.CargarSonido('epirata_jump.ogg')})
+			self.audio.update({P_ATACANDO1: GestorRecursos.CargarSonido('epirata_attack.ogg')})
+			self.audio.update({P_HERIDO: GestorRecursos.CargarSonido('epirata_hurt.ogg')})
+			self.audio.update({P_MURIENDO: GestorRecursos.CargarSonido('epirata_die.ogg')})	
+		
+		###COORDENADAS###
 		datos = GestorRecursos.CargarArchivoCoordenadas(archivoCoordenadas)
 		datos = datos.split()
 		self.numPostura = 1;
@@ -179,11 +199,13 @@ class Personaje(MiSprite):
 			self.invulnerable_clock = time
 			if (self.vida == 1):
 				self.vida = 0
+				self.audio[P_MURIENDO].play()
 				self.posturas[P_MURIENDO] = True
 				self.numPostura = P_MURIENDO
 				self.numImagenPostura = 0
 			elif(self.vida>0):
 				self.vida-=1
+				self.audio[P_HERIDO].play()
 
 		return self.vida
 
@@ -202,7 +224,7 @@ class Personaje(MiSprite):
 		# Las velocidades a las que iba hasta este momento
 		(velocidadx, velocidady) = self.velocidad
 
-		# Si vamos a la izquierda o a la derecha        
+		###MOVIMIENTO LATERLAL###     
 		if (self.movimientos[IZQUIERDA] != self.movimientos[DERECHA]):	#XOR! No se mueve si se pulsa izq y der
 			# Esta mirando hacia ese lado
 			if self.movimientos[IZQUIERDA]:
@@ -218,13 +240,14 @@ class Personaje(MiSprite):
 			velocidadx = 0
 
 		plataformas = pygame.sprite.spritecollide(self, grupoPlataformas, False)
-		#COLISIONES
+
+		###COLISIONES PLATAFORMAS###
 		floor_detected = None
 
 		for plataforma in plataformas:
 			if(plataforma.tipo != 1):
 				if( (self.rect.bottom-3) < plataforma.rect.bottom): #Sobre una plataforma
-					if(self.rect.centerx + 10 > plataforma.rect.left and self.rect.centerx - 10 < plataforma.rect.right): #Plataforma sobre la que estamos
+					if(self.rect.centerx + 10 > plataforma.rect.left and self.rect.centerx - 10 < plataforma.rect.right and velocidady>=0): #Plataforma sobre la que estamos
 						self.posturas[P_SALTANDO] = False 	#Dejamos de saltar solo si estáos cayendo
 						if(floor_detected == None or floor_detected.rect.left > plataforma.rect.left):
 							floor_detected = plataforma
@@ -249,10 +272,12 @@ class Personaje(MiSprite):
 
 		if floor_detected == None : self.posturas[P_SALTANDO] = True
 		
-		# Si queremos saltar
+		###SALTO###
 		if self.movimientos[ARRIBA]:
 			# La postura actual sera estar saltando
-			if not self.posturas[P_SALTANDO] : velocidady = -self.velocidadSalto
+			if not self.posturas[P_SALTANDO] : 
+				velocidady = -self.velocidadSalto
+				self.audio[P_SALTANDO].play()
 			self.posturas[P_SALTANDO] = True
 			# Le imprimimos una velocidad en el eje y
 
@@ -261,23 +286,23 @@ class Personaje(MiSprite):
 		else: 
 			velocidady = 0
 
+		###ATAQUE###
 		# Si queremos atacar [Tenemos que comprobar que queremos atacar, pero también que ya no estemos atacando y que haya pasado el retardo desde el último ataque realizado]
 		if self.movimientos[ATAQUE1] and not self.posturas[P_ATACANDO1]:
 			time = pygame.time.get_ticks()
 			if (time > self.ataque_clock + self.ataque_retardo):
+				self.audio[P_ATACANDO1].play()
 				self.ataque_clock = time
 				self.posturas[P_ATACANDO1] = True
 				self.retardoMovimiento = -1
 				self.numImagenPostura = 0
 
+		###POSTURA FINAL###
 		self.numPostura = QUIETO
 		for postura,value in self.posturas.items():
 			if value: self.numPostura = postura
 
-		if self.numPostura == QUIETO: 
-			self.numPostura = QUIETO
 
-		#velocidady = 0
 		# Actualizamos la imagen a mostrar
 		self.actualizarPostura()
 
@@ -286,7 +311,6 @@ class Personaje(MiSprite):
 
 		# Y llamamos al método de la superclase para que, según la velocidad y el tiempo
 		#  calcule la nueva posición del Sprite
-
 		MiSprite.update(self, tiempo)
 
 		return
@@ -337,10 +361,18 @@ class NoJugador(Personaje):
 
 class Pirata(NoJugador):
 	"El enemigo 'Pirata'"
-	def __init__(self):
+	def __init__(self, clase=0):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
-		NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 3000, 3);
-	
+		if clase == 0: 
+			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 5000, 2);
+		elif clase == 1: 
+			NoJugador.__init__(self,EPIRATA1,'Pirate_r.png','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA+0.05, VELOCIDAD_SALTO_EPIRATA+0.05, RETARDO_ANIMACION_EPIRATA, 2500, 3);
+		elif clase == 2: 
+			NoJugador.__init__(self,EPIRATA1,'Pirate_w.png','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA+0.1, VELOCIDAD_SALTO_EPIRATA+0.1, RETARDO_ANIMACION_EPIRATA, 1250, 4);
+		elif clase == 3: 
+			NoJugador.__init__(self,EPIRATA1,'Pirate_b.png','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA+0.2, VELOCIDAD_SALTO_EPIRATA+0.2, RETARDO_ANIMACION_EPIRATA, 1000, 10);
+		else:
+			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 4, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 5000, 2);
 	# Aqui vendria la implementacion de la IA segun las posiciones de los jugadores
 	# La implementacion de la inteligencia segun este personaje particular
 
@@ -349,15 +381,16 @@ class Pirata(NoJugador):
 		if self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA:
 
 			# Y nos movemos andando hacia el protagonista, si estamos muy cerca atacamos
-			if jugador1.rect.right-5<self.rect.left:
+			if jugador1.rect.right-10<self.rect.left:
 				Personaje.mover_wreset(self,{IZQUIERDA:True})
-			elif(jugador1.rect.left-5>self.rect.right):
+			elif(jugador1.rect.left-10>self.rect.right):
 				Personaje.mover_wreset(self,{DERECHA:True})
 			else:
 				Personaje.mover_wreset(self,{ATAQUE1:True})
 
-			# Si está por encima el prota, saltamos
-			if (jugador1.rect.bottom < self.rect.top): Personaje.mover(self,{ARRIBA:True})
+			# Si está por encima el prota, saltamos4
+			if  abs(self.rect.centerx-jugador1.rect.centerx) < 150 :
+				if (jugador1.rect.bottom < self.rect.top): Personaje.mover(self,{ARRIBA:True})
 
 		# Si este personaje no esta en pantalla, no hara nada
 		else:

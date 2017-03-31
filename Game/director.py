@@ -14,7 +14,7 @@ class Director():
         #self.screen = pygame.display.set_mode((ANCHO_PANTALLA, ALTO_PANTALLA), pygame.FULLSCREEN, 32)
         self.screen = pygame.display.set_mode((ANCHO_PANTALLA, ALTO_PANTALLA), 0, 32)
         
-        pygame.mixer.pre_init(44100, 16, 2, 4096)
+        pygame.mixer.pre_init(44100, 16, 2, 1024)
         pygame.mixer.init()
         pygame.display.set_caption("La pluma del tiempo...")
 
