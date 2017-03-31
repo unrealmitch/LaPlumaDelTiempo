@@ -8,20 +8,33 @@ from escenario import *
 from pygame.locals import *
 from animacionesPygame import *
 from piratas import Piratas
+from dinosaurios import Dinosaurios
 
 # -------------------------------------------------
 # Clase EscenaCarga
 
 class EscenaCarga(Escena):
-    def __init__(self, director, recursos):
+    def __init__(self, director, fase):
         Escena.__init__(self, director)
         self.tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 40)
-        self.texto = self.tipoLetra.render('#Loading mision 1...', True, (0,238,255), (0,0,0))
+        self.fase = fase;
+
+        if(self.fase == 1):
+            recursos = "piratas.conf"
+            title = '#Loading mision 2: PIRATAS'
+        else:
+            recursos = "dinosaurios.conf"
+            title = '#Loading mision 1: DINOSAURIOS'
+
+        self.texto = self.tipoLetra.render(title, True, (0,238,255), (0,0,0))
         self.rect = self.texto.get_rect()
         self.rect.center = (ANCHO_PANTALLA/2, ALTO_PANTALLA/2)
-        self.conf_file = open (recursos, "r")
+        
+        recursos = os.path.join('others', recursos)
+        self.conf_file = open(recursos, "r")
         self.conf_lines = self.conf_file.readlines ()
         self.it = iter (self.conf_lines)
+        
 
     def update(self, tiempo):
         # Carga los elementos de la fase uno a uno en cada iteracion del bucle 
@@ -33,8 +46,12 @@ class EscenaCarga(Escena):
         except TypeError:
             # Entra después de cargar todas las lineas del iterador. No se puede
             # hacer len() de un tipo None. Ahora carga la escena del juego.
-            escenaPiratas = Piratas(self.director)
-            self.director.cambiarEscena(escenaPiratas)
+            if(self.fase == 1):
+                escenaPiratas = Piratas(self.director)
+                self.director.cambiarEscena(escenaPiratas)
+            else:
+                escenaDinosauros= Dinosaurios(self.director)
+                self.director.cambiarEscena(escenaDinosauros)
             return
 
     def dibujar(self, pantalla):

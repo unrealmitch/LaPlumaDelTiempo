@@ -23,9 +23,9 @@ MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
 # -------------------------------------------------
-# Clase Piratas
+# Clase Dinosaurios
 
-class Piratas(Escena):
+class Dinosaurios(Escena):
 	def __init__(self, director):
 
 		Escena.__init__(self, director)
@@ -35,37 +35,17 @@ class Piratas(Escena):
 		self.time_fade = pygame.time.get_ticks()
 
 		### ESCENARIO ###
+		### ESCENARIO ###
 		if DEBUG:
-			self.background = StaticScenario('pirata_fondo.png',(0.3,0))
+			self.background = StaticScenario('dino_fondo.png',(0.3,0))
 		else:
-			self.background = DynamicScenario("animations/pirata_fondo",21,0,(0.3,0))
+			self.background = DynamicScenario("animations/dino_fondo",21,0,(0.3,0))
+		
 
-		self.decorado = StaticScenario('pirata_escenario.png',(1,1))
+		self.decorado = StaticScenario('dino_escenario.png',(1,1))
 		
 		self.capaEscenario = Capa(self.background)
 		
-		# autonomeSprite(image, (startX, startY, maxX, maxY, velX, velY), (startScaleX, startScaleY, maxScaleX, maxScaley, velScaleX, velScaleY), (velScrollX, velScrollY))
-		
-		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/2,320,4000,0,0.005,0),(0.2,0.2,1,1,0,0),(0.17,0.07)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/1.75,320,4000,0,0.007,0),(0.25,0.25,1,1,0,0),(0.18,0.08)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/3,310,4000,0,0.01,0),(0.3,0.3,1,1,0,0),(0.19,0.09)))
-
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(700,200,2000,0,0.002,0.001),(0.15,0.15,0.25,0.25,0.000001,0.000001),(0.3,0.25)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(100,50,3000,0,0.01,-0.01),(0.25,0.25,0.5,0.5,0.000005,0.000005),(0.33,-0.5)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(1000,230,2000,0,0.002,0.001),(0.18,0.18,0.25,0.25,0.000001,0.000001),(0.3,0.25)))
-
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(1800,250,5500,0,0,0.002),(0.1,0.1,0.15,0.15,0.000001,0.000001),(0.2,0.2)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(2200,130,5200,0,0,0.03),(0.27,0.27,0.4,0.4,0.000001,0.000001),(0.32,0.4)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(2000,100,5000,0,0,0.04),(0.3,0.3,0.4,0.4,0.000001,0.000001),(0.33,-0.5)))
-		
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(1700,300,0,0,0,0),(-0.6,0.6,0,0,0,0),(0.86,-0.86)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(1550,250,0,0,0,0),(-0.75,0.75,0,0,0,0),(0.88,-0.88)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(1400,200,0,0,0,0),(-0.9,0.9,0,0,0,0),(0.9,-0.9)))
-		
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5400,240,0,0,0,0),(0.7,0.7,0,0,0,0),(0.86,0.86)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5300,250,0,0,0,0),(0.75,0.75,0,0,0,0),(0.88,0.88)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5200,250,0,0,0,0),(0.8,0.8,0,0,0,0),(0.9,0.9)))
-
 		# Que parte del decorado estamos visualizando
 		self.scroll = (0,0.)
 		self.virtual_scroll = (0.,0.)
@@ -73,7 +53,7 @@ class Piratas(Escena):
 
 		### JUGADORES ###
 		self.jugador1 = Jugador()
-		self.jugador1.establecerPosicion((0, 555*ESCALA))
+		self.jugador1.establecerPosicion((0, 300*ESCALA))
 		self.grupoJugadores = pygame.sprite.Group( self.jugador1 )
 		self.lifebar = LifeBar()
 
@@ -81,7 +61,7 @@ class Piratas(Escena):
 		random.seed()
 		self.grupoEnemigos = pygame.sprite.Group()
 
-		n_enemigos=8
+		n_enemigos=1
 		dist_enemigos = self.decorado.rect.width/n_enemigos
 		piratas = []
 
@@ -104,12 +84,12 @@ class Piratas(Escena):
 		self.final.establecerPosicion((7000*ESCALA, 400))
 		self.grupoEnemigos.add(self.final)
 		### PLATAFORMAS ###
-		file_plataformas = GestorRecursos.CargarMapaPlataformas("pirata_plataform.txt")
+		file_plataformas = GestorRecursos.CargarMapaPlataformas("dino_plataform.txt")
 		plataformas = []
 		self.grupoPlataformas = pygame.sprite.Group()
 
 		for elem in file_plataformas:
-			self.grupoPlataformas.add(Plataforma(pygame.Rect(elem[0], elem[1], elem[2], elem[3]),elem[4]))
+			self.grupoPlataformas.add(Plataforma(pygame.Rect(elem[0], elem[1]+280, elem[2], elem[3]),elem[4]))
 
 		#Grupos cojnutos de sprites
 		self.grupoSpritesDinamicos = pygame.sprite.Group( self.jugador1 )
@@ -158,10 +138,10 @@ class Piratas(Escena):
 			desplazamiento = (jugador.rect.right - MAXIMO_X_JUGADOR)
 
 			if self.scroll[0]*ESCALA + ANCHO_PANTALLA + 10 >= self.decorado.rect.right:
-				#if self.fade == 0: self.fade = -250
+				if self.fade == 0: self.fade = -250
 				#if self.jugador1.rect.centerx > ANCHO_PANTALLA + 100: self.salir(True)
 				if self.fade == 0:
-					if self.jugador1.rect.right > self.decorado.rect.right: jugador.establecerPosicion((self.decorado.right-self.jugador1.rect.width, jugador.posicion[1]))
+					if self.jugador1.rect.right + 100 > self.decorado.rect.right: jugador.establecerPosicion((self.decorado.right-self.jugador1.rect.width, jugador.posicion[1]))
 
 				#self.scroll = (self.decorado.rect.right*ESCALA - ANCHO_PANTALLA, self.scroll[1])
 				#jugador.establecerPosicion((self.scroll[0]*ESCALA + MAXIMO_X_JUGADOR*ESCALA, jugador.posicion[1]))
@@ -227,7 +207,7 @@ class Piratas(Escena):
 		if(not self.jugador1.alive()):
 			if(self.fade == 0): self.fade = -250
 
-		if ( not self.final.alive() ):
+		if ( not self.final.alive() and False ):
 			if self.fade == 0: self.fade = -250
 
 		if(self.fade < 0):

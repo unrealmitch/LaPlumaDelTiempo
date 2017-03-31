@@ -187,7 +187,7 @@ class Menu(Escena):
         self.director.salirPrograma()
 
     def ejecutarJuego(self):
-        escena = EscenaCarga(self.director, "piratas.conf")
+        escena = EscenaCarga(self.director, 0)
         self.director.apilarEscena(escena)
 
     def mostrarPantallaInicial(self):

@@ -275,8 +275,9 @@ class Personaje(MiSprite):
 								self.establecerPosicion((self.posicion[0], (new_y)))
 
 			elif(self.rect.bottom > plataforma.rect.top + 15 and plataforma.tipo == 1): #Paredes [No atravesarlas]
-				if( self.mirando == DERECHA and self.rect.right > plataforma.rect.left and self.rect.left < plataforma.rect.left): velocidadx = 0
-				elif( self.mirando == IZQUIERDA and self.rect.left < plataforma.rect.right and self.rect.right > plataforma.rect.right): velocidadx = 0
+				if( self.mirando == DERECHA and self.rect.right > plataforma.rect.left and self.rect.left < plataforma.rect.left and self.rect.right < plataforma.rect.right): velocidadx = 0
+				if( self.mirando == IZQUIERDA and self.rect.left < plataforma.rect.right and self.rect.right > plataforma.rect.right and self.rect.left > plataforma.rect.left): velocidadx = 0
+					
 
 		if floor_detected == None : self.posturas[P_SALTANDO] = True
 		
@@ -314,6 +315,7 @@ class Personaje(MiSprite):
 		# Actualizamos la imagen a mostrar
 		self.actualizarPostura()
 
+		#velocidady = 0
 		# Aplicamos la velocidad en cada eje      
 		self.velocidad = (velocidadx, velocidady)
 
@@ -386,12 +388,12 @@ class Pirata(NoJugador):
 
 	def mover_cpu(self, jugador1, grupoPlataformas):
 		# Movemos solo a los enemigos que esten en la pantalla
-		if self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA:
+		if self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA and jugador1.alive():
 
 			# Y nos movemos andando hacia el protagonista, si estamos muy cerca atacamos
-			if jugador1.rect.right-10<self.rect.left:
+			if jugador1.rect.right<self.rect.left:
 				Personaje.mover_wreset(self,{IZQUIERDA:True})
-			elif(jugador1.rect.left-10>self.rect.right):
+			elif(jugador1.rect.left>self.rect.right):
 				Personaje.mover_wreset(self,{DERECHA:True})
 			else:
 				Personaje.mover_wreset(self,{ATAQUE1:True})
