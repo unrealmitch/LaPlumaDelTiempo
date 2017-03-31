@@ -188,6 +188,7 @@ class Personaje(MiSprite):
 		return self.vida
 
 	def update(self, grupoPlataformas, tiempo):
+		if(tiempo > 1000): return	#Fix para cuando un fotograma consume mucho tiempo, normalmente al inicio de la escena, se descarte, ya que haría movimientos incosistentes dado la larga duración que se aplicaría a los movimientos
 
 		# Si no tenemos vida, no podemos realziar movimientos
 		if self.vida <= 0:
@@ -217,9 +218,6 @@ class Personaje(MiSprite):
 			velocidadx = 0
 
 		plataformas = pygame.sprite.spritecollide(self, grupoPlataformas, False)
-
-		#self.posturas[P_SALTANDO] = True
-
 		#COLISIONES
 		floor_detected = None
 
@@ -249,18 +247,17 @@ class Personaje(MiSprite):
 				if( self.mirando == DERECHA and self.rect.right > plataforma.rect.left and self.rect.left < plataforma.rect.left): velocidadx = 0
 				elif( self.mirando == IZQUIERDA and self.rect.left < plataforma.rect.right and self.rect.right > plataforma.rect.right): velocidadx = 0
 
+		if floor_detected == None : self.posturas[P_SALTANDO] = True
+		
 		# Si queremos saltar
 		if self.movimientos[ARRIBA]:
 			# La postura actual sera estar saltando
 			if not self.posturas[P_SALTANDO] : velocidady = -self.velocidadSalto
 			self.posturas[P_SALTANDO] = True
 			# Le imprimimos una velocidad en el eje y
-			
-		elif(pygame.sprite.spritecollideany(self, grupoPlataformas) == None):
-			self.posturas[P_SALTANDO] = True
 
-		if self.posturas[P_SALTANDO]: 
-			velocidady += GRAVEDAD * tiempo 
+		if self.posturas[P_SALTANDO]:
+			velocidady += GRAVEDAD * float(tiempo) 
 		else: 
 			velocidady = 0
 
@@ -289,6 +286,7 @@ class Personaje(MiSprite):
 
 		# Y llamamos al método de la superclase para que, según la velocidad y el tiempo
 		#  calcule la nueva posición del Sprite
+
 		MiSprite.update(self, tiempo)
 
 		return
@@ -347,7 +345,6 @@ class Pirata(NoJugador):
 	# La implementacion de la inteligencia segun este personaje particular
 
 	def mover_cpu(self, jugador1):
-
 		# Movemos solo a los enemigos que esten en la pantalla
 		if self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA:
 

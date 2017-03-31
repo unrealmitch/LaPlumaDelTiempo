@@ -18,7 +18,7 @@ from animacionesPygame import *
 # -------------------------------------------------
 
 # Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = True
+DEBUG = False
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -67,6 +67,14 @@ class Piratas(Escena):
 		self.grupoJugadores = pygame.sprite.Group( self.jugador1 )
 		self.lifebar = LifeBar()
 
+		### ENEMIGOS ###
+		self.grupoEnemigos = pygame.sprite.Group()
+		piratas = [(1500*ESCALA, 555*ESCALA), (2500*ESCALA, 555*ESCALA), (3500*ESCALA, 500*ESCALA), (5200*ESCALA, 720*ESCALA)]
+		for posicion in piratas:
+			pirata = Pirata()
+			pirata.establecerPosicion(posicion)
+			self.grupoEnemigos.add(pirata)
+
 		### PLATAFORMAS ###
 		file_plataformas = GestorRecursos.CargarMapaPlataformas("pirata_plataform.txt")
 		plataformas = []
@@ -74,24 +82,10 @@ class Piratas(Escena):
 
 		for elem in file_plataformas:
 			self.grupoPlataformas.add(Plataforma(pygame.Rect(elem[0], elem[1], elem[2], elem[3]),elem[4]))
-		
-		### ENEMIGOS ###
-		enemigo1 = Pirata()
-		enemigo1.establecerPosicion((1500*ESCALA, 555*ESCALA))
-		enemigo2 = Pirata()
-		enemigo2.establecerPosicion((2500*ESCALA, 555*ESCALA))
-		enemigo3 = Pirata()
-		enemigo3.establecerPosicion((3500*ESCALA, 500*ESCALA))
-		enemigo4 = Pirata()
-		enemigo4.establecerPosicion((5200*ESCALA, 720*ESCALA))
 
-		# Creamos un grupo con los enemigos
-		self.grupoEnemigos = pygame.sprite.Group( enemigo1, enemigo2, enemigo3, enemigo4 )
-
-		
+		#Grupos cojnutos de sprites
 		self.grupoSpritesDinamicos = pygame.sprite.Group( self.jugador1 )
 		self.grupoSpritesDinamicos.add(self.grupoEnemigos)
-		self.grupoSpritesDinamicos.add()
 
 		self.grupoSprites = pygame.sprite.Group( self.jugador1 )
 		self.grupoSprites.add(self.grupoEnemigos)
@@ -167,9 +161,6 @@ class Piratas(Escena):
 			sprite.establecerPosicionPantalla(self.virtual_scroll)
 
 		self.capaEscenario.establecerPosicionPantalla(self.virtual_scroll)
-
-		for sprite in iter(self.grupoSprites):
-			sprite.establecerPosicionPantalla(self.virtual_scroll)
 
 		if(self.fade == 0):
 			sound_lvl = float(self.scroll[0])/float(self.background.rect.width)/2
