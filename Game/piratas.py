@@ -18,7 +18,7 @@ from animacionesPygame import *
 # -------------------------------------------------
 
 # Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = False
+DEBUG = True
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -83,7 +83,7 @@ class Piratas(Escena):
 		self.grupoEnemigos = pygame.sprite.Group()
 
 		piratas = []
-		for i in range(2,10):
+		for i in range(2,14):
 			piratas.append((500*ESCALA*i + random.randint(-100, 100), 500*ESCALA))
 
 		for posicion in piratas:
@@ -98,7 +98,7 @@ class Piratas(Escena):
 			self.grupoEnemigos.add(pirata)
 
 		final = pirata = Pirata(3)
-		final.establecerPosicion((7000*ESCALA), 400)
+		final.establecerPosicion((7000*ESCALA, 400))
 		self.grupoEnemigos.add(final)
 		### PLATAFORMAS ###
 		file_plataformas = GestorRecursos.CargarMapaPlataformas("pirata_plataform.txt")

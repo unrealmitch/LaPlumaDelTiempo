@@ -246,14 +246,15 @@ class Personaje(MiSprite):
 
 		for plataforma in plataformas:
 			if(plataforma.tipo != 1):
-				if( (self.rect.bottom-3) < plataforma.rect.bottom): #Sobre una plataforma
-					if(self.rect.centerx + 10 > plataforma.rect.left and self.rect.centerx - 10 < plataforma.rect.right and velocidady>=0): #Plataforma sobre la que estamos
-						self.posturas[P_SALTANDO] = False 	#Dejamos de saltar solo si estáos cayendo
+				if( (self.rect.bottom) < plataforma.rect.bottom): #Sobre una plataforma (si es suelo ignoramos si la cogemos de lado)
+					if(self.rect.centerx + 10 > plataforma.rect.left and self.rect.centerx - 10 < plataforma.rect.right and velocidady>=0): #Plataforma sobre la que estamos (si realmente estamos sobre ella)
+						
 						if(floor_detected == None or floor_detected.rect.left > plataforma.rect.left):
+							self.posturas[P_SALTANDO] = False
 							floor_detected = plataforma
 							if (plataforma.tipo == 0): #Suelo
 									self.establecerPosicion((self.posicion[0], plataforma.posicion[1]-plataforma.rect.height+1))							
-							else:	#Rampa
+							else: #Rampa
 								percent_ramp = (float(self.rect.centerx) - float(plataforma.rect.left))/float(plataforma.rect.width);
 								if percent_ramp < 0: 
 									percent_ramp = 0
