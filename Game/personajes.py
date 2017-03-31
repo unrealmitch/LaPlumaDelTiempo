@@ -315,6 +315,7 @@ class Personaje(MiSprite):
 		# Actualizamos la imagen a mostrar
 		self.actualizarPostura()
 
+		#velocidady = 0
 		# Aplicamos la velocidad en cada eje      
 		self.velocidad = (velocidadx, velocidady)
 
