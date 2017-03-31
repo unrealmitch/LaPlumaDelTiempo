@@ -45,7 +45,6 @@ class Piratas(Escena):
 		self.capaEscenario = Capa(self.background)
 		
 		# autonomeSprite(image, (startX, startY, maxX, maxY, velX, velY), (startScaleX, startScaleY, maxScaleX, maxScaley, velScaleX, velScaleY), (velScrollX, velScrollY))
-		#self.capaEscenario.add(autonomeSprite('pirata_barco2.png',(1000,150,2000,0,0.01,0),(0.8,0.8,1,1,0,0),(0.3,0.25)))
 		
 		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/2,320,4000,0,0.005,0),(0.2,0.2,1,1,0,0),(0.17,0.07)))
 		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/1.75,320,4000,0,0.007,0),(0.25,0.25,1,1,0,0),(0.18,0.08)))
@@ -82,12 +81,13 @@ class Piratas(Escena):
 		random.seed()
 		self.grupoEnemigos = pygame.sprite.Group()
 
-		n_enemigos=16
+		n_enemigos=8
 		dist_enemigos = self.decorado.rect.width/n_enemigos
 		piratas = []
 
-		for i in range(1,n_enemigos):
-			piratas.append((dist_enemigos*ESCALA*(i+1) + random.randint(-100, 100), 500*ESCALA))
+		for i in range(0,n_enemigos):
+			#piratas.append((dist_enemigos*ESCALA*(i+1) + random.randint(-dist_enemigos/2, dist_enemigos/2), 500*ESCALA))
+			piratas.append((dist_enemigos*(i+1) + random.randint(-100, 100), 500*ESCALA))
 
 		for posicion in piratas:
 			if random.randint(0,100) > 90:
