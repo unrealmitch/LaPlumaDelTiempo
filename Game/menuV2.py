@@ -271,7 +271,6 @@ class Menu(Escena):
         self.director.salirPrograma()
 
     def ejecutarJuego(self,fase):
-        pygame.mixer.stop();
         escena = EscenaCarga(self.director, fase)
         self.director.apilarEscena(escena)
 
