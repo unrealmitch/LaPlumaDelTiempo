@@ -146,11 +146,11 @@ class PantallaInicialGUI(PantallaGUI):
 # -------------------------------------------------
 # Clase Menu, la escena en sí
 
-class Menu(Escena):
+class Menu(EscenaPygame):
 
     def __init__(self, director):
         # Llamamos al constructor de la clase padre
-        Escena.__init__(self, director);
+        EscenaPygame.__init__(self, director);
         # Creamos la lista de pantallas
         self.listaPantallas = []
         # Creamos las pantallas que vamos a tener

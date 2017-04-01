@@ -13,9 +13,9 @@ from dinosaurios import Dinosaurios
 # -------------------------------------------------
 # Clase EscenaCarga
 
-class EscenaCarga(Escena):
+class EscenaCarga(EscenaPygame):
     def __init__(self, director, fase):
-        Escena.__init__(self, director)
+        EscenaPygame.__init__(self, director)
         self.tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 40)
         self.fase = fase;
 
