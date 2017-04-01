@@ -81,7 +81,7 @@ class Piratas(Escena):
 		random.seed()
 		self.grupoEnemigos = pygame.sprite.Group()
 
-		n_enemigos=1
+		n_enemigos=10
 		dist_enemigos = self.decorado.rect.width/(n_enemigos+1)
 		piratas = []
 

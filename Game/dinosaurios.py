@@ -42,9 +42,12 @@ class Dinosaurios(Escena):
 			self.background = DynamicScenario("animations/dino_fondo",21,0,(0.3,0))
 		
 
-		self.decorado = StaticScenario('dino_escenario.png',(1,1))
+		self.background2 = StaticScenario('dino_fondo2.png',(0.6,0))
+		self.decorado = StaticScenario('dino_escenario.png',(1,0))
 		
 		self.capaEscenario = Capa(self.background)
+		self.capaEscenario.add(self.background2)
+
 		
 		# Que parte del decorado estamos visualizando
 		self.scroll = (0,0.)
@@ -61,7 +64,7 @@ class Dinosaurios(Escena):
 		random.seed()
 		self.grupoEnemigos = pygame.sprite.Group()
 
-		n_enemigos=10
+		n_enemigos=5
 		dist_enemigos = self.decorado.rect.width/(n_enemigos+1)
 		dinos = []
 
@@ -89,7 +92,7 @@ class Dinosaurios(Escena):
 		self.grupoPlataformas = pygame.sprite.Group()
 
 		for elem in file_plataformas:
-			self.grupoPlataformas.add(Plataforma(pygame.Rect(elem[0], elem[1]+280, elem[2], elem[3]),elem[4]))
+			self.grupoPlataformas.add(Plataforma(pygame.Rect(elem[0], elem[1]+295, elem[2], elem[3]),elem[4]))
 
 		#Grupos cojnutos de sprites
 		self.grupoSpritesDinamicos = pygame.sprite.Group( self.jugador1 )
@@ -98,6 +101,18 @@ class Dinosaurios(Escena):
 		self.grupoSprites = pygame.sprite.Group( self.jugador1 )
 		self.grupoSprites.add(self.grupoEnemigos)
 		self.grupoSprites.add(self.grupoPlataformas)
+
+		### ANIMACIONES ###
+		self.animacionLava = []
+		for i in range(int(ANCHO_PANTALLA/(400*ESCALA))):
+			animacionLava = AnimacionLava()
+			pyganim.PygAnimation.scale(animacionLava, (int(512*ESCALA), int(256*ESCALA)))
+			animacionLava.posicionx = 512*i*ESCALA
+			animacionLava.posiciony = 600*ESCALA
+			self.animacionLava.append(animacionLava)
+		
+		for elem in self.animacionLava:
+			elem.play()
 
 		### Sonido ###
 		sound_bso = GestorRecursos.CargarSonido('dino_bso.ogg')
@@ -153,10 +168,11 @@ class Dinosaurios(Escena):
 		cambioScroll = self.actualizarScrollOrdenados(jugador)
 
 		self.decorado.establecerPosicionPantalla(self.virtual_scroll)
+		self.background2.establecerPosicionPantalla(self.virtual_scroll)
 		self.background.establecerPosicionPantalla(self.virtual_scroll)
 
 		for sprite in iter(self.grupoSprites):
-			sprite.establecerPosicionPantalla(self.virtual_scroll)
+			sprite.establecerPosicionPantalla((self.virtual_scroll[0], 0))
 
 		self.capaEscenario.establecerPosicionPantalla(self.virtual_scroll)
 
@@ -189,14 +205,13 @@ class Dinosaurios(Escena):
 			
 		
 		self.actualizarScroll(self.jugador1)
-		self.background.establecerPosicionPantalla(self.virtual_scroll)
 
 		#Cuando hacemos el fundido a negro
 
 		if(not self.jugador1.alive()):
 			if(self.fade == 0): self.fade = -250
 
-		if ( not self.final.alive() and False ):
+		if ( not self.final.alive() ):
 			if self.fade == 0: self.fade = -250
 
 		if(self.fade < 0):
@@ -241,6 +256,10 @@ class Dinosaurios(Escena):
 		if DEBUG:
 			for elem in self.grupoPlataformas.sprites():
 				elem.draw(pantalla)
+
+		for animacion in self.animacionLava:
+			animacion.posiciony = 600*ESCALA + self.virtual_scroll[1]
+			animacion.dibujar(pantalla)
 
 		#Efecto fundido, para entrar a la escena, y para terminarla
 		if(self.fade != 0):

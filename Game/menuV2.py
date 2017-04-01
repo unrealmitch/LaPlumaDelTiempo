@@ -5,6 +5,7 @@ from pygame.locals import *
 from escena import *
 from gestorRecursos import *
 from escenaCarga import EscenaCarga
+from animacionesPygame import *
 
 # -------------------------------------------------
 # Clase abstracta ElementoGUI
@@ -26,11 +27,56 @@ class ElementoGUI:
         else:
             return False
 
+    def focus(self,over):
+        ''
+
     def dibujar(self):
         raise NotImplemented("Tiene que implementar el metodo dibujar.")
     def accion(self):
         raise NotImplemented("Tiene que implementar el metodo accion.")
 
+class Portal(ElementoGUI):
+    def __init__(self, pantalla, fase):
+        self.fase = fase
+        if fase == 0:
+            self.animPortal = AnimacionMenuDino()
+            self.animPortal.posicionx = 0.75*ANCHO_PANTALLA
+            self.animPortal.posiciony = 0.1*ALTO_PANTALLA
+            pyganim.PygAnimation.scale(self.animPortal, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
+            sound_bso = GestorRecursos.CargarSonido('dino_bso_jp.ogg')
+        else:
+            self.animPortal = AnimacionMenuPirata()
+            self.animPortal.posicionx = 0.75*ANCHO_PANTALLA
+            self.animPortal.posiciony = 0.5*ALTO_PANTALLA
+            pyganim.PygAnimation.scale(self.animPortal, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
+            sound_bso = GestorRecursos.CargarSonido('pirata_bso_pc.ogg')
+
+        self.animPortal.pause()
+        self.channel_bso = sound_bso.play(-1)
+        self.channel_bso.set_volume(0)
+
+        ElementoGUI.__init__(self, pantalla, (400*ESCALA,400*ESCALA) )
+
+    def dibujar(self, pantalla):
+        self.animPortal.dibujar(pantalla)
+
+    def accion(self):
+        self.pantalla.menu.ejecutarJuego(self.fase)
+
+    def posicionEnElemento(self, posicion):
+        (posicionx, posiciony) = posicion
+        if(posicionx > self.animPortal.posicionx and posicionx < self.animPortal.posicionx + 400*ESCALA and posiciony> self.animPortal.posiciony and posiciony < self.animPortal.posiciony + 400*ESCALA):
+            return True
+        else:
+            return False
+
+    def focus(self,over):
+        if over:
+            self.animPortal.play()
+            self.channel_bso.set_volume(75)
+        else:
+            self.animPortal.pause()
+            self.channel_bso.set_volume(0)
 
 # -------------------------------------------------
 # Clase Boton y los distintos botones
@@ -52,12 +98,12 @@ class BotonJugar(Boton):
         Boton.__init__(self, pantalla, 'menu_boton_comenzar.png', 
             (ANCHO_PANTALLA*0.5 ,ALTO_PANTALLA*0.90))
     def accion(self):
-        self.pantalla.menu.ejecutarJuego()
+        self.pantalla.menu.ejecutarJuego(0)
 
 class BotonSalir(Boton):
     def __init__(self, pantalla):
         Boton.__init__(self, pantalla, 'menu_boton_salir.png', 
-            (ANCHO_PANTALLA*0.5,ALTO_PANTALLA*0.97))
+            (ANCHO_PANTALLA*0.5-10,ALTO_PANTALLA*0.90))
     def accion(self):
         self.pantalla.menu.salirPrograma()
 
@@ -72,7 +118,7 @@ class TextoGUI(ElementoGUI):
         ElementoGUI.__init__(self, pantalla, self.imagen.get_rect())
         # Se coloca el rectangulo en su posicion
         self.establecerPosicion(posicion)
-        self.rect.centerx = ANCHO_PANTALLA*0.5+10
+        self.rect.centerx = ANCHO_PANTALLA*0.5
     def dibujar(self, pantalla):
         pantalla.blit(self.imagen, self.rect)
 
@@ -86,14 +132,14 @@ class TextoJugar(TextoGUI):
         TextoGUI.__init__(self, pantalla, fuente, (0, 238, 255), 'Comenzar', 
             (ANCHO_PANTALLA*0.5, ALTO_PANTALLA*0.87))
     def accion(self):
-        self.pantalla.menu.ejecutarJuego()
+        self.pantalla.menu.ejecutarJuego(0)
 
 class TextoSalir(TextoGUI):
     def __init__(self, pantalla):
         # La fuente la debería cargar el estor de recursos
         fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 29-1)
         TextoGUI.__init__(self, pantalla, fuente, (0, 238, 255), 'Salir', 
-            (ANCHO_PANTALLA*0.5, ALTO_PANTALLA*0.94))
+            (100*ESCALA, ALTO_PANTALLA*0.86))
     def accion(self):
         self.pantalla.menu.salirPrograma()
 
@@ -111,6 +157,10 @@ class PantallaGUI:
 
     def eventos(self, lista_eventos):
         for evento in lista_eventos:
+            if evento.type == MOUSEMOTION:
+                mouse = pygame.mouse.get_pos()
+                for elemento in self.elementosGUI:
+                    elemento.focus(elemento.posicionEnElemento(mouse))
             if evento.type == MOUSEBUTTONDOWN:
                 self.elementoClic = None
                 for elemento in self.elementosGUI:
@@ -125,23 +175,29 @@ class PantallaGUI:
     def dibujar(self, pantalla):
         # Dibujamos primero la imagen de fondo
         pantalla.blit(self.imagen, self.imagen.get_rect())
-        # Después los botones
+
         for elemento in self.elementosGUI:
             elemento.dibujar(pantalla)
 
 class PantallaInicialGUI(PantallaGUI):
     def __init__(self, menu):
-        PantallaGUI.__init__(self, menu, 'menu_fondo.png')
+        PantallaGUI.__init__(self, menu, 'portada.jpg')
         # Creamos los botones y los metemos en la lista
         botonJugar = BotonJugar(self)
         botonSalir = BotonSalir(self)
-        self.elementosGUI.append(botonJugar)
+        #self.elementosGUI.append(botonJugar)
         self.elementosGUI.append(botonSalir)
         # Creamos el texto y lo metemos en la lista
         textoJugar = TextoJugar(self)
         textoSalir = TextoSalir(self)
-        self.elementosGUI.append(textoJugar)
+        #self.elementosGUI.append(textoJugar)
         self.elementosGUI.append(textoSalir)
+        # Animacion
+        animDino = Portal(self, 0)
+        self.elementosGUI.append(animDino)
+
+        animPirata = Portal(self, 1)
+        self.elementosGUI.append(animPirata)
 
 # -------------------------------------------------
 # Clase Menu, la escena en sí
@@ -186,8 +242,9 @@ class Menu(Escena):
     def salirPrograma(self):
         self.director.salirPrograma()
 
-    def ejecutarJuego(self):
-        escena = EscenaCarga(self.director, 0)
+    def ejecutarJuego(self,fase):
+        pygame.mixer.stop();
+        escena = EscenaCarga(self.director, fase)
         self.director.apilarEscena(escena)
 
     def mostrarPantallaInicial(self):

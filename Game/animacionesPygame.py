@@ -67,3 +67,27 @@ class AnimacionOlas(Animacion):
 			array_animation.append(('animations/pirata_waves/frame (' + str(i) + ').gif', 0.1))
 
 		pyganim.PygAnimation.__init__(self,array_animation)
+
+class AnimacionLava(Animacion):
+	def __init__(self):
+		array_animation = []
+		for i in range(1,9):
+			array_animation.append(('animations/dino_lava/frame (' + str(i) + ').png', 0.1))
+
+		pyganim.PygAnimation.__init__(self,array_animation)
+
+class AnimacionMenuPirata(Animacion):
+	def __init__(self):
+		array_animation = []
+		for i in range(1,25):
+			array_animation.append(('animations/menu_pirata/frame (' + str(i) + ').png', 0.1))
+
+		pyganim.PygAnimation.__init__(self,array_animation)
+
+class AnimacionMenuDino(Animacion):
+	def __init__(self):
+		array_animation = []
+		for i in range(1,25):
+			array_animation.append(('animations/menu_dino/frame (' + str(i) + ').png', 0.1))
+
+		pyganim.PygAnimation.__init__(self,array_animation)
