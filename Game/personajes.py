@@ -119,12 +119,17 @@ class Personaje(MiSprite):
 			self.audio.update({P_ATACANDO1: GestorRecursos.CargarSonido('pirata_attack.ogg')})
 			self.audio.update({P_HERIDO: GestorRecursos.CargarSonido('pirata_hurt.ogg')})
 			self.audio.update({P_MURIENDO: GestorRecursos.CargarSonido('pirata_die.ogg')})
-		else:
+		elif self.tipo < 10:
 			self.audio.update({P_SALTANDO: GestorRecursos.CargarSonido('epirata_jump.ogg')})
 			self.audio.update({P_ATACANDO1: GestorRecursos.CargarSonido('epirata_attack.ogg')})
 			self.audio.update({P_HERIDO: GestorRecursos.CargarSonido('epirata_hurt.ogg')})
 			self.audio.update({P_MURIENDO: GestorRecursos.CargarSonido('epirata_die.ogg')})	
-		
+		else:
+			self.audio.update({P_SALTANDO: GestorRecursos.CargarSonido('dino_jump.ogg')})
+			self.audio.update({P_ATACANDO1: GestorRecursos.CargarSonido('dino_attack.ogg')})
+			self.audio.update({P_HERIDO: GestorRecursos.CargarSonido('dino_hurt.ogg')})
+			self.audio.update({P_MURIENDO: GestorRecursos.CargarSonido('dino_die.ogg')})
+
 		###COORDENADAS###
 		datos = GestorRecursos.CargarArchivoCoordenadas(archivoCoordenadas)
 		datos = datos.split()
@@ -393,7 +398,7 @@ class Enemigo(NoJugador):
 		elif clase == EPIRATA4: 
 			NoJugador.__init__(self,EPIRATA4,'Pirate_b.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.15, VELOCIDAD_SALTO_EPIRATA+0.1, RETARDO_ANIMACION_EPIRATA, 1500, 4);
 		elif clase == EDINO1:
-			NoJugador.__init__(self,EPIRATA1,'dino_Velociraptor.gif','dino_Velociraptor.txt', [5, 4, 4, 5, 4], VELOCIDAD_EDINO, VELOCIDAD_SALTO_EDINO, RETARDO_ANIMACION_EDINO, 4000, 1);
+			NoJugador.__init__(self,EDINO1,'dino_Velociraptor.gif','dino_Velociraptor.txt', [5, 4, 4, 5, 4], VELOCIDAD_EDINO, VELOCIDAD_SALTO_EDINO, RETARDO_ANIMACION_EDINO, 4000, 1);
 		else:
 			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 5000, 2);
 	# Aqui vendria la implementacion de la IA segun las posiciones de los jugadores

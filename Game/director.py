@@ -25,11 +25,18 @@ class Director():
         # Reloj
         self.reloj = pygame.time.Clock()
 
-        #self.screen.fill((0,0,0))
         #tipoLetra = pygame.font.SysFont('arial', 48)
         #texto = tipoLetra.render('#Loading mision 1...', True, (255,255,255), (0,0,0))
         #self.screen.blit(texto, (ANCHO_PANTALLA/2-200,ALTO_PANTALLA/2-50,300,300))
         #pygame.display.flip()
+
+        self.screen.fill((0,0,0))
+        tipoLetra =  pygame.font.SysFont('arial', 40)
+        texto = tipoLetra.render("Loading ...", True, (0,238,255), (0,0,0))
+        rect = texto.get_rect()
+        rect.center = (ANCHO_PANTALLA/2, ALTO_PANTALLA/2)
+        self.screen.blit(texto, rect)
+        pygame.display.flip()
 
 
     def bucle(self, escena):

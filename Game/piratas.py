@@ -139,6 +139,7 @@ class Piratas(Escena):
 		self.channel_ambient = sound_ambient.play(-1)
 
 	def salir(self):
+		pygame.time.delay(2500)	#Retardo para terminar el audio
 		pygame.mixer.stop();
 		self.director.salirEscena();
 
@@ -225,16 +226,21 @@ class Piratas(Escena):
 		self.actualizarScroll(self.jugador1)
 		self.background.establecerPosicionPantalla(self.virtual_scroll)
 
-		#Cuando hacemos el fundido a negro
+		#Cuando hacemos el fundido a negro (Salímos)
 
 		if(not self.jugador1.alive()):
-			if(self.fade == 0): self.fade = -250
+			if(self.fade == 0): 
+				self.fade = -250
+				GestorRecursos.CargarSonido('game_over.ogg').play()
+
 
 		if ( not self.final.alive()):
-			if self.fade == 0: self.fade = -250
+			if self.fade == 0: 
+				self.fade = -250
+				GestorRecursos.CargarSonido('mision_complete_long.ogg').play()
 
 		if(self.fade < 0):
-			self.channel_bso.set_volume(self.channel_bso.get_volume()-0.01)
+			self.channel_bso.set_volume(-self.fade/300)
 			if(self.jugador1.alive()):
 				self.jugador1.avanzar(self.grupoPlataformas)
 
@@ -282,20 +288,33 @@ class Piratas(Escena):
 			if(time > self.time_fade + 1):
 				self.time_fade = time
 
-				s = pygame.Surface((ANCHO_PANTALLA,ALTO_PANTALLA))
-				s.fill((0,0,0))
+				black = pygame.Surface((ANCHO_PANTALLA,ALTO_PANTALLA))
+				black.fill((0,0,0))
 
 				if(self.fade>0):
 					self.fade-=10
-					s.set_alpha(self.fade)
-					pantalla.blit(s, (0,0))
-				else:
+					black.set_alpha(self.fade)
+					pantalla.blit(black, (0,0))
+				else:	#Cuando se hace el fundido a negro por si pasamos la mision o morimos
 					if(self.fade < -10):
 						self.fade+=8
 					else:
 						self.fade=-1
-					s.set_alpha(255+self.fade)
-					pantalla.blit(s, (0,0))
+
+					if(self.jugador1.alive()):
+						image = GestorRecursos.CargarImagen("complete.png",-1)
+					else:
+						image = GestorRecursos.CargarImagen("game_over.png",-1)
+
+					rect = image.get_rect()
+					rect.centerx = ANCHO_PANTALLA/2
+					rect.centery = ALTO_PANTALLA/2
+
+					image.set_alpha(300+self.fade)
+					black.set_alpha(300+self.fade)
+
+					pantalla.blit(black, (0,0))
+					pantalla.blit(image,rect)
 					#pygame.draw.rect(pantalla,(255,255,255, ), (0,0,ANCHO_PANTALLA,ALTO_PANTALLA))
 
 	def eventos(self, lista_eventos):

@@ -18,7 +18,7 @@ from animacionesPygame import *
 # -------------------------------------------------
 
 # Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = False
+DEBUG = True
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -46,13 +46,21 @@ class Dinosaurios(Escena):
 		self.decorado = StaticScenario('dino_escenario.png',(1,0))
 		
 		self.capaEscenario = Capa(self.background)
+		self.capaEscenario.add(autonomeSprite('dino2.png',(ANCHO_PANTALLA/1.2,10,5000,0,0,0),(1.2,1.2,1,1,0,0),(0.1,-0.2)))
+		
+		for i in range(10):
+			random.seed()
+			self.capaEscenario.add(autonomeSprite('dino_ave.png',(random.randint(400,7000),random.randint(10,300),7000,0,-float(random.randint(1,100))/1000.,0),(0.5,0.5,1,1,0,0),(float(random.randint(10,100))/100.,float(random.randint(-200,200))/100.)))
+
 		self.capaEscenario.add(self.background2)
+		self.capaEscenario.add(autonomeSprite('dino1.png',(0,320,5000,0,0.01,0),(1.5,1.5,1,1,0,0),(0.3,1)))
 
 		
+
 		# Que parte del decorado estamos visualizando
 		self.scroll = (0,0.)
 		self.virtual_scroll = (0.,0.)
-		self.scroll_waves = 0.01
+		self.scroll_waves = 0.10
 
 		### JUGADORES ###
 		self.jugador1 = Jugador(PLAYER_DINO)
@@ -122,6 +130,7 @@ class Dinosaurios(Escena):
 		self.channel_ambient = sound_ambient.play(-1)
 
 	def salir(self):
+		pygame.time.delay(2500)	#Retardo para terminar el audio
 		pygame.mixer.stop();
 		self.director.salirEscena();
 
@@ -206,16 +215,21 @@ class Dinosaurios(Escena):
 		
 		self.actualizarScroll(self.jugador1)
 
-		#Cuando hacemos el fundido a negro
+		#Cuando hacemos el fundido a negro (Salímos)
 
 		if(not self.jugador1.alive()):
-			if(self.fade == 0): self.fade = -250
+			if(self.fade == 0): 
+				self.fade = -250
+				GestorRecursos.CargarSonido('game_over.ogg').play()
 
-		if ( not self.final.alive() ):
-			if self.fade == 0: self.fade = -250
+
+		if ( not self.final.alive()):
+			if self.fade == 0: 
+				self.fade = -250
+				GestorRecursos.CargarSonido('mision_complete_long.ogg').play()
 
 		if(self.fade < 0):
-			self.channel_bso.set_volume(self.channel_bso.get_volume()-0.01)
+			self.channel_bso.set_volume(-self.fade/300)
 			if(self.jugador1.alive()):
 				self.jugador1.avanzar(self.grupoPlataformas)
 
@@ -264,23 +278,36 @@ class Dinosaurios(Escena):
 		#Efecto fundido, para entrar a la escena, y para terminarla
 		if(self.fade != 0):
 			time = pygame.time.get_ticks()
-			if(time > self.time_fade + 1):
+			if(time > self.time_fade + 3):
 				self.time_fade = time
 
-				s = pygame.Surface((ANCHO_PANTALLA,ALTO_PANTALLA))
-				s.fill((0,0,0))
+				black = pygame.Surface((ANCHO_PANTALLA,ALTO_PANTALLA))
+				black.fill((0,0,0))
 
 				if(self.fade>0):
 					self.fade-=10
-					s.set_alpha(self.fade)
-					pantalla.blit(s, (0,0))
-				else:
+					black.set_alpha(self.fade)
+					pantalla.blit(black, (0,0))
+				else:	#Cuando se hace el fundido a negro por si pasamos la mision o morimos
 					if(self.fade < -10):
 						self.fade+=8
 					else:
 						self.fade=-1
-					s.set_alpha(255+self.fade)
-					pantalla.blit(s, (0,0))
+
+					if(self.jugador1.alive()):
+						image = GestorRecursos.CargarImagen("complete.png",-1)
+					else:
+						image = GestorRecursos.CargarImagen("game_over.png",-1)
+
+					rect = image.get_rect()
+					rect.centerx = ANCHO_PANTALLA/2
+					rect.centery = ALTO_PANTALLA/2
+
+					image.set_alpha(300+self.fade)
+					black.set_alpha(300+self.fade)
+
+					pantalla.blit(black, (0,0))
+					pantalla.blit(image,rect)
 					#pygame.draw.rect(pantalla,(255,255,255, ), (0,0,ANCHO_PANTALLA,ALTO_PANTALLA))
 
 	def eventos(self, lista_eventos):

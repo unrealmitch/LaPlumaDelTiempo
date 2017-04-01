@@ -29,6 +29,11 @@ class EscenaCarga(Escena):
         self.texto = self.tipoLetra.render(title, True, (0,238,255), (0,0,0))
         self.rect = self.texto.get_rect()
         self.rect.center = (ANCHO_PANTALLA/2, ALTO_PANTALLA/2)
+
+        self.tipoLetra2 = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 18)
+        self.texto2 = self.tipoLetra2.render("!Localiza y acaba con el hombre misterioso!", True, (0,175,200), (0,0,0))
+        self.rect2 = self.texto2.get_rect()
+        self.rect2.center = (ANCHO_PANTALLA/2, ALTO_PANTALLA/1.5)
         
         recursos = os.path.join('others', recursos)
         self.conf_file = open(recursos, "r")
@@ -58,6 +63,7 @@ class EscenaCarga(Escena):
         # Mostrar mensaje de espera
         pantalla.fill((0,0,0))
         pantalla.blit(self.texto, self.rect)
+        pantalla.blit(self.texto2, self.rect2)
 
     def eventos(self, lista_eventos):
         for evento in lista_eventos:
