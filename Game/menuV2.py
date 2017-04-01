@@ -44,21 +44,21 @@ class Portal(ElementoGUI):
             self.animPortal.posicionx = 0.75*ANCHO_PANTALLA
             self.animPortal.posiciony = 0.1*ALTO_PANTALLA
             pyganim.PygAnimation.scale(self.animPortal, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
-            sound_bso = GestorRecursos.CargarSonido('dino_bso_jp.ogg')
+            self.sound_bso = GestorRecursos.CargarSonido('dino_bso_jp.ogg')
             self.lvl = 'DINOS_LVL'
         else:
             self.animPortal = AnimacionMenuPirata()
             self.animPortal.posicionx = 0.75*ANCHO_PANTALLA
             self.animPortal.posiciony = 0.5*ALTO_PANTALLA
             pyganim.PygAnimation.scale(self.animPortal, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
-            sound_bso = GestorRecursos.CargarSonido('pirata_bso_pc.ogg')
+            self.sound_bso = GestorRecursos.CargarSonido('pirata_bso_pc.ogg')
             self.lvl = 'PIRATAS_LVL'
 
         self.block = imagen = GestorRecursos.CargarImagen("pirate_block.png", -1)
         self.block = pygame.transform.scale(self.block, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
 
         self.animPortal.pause()
-        self.channel_bso = sound_bso.play(-1)
+        self.channel_bso = self.sound_bso.play(-1)
         self.channel_bso.set_volume(0)
 
         ElementoGUI.__init__(self, pantalla, (400*ESCALA,400*ESCALA) )
@@ -89,6 +89,7 @@ class Portal(ElementoGUI):
     def focus(self,over):
         if over and not (self.fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') == 0 ):
             self.animPortal.play()
+            if self.channel_bso.get_busy() == False: self.channel_bso = self.sound_bso.play(-1)
             self.channel_bso.set_volume(0.75)
             return True
         else:
@@ -175,6 +176,7 @@ class PantallaGUI:
         self.elementosGUI = []
 
     def eventos(self, lista_eventos):
+        if self.menu.channel_bso.get_busy() == False: self.menu.channel_bso = self.menu.song.play(-1)
         for evento in lista_eventos:
             if evento.type == MOUSEMOTION:
                 self.menu.unmute()
@@ -229,8 +231,8 @@ class Menu(EscenaPygame):
         EscenaPygame.__init__(self, director);
         # Creamos la lista de pantallas
         self.listaPantallas = []
-        song = GestorRecursos.CargarSonido('menu_bso.ogg')
-        self.channel_bso = song.play(-1)
+        self.song = GestorRecursos.CargarSonido('menu_bso.ogg')
+        self.channel_bso = self.song.play(-1)
         self.channel_bso.set_volume(0.4)
         # Creamos las pantallas que vamos a tener
         #   y las metemos en la lista
@@ -274,6 +276,7 @@ class Menu(EscenaPygame):
     def ejecutarJuego(self,fase):
         pygame.mixer.stop();
         escena = EscenaAnimacion1(self.director)
+        #escena = EscenaCarga(self.director, fase)
         #escena = EscenaCarga(self.director, fase)
         self.director.apilarEscena(escena)
 

@@ -51,6 +51,7 @@ class EscenaCarga(EscenaPygame):
         except TypeError:
             # Entra después de cargar todas las lineas del iterador. No se puede
             # hacer len() de un tipo None. Ahora carga la escena del juego.
+            
             if(self.fase == 1):
                 escenaPiratas = Piratas(self.director)
                 self.director.cambiarEscena(escenaPiratas)

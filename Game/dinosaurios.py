@@ -141,6 +141,7 @@ class Dinosaurios(EscenaPygame):
 		### Sonido ###
 		sound_bso = GestorRecursos.CargarSonido('dino_bso.ogg')
 		sound_ambient = GestorRecursos.CargarSonido('dino_ambient.ogg')
+		pygame.mixer.stop();
 		self.channel_bso = sound_bso.play(-1)
 		self.channel_bso.set_volume(0)
 		self.channel_ambient = sound_ambient.play(-1)
