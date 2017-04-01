@@ -30,11 +30,27 @@ class Dinosaurios(Escena):
 
 		Escena.__init__(self, director)
 
+		#Cargamos la configuracion
+		self.teclasConfig = {ARRIBA: GestorRecursos.getConfigParam('ARRIBA'), ABAJO: GestorRecursos.getConfigParam('ABAJO'), 
+		IZQUIERDA: GestorRecursos.getConfigParam('IZQUIERDA'), DERECHA: GestorRecursos.getConfigParam('DERECHA'), 
+		ATAQUE1: GestorRecursos.getConfigParam('ATAQUE1')}
+
+		self.nivel = GestorRecursos.getConfigParam('DINOS_LVL')
+
+		#Intercambiamos teclas apra aumentar dificultad
+		if self.nivel > 3:
+			tmp = self.teclasConfig[IZQUIERDA]
+			self.teclasConfig[IZQUIERDA] = self.teclasConfig[DERECHA]
+			self.teclasConfig[DERECHA] = tmp
+			if self.nivel > 5:
+				tmp = self.teclasConfig[ARRIBA]
+				self.teclasConfig[ARRIBA] = self.teclasConfig[ATAQUE1]
+				self.teclasConfig[ATAQUE1] = tmp
+
 		#Atenuado
 		self.fade = 250
 		self.time_fade = pygame.time.get_ticks()
 
-		### ESCENARIO ###
 		### ESCENARIO ###
 		if DEBUG:
 			self.background = StaticScenario('dino_fondo.png',(0.3,0))
@@ -72,7 +88,7 @@ class Dinosaurios(Escena):
 		random.seed()
 		self.grupoEnemigos = pygame.sprite.Group()
 
-		n_enemigos=5
+		n_enemigos = 2 + self.nivel*2
 		dist_enemigos = self.decorado.rect.width/(n_enemigos+1)
 		dinos = []
 
@@ -81,12 +97,12 @@ class Dinosaurios(Escena):
 			dinos.append((dist_enemigos*(i+1) + random.randint(-50, 50), 500*ESCALA))
 
 		for posicion in dinos:
-			if random.randint(0,100) > 90:
-				dino = Enemigo(10)
-			elif random.randint(0,100) > 60:
-				dino = Enemigo(10)
+			if random.randint(0,100) >= 100-5*self.nivel:
+				dino = Enemigo(EDINO1)
+			elif random.randint(0,100) > 90-10*self.nivel:
+				dino = Enemigo(EDINO1)
 			else:
-				dino = Enemigo(10)
+				dino = Enemigo(EDINO1)
 
 			dino.establecerPosicion(posicion)
 			self.grupoEnemigos.add(dino)
@@ -222,14 +238,15 @@ class Dinosaurios(Escena):
 				self.fade = -250
 				GestorRecursos.CargarSonido('game_over.ogg').play()
 
-
 		if ( not self.final.alive()):
 			if self.fade == 0: 
 				self.fade = -250
 				GestorRecursos.CargarSonido('mision_complete_long.ogg').play()
+				GestorRecursos.setConfigParam('DINOS_LVL', self.nivel + 1)
 
 		if(self.fade < 0):
 			self.channel_bso.set_volume(-self.fade/300)
+			self.channel_ambient.set_volume(-self.fade/300)
 			if(self.jugador1.alive()):
 				self.jugador1.avanzar(self.grupoPlataformas)
 
@@ -315,7 +332,7 @@ class Dinosaurios(Escena):
 			if evento.type == KEYDOWN:
 				if evento.key == K_ESCAPE:
 					self.director.salirPrograma()
-				if evento.key == K_F1:
+				if evento.key == K_F11:
 					pygame.display.toggle_fullscreen()
 			if evento.type == pygame.QUIT:
 				self.director.salirPrograma()

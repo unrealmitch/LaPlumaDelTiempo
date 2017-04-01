@@ -5,11 +5,14 @@ import pygame
 import sys
 #import escena
 from escena import *
+from gestorRecursos import *
 from pygame.locals import *
 
 class Director():
 
     def __init__(self):
+        #Cargamos la configuración:
+        GestorRecursos.LoadConfig()
         # Inicializamos la pantalla y el modo grafico
         #self.screen = pygame.display.set_mode((ANCHO_PANTALLA, ALTO_PANTALLA), pygame.FULLSCREEN, 32)
         self.screen = pygame.display.set_mode((ANCHO_PANTALLA, ALTO_PANTALLA), 0, 32)

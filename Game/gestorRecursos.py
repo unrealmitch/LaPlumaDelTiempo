@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pygame, sys, os
+import json
 from escena import *
 from pygame.locals import *
 
@@ -11,6 +12,7 @@ from pygame.locals import *
 # En este caso se implementa como una clase vacía, solo con métodos de clase
 class GestorRecursos(object):
 	recursos = {}
+	config = {'ARRIBA': K_UP, 'ABAJO': K_DOWN, 'IZQUIERDA': K_LEFT, 'DERECHA': K_RIGHT, 'ATAQUE1': K_SPACE, 'SOUND': 100, 'DINOS_LVL': 0, 'PIRATAS_LVL': 0, 'RATIO': (16,9), 'RES': 600}
 
 	@classmethod
 	def CargarImagen(cls, nombre, colorkey=None):
@@ -178,3 +180,33 @@ class GestorRecursos(object):
 			cls.recursos[folder] = gif
 			# Se devuelve
 			return gif
+
+	@classmethod
+	def LoadConfig(cls):
+		fullname = os.path.join('others', 'game.conf')
+		try:
+			with open(fullname, 'r') as fp:
+				cls.config = json.load(fp)
+		except IOError, message:
+				print 'Cannot load configuration file:', fullname, ' Creating default file config!'
+				cls.SaveConfig()
+
+
+	@classmethod
+	def SaveConfig(cls):
+		fullname = os.path.join('others', 'game.conf')
+		try:
+			with open(fullname, 'w') as fp:
+				json.dump(cls.config, fp, sort_keys=True, indent=4)
+		except IOError, message:
+				print 'Cannot save configuration file:', fullname
+				raise SystemExit, message
+    
+	@classmethod
+	def getConfigParam(cls, param):
+		return cls.config[param]
+
+	@classmethod
+	def setConfigParam(cls, param, value):
+		cls.config[param] = value
+		cls.SaveConfig()

@@ -44,12 +44,17 @@ class Portal(ElementoGUI):
             self.animPortal.posiciony = 0.1*ALTO_PANTALLA
             pyganim.PygAnimation.scale(self.animPortal, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
             sound_bso = GestorRecursos.CargarSonido('dino_bso_jp.ogg')
+            self.lvl = 'DINOS_LVL'
         else:
             self.animPortal = AnimacionMenuPirata()
             self.animPortal.posicionx = 0.75*ANCHO_PANTALLA
             self.animPortal.posiciony = 0.5*ALTO_PANTALLA
             pyganim.PygAnimation.scale(self.animPortal, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
             sound_bso = GestorRecursos.CargarSonido('pirata_bso_pc.ogg')
+            self.lvl = 'PIRATAS_LVL'
+
+        self.block = imagen = GestorRecursos.CargarImagen("pirate_block.png", -1)
+        self.block = pygame.transform.scale(self.block, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
 
         self.animPortal.pause()
         self.channel_bso = sound_bso.play(-1)
@@ -58,7 +63,17 @@ class Portal(ElementoGUI):
         ElementoGUI.__init__(self, pantalla, (400*ESCALA,400*ESCALA) )
 
     def dibujar(self, pantalla):
-        self.animPortal.dibujar(pantalla)
+
+        if(self.fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') == 0):
+            pantalla.blit(self.block, (0.75*ANCHO_PANTALLA, 0.5*ALTO_PANTALLA))
+        else:
+            self.animPortal.dibujar(pantalla)
+            lvl = GestorRecursos.getConfigParam(self.lvl)
+            text = "Nivel: " + str(lvl)
+            texto = pygame.font.SysFont('arial', 20).render(text, True, (0,238,255))
+            rect = texto.get_rect()
+            rect.center = (ANCHO_PANTALLA/1.4, self.animPortal.posiciony + 105)
+            pantalla.blit(texto, rect)
 
     def accion(self):
         self.pantalla.menu.ejecutarJuego(self.fase)
@@ -71,12 +86,14 @@ class Portal(ElementoGUI):
             return False
 
     def focus(self,over):
-        if over:
+        if over and not (self.fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') == 0 ):
             self.animPortal.play()
-            self.channel_bso.set_volume(75)
+            self.channel_bso.set_volume(0.75)
+            return True
         else:
             self.animPortal.pause()
             self.channel_bso.set_volume(0)
+            return False
 
 # -------------------------------------------------
 # Clase Boton y los distintos botones
@@ -118,7 +135,7 @@ class TextoGUI(ElementoGUI):
         ElementoGUI.__init__(self, pantalla, self.imagen.get_rect())
         # Se coloca el rectangulo en su posicion
         self.establecerPosicion(posicion)
-        self.rect.centerx = ANCHO_PANTALLA*0.5
+        
     def dibujar(self, pantalla):
         pantalla.blit(self.imagen, self.rect)
 
@@ -140,9 +157,10 @@ class TextoSalir(TextoGUI):
         fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 29-1)
         TextoGUI.__init__(self, pantalla, fuente, (0, 238, 255), 'Salir', 
             (100*ESCALA, ALTO_PANTALLA*0.86))
+        self.rect.centerx = ANCHO_PANTALLA*0.5
+
     def accion(self):
         self.pantalla.menu.salirPrograma()
-
 # -------------------------------------------------
 # Clase PantallaGUI y las distintas pantallas
 
@@ -158,9 +176,10 @@ class PantallaGUI:
     def eventos(self, lista_eventos):
         for evento in lista_eventos:
             if evento.type == MOUSEMOTION:
+                self.menu.unmute()
                 mouse = pygame.mouse.get_pos()
                 for elemento in self.elementosGUI:
-                    elemento.focus(elemento.posicionEnElemento(mouse))
+                    if elemento.focus(elemento.posicionEnElemento(mouse)): self.menu.mute()
             if evento.type == MOUSEBUTTONDOWN:
                 self.elementoClic = None
                 for elemento in self.elementosGUI:
@@ -209,6 +228,9 @@ class Menu(Escena):
         Escena.__init__(self, director);
         # Creamos la lista de pantallas
         self.listaPantallas = []
+        song = GestorRecursos.CargarSonido('menu_bso.ogg')
+        self.channel_bso = song.play(-1)
+        self.channel_bso.set_volume(0.4)
         # Creamos las pantallas que vamos a tener
         #   y las metemos en la lista
         self.listaPantallas.append(PantallaInicialGUI(self))
@@ -218,6 +240,12 @@ class Menu(Escena):
     def update(self, *args):
         return
 
+    def mute (self):
+        self.channel_bso.set_volume(0)
+
+    def unmute(self):
+        self.channel_bso.set_volume(0.4)
+
     def eventos(self, lista_eventos):
         # Se mira si se quiere salir de esta escena
         for evento in lista_eventos:
@@ -225,7 +253,7 @@ class Menu(Escena):
             if evento.type == KEYDOWN:
                 if evento.key == K_ESCAPE:
                     self.salirPrograma()
-                if evento.key == K_F1:
+                if evento.key == K_F11:
                     pygame.display.toggle_fullscreen()
             elif evento.type == pygame.QUIT:
                 self.director.salirPrograma()
