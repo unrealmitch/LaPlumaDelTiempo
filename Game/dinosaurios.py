@@ -18,7 +18,7 @@ from animacionesPygame import *
 # -------------------------------------------------
 
 # Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = True
+DEBUG = False
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -130,7 +130,7 @@ class Dinosaurios(Escena):
 		self.channel_ambient = sound_ambient.play(-1)
 
 	def salir(self):
-		pygame.time.delay(2500)	#Retardo para terminar el audio
+		pygame.time.delay(3000)	#Retardo para terminar el audio
 		pygame.mixer.stop();
 		self.director.salirEscena();
 

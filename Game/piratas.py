@@ -139,7 +139,7 @@ class Piratas(Escena):
 		self.channel_ambient = sound_ambient.play(-1)
 
 	def salir(self):
-		pygame.time.delay(2500)	#Retardo para terminar el audio
+		pygame.time.delay(3000)	#Retardo para terminar el audio
 		pygame.mixer.stop();
 		self.director.salirEscena();
 
