@@ -25,7 +25,7 @@ MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 # -------------------------------------------------
 # Clase Piratas
 
-class Piratas(Escena):
+class Piratas_Arcade(Escena):
 	def __init__(self, director):
 
 		Escena.__init__(self, director)
@@ -35,21 +35,13 @@ class Piratas(Escena):
 		IZQUIERDA: GestorRecursos.getConfigParam('IZQUIERDA'), DERECHA: GestorRecursos.getConfigParam('DERECHA'), 
 		ATAQUE1: GestorRecursos.getConfigParam('ATAQUE1')}
 
-		self.nivel = GestorRecursos.getConfigParam('PIRATAS_LVL')
-
-		#Intercambiamos teclas apra aumentar dificultad
-		if self.nivel > 3:
-			tmp = self.teclasConfig[IZQUIERDA]
-			self.teclasConfig[IZQUIERDA] = self.teclasConfig[DERECHA]
-			self.teclasConfig[DERECHA] = tmp
-			if self.nivel > 5:
-				tmp = self.teclasConfig[ARRIBA]
-				self.teclasConfig[ARRIBA] = self.teclasConfig[ATAQUE1]
-				self.teclasConfig[ATAQUE1] = tmp
+		self.nivel = 0
+		self.nivel_max = GestorRecursos.getConfigParam('PIRATAS_ARCADE')
 
 		#Atenuado
 		self.fade = 250
 		self.time_fade = pygame.time.get_ticks()
+		self.clock_start = pygame.time.get_ticks()
 
 		### ESCENARIO ###
 		if DEBUG:
@@ -59,66 +51,22 @@ class Piratas(Escena):
 
 		self.decorado = StaticScenario('pirata_escenario.png',(1,1))
 		self.capaEscenario = Capa(self.background)
-		
-		# Pendiente hacerlo modular [Cargarlo de ficherp]
-		# autonomeSprite(image, (startX, startY, maxX, maxY, velX, velY), (startScaleX, startScaleY, maxScaleX, maxScaley, velScaleX, velScaleY), (velScrollX, velScrollY))
-		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/2,320,4000,0,0.005,0),(0.2,0.2,1,1,0,0),(0.17,0.07)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/1.75,320,4000,0,0.007,0),(0.25,0.25,1,1,0,0),(0.18,0.08)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco2_2.png',(ANCHO_PANTALLA/3,310,4000,0,0.01,0),(0.3,0.3,1,1,0,0),(0.19,0.09)))
-
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(700,200,2000,0,0.002,-0.001),(0.15,0.15,0.25,0.25,0.000001,0.000001),(0.3,0.25)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(100,50,3000,0,0.01,-0.005),(0.25,0.25,0.3,0.3,0.000005,0.000005),(0.33,-0.5)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(1000,230,2000,0,0.002,-0.001),(0.18,0.18,0.25,0.25,0.000001,0.000001),(0.3,0.25)))
-
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(1800,250,5500,0,0,0.002),(0.1,0.1,0.15,0.15,0.000001,0.000001),(0.2,0.2)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(2200,130,5200,0,0,0.03),(0.27,0.27,0.4,0.4,0.000001,0.000001),(0.32,0.4)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco1.png',(2000,100,5000,0,0,0.04),(0.3,0.3,0.4,0.4,0.000001,0.000001),(0.33,-0.5)))
-		
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(1700,300,0,0,0,0),(-0.6,0.6,0,0,0,0),(0.86,-0.86)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(1550,250,0,0,0,0),(-0.75,0.75,0,0,0,0),(0.88,-0.88)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(1400,200,0,0,0,0),(-0.9,0.9,0,0,0,0),(0.9,-0.9)))
-		
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5400,240,0,0,0,0),(0.7,0.7,0,0,0,0),(0.86,0.86)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5300,250,0,0,0,0),(0.75,0.75,0,0,0,0),(0.88,0.88)))
-		self.capaEscenario.add(autonomeSprite('pirata_barco3.png',(5200,250,0,0,0,0),(0.8,0.8,0,0,0,0),(0.9,0.9)))
-
+	
 		###SCROLL### Que parte del decorado estamos visualizando
-		self.scroll = (0,0.)
+		self.scroll = (1100*ESCALA,0.)
 		self.virtual_scroll = (0.,0.)
 		self.scroll_waves = 0.01
 
 		### JUGADORES ###
 		self.jugador1 = Jugador(PLAYER_PIRATA)
-		self.jugador1.establecerPosicion((0, 555*ESCALA))
+		self.jugador1.establecerPosicion((1820*ESCALA, 400*ESCALA))
 		self.grupoJugadores = pygame.sprite.Group( self.jugador1 )
 		self.lifebar = LifeBar()
 
 		### ENEMIGOS ###
-		random.seed()
 		self.grupoEnemigos = pygame.sprite.Group()
-
-		n_enemigos = 2 + self.nivel * 2
-		dist_enemigos = self.decorado.rect.width/(n_enemigos+1)
-		piratas = []
-
-		for i in range(0,n_enemigos):
-			#piratas.append((dist_enemigos*ESCALA*(i+1) + random.randint(-dist_enemigos/2, dist_enemigos/2), 500*ESCALA))
-			piratas.append((dist_enemigos*(i+1) + random.randint(-100, 100), 500*ESCALA))
-
-		for posicion in piratas:
-			if random.randint(0,100) >= 100-5*self.nivel:
-				pirata = Enemigo(EPIRATA3)
-			elif random.randint(0,100) > 90-10*self.nivel:
-				pirata = Enemigo(EPIRATA2)
-			else:
-				pirata = Enemigo(EPIRATA1)
-
-			pirata.establecerPosicion(posicion)
-			self.grupoEnemigos.add(pirata)
-
-		self.final = Enemigo(EPIRATA4)
-		self.final.establecerPosicion((7000*ESCALA, 400))
-		self.grupoEnemigos.add(self.final)
+		self.lastEnemy = 0
+		self.nextEnemy = 0
 
 		### PLATAFORMAS ###
 		file_plataformas = GestorRecursos.CargarMapaPlataformas("pirata_plataform.txt")
@@ -149,17 +97,48 @@ class Piratas(Escena):
 			elem.play()
 
 		### Sonido ###
-		sound_bso = GestorRecursos.CargarSonido('pirata_bso.ogg')
+		sound_bso = GestorRecursos.CargarSonido('arcade_bso.ogg')
 		sound_ambient = GestorRecursos.CargarSonido('pirata_ambient.ogg')
 		pygame.mixer.stop();
 		self.channel_bso = sound_bso.play(-1)
-		self.channel_bso.set_volume(0)
+		self.channel_bso.set_volume(0.5)
 		self.channel_ambient = sound_ambient.play(-1)
 
 	def salir(self):
 		pygame.time.delay(3000)	#Retardo para terminar el audio
 		pygame.mixer.stop();
 		self.director.salirEscena();
+
+	def addEnemy(self):
+		if pygame.time.get_ticks() > self.nextEnemy:
+			random.seed()
+
+			dificultad = (self.nivel / 10) + 1
+
+			nextTime = 10000/dificultad
+			nextTime = random.randint(nextTime, nextTime*2)
+			if nextTime < 200: nextTime = 200
+			self.nextEnemy = pygame.time.get_ticks() + nextTime
+
+			if random.randint(0,100) >= 101-1*dificultad:
+				pirata = Enemigo(EPIRATA3, True)
+			if random.randint(0,100) >= 100-5*dificultad:
+				pirata = Enemigo(EPIRATA3, True)
+			elif random.randint(0,100) >= 80-10*dificultad:
+				pirata = Enemigo(EPIRATA2, True)
+			else:
+				pirata = Enemigo(EPIRATA1, True)
+
+			distancia = (300*ESCALA + random.randint(0,1000)) * random.choice([1,-1])
+			pirata.establecerPosicion( (distancia+self.jugador1.posicion[0] , random.randint(0,400)*ESCALA))
+			#pirata.establecerPosicion( (self.jugador1.posicion[0] , 50) )
+			self.grupoEnemigos.add(pirata)
+			self.grupoSpritesDinamicos.add(self.grupoEnemigos)
+			self.grupoSprites.add(self.grupoEnemigos)
+
+			return True
+		else:
+			return False
 
 	def actualizarScrollOrdenados(self, jugador):
 		if (jugador.rect.left<MINIMO_X_JUGADOR):
@@ -213,14 +192,14 @@ class Piratas(Escena):
 
 		self.capaEscenario.establecerPosicionPantalla(self.virtual_scroll)
 
-		if(self.fade == 0):
-			sound_lvl = float(self.scroll[0])/float(self.background.rect.width)/2
-			self.channel_bso.set_volume(sound_lvl)
-
 	def update(self, tiempo):
+		#Contador de tiempo
+		self.nivel = (pygame.time.get_ticks() - self.clock_start) / 1000
 
+		self.addEnemy()
 		self.capaEscenario.update(tiempo)
 		self.decorado.update(tiempo)
+
 		# Primero, se indican las acciones que van a hacer los enemigos segun como esten los jugadores
 		for enemigo in iter(self.grupoEnemigos):
 			enemigo.mover_cpu(self.jugador1, self.grupoPlataformas)
@@ -250,20 +229,15 @@ class Piratas(Escena):
 			if(self.fade == 0): 
 				self.fade = -250
 				GestorRecursos.CargarSonido('game_over.ogg').play()
-
-
-		if ( not self.final.alive()):
-			if self.fade == 0: 
-				self.fade = -250
-				GestorRecursos.CargarSonido('mision_complete_long.ogg').play()
-
+				GestorRecursos.setConfigParam('PIRATAS_ARCADE', self.nivel + 1)
 
 		if(self.fade < 0):
 			self.channel_bso.set_volume(-self.fade/300)
 			self.channel_ambient.set_volume(-self.fade/300)
+
 			if(self.jugador1.alive()):
 				self.jugador1.avanzar(self.grupoPlataformas)
-				GestorRecursos.setConfigParam('PIRATAS_LVL', self.nivel + 1)
+				
 
 			if(self.fade>-10):
 				self.salir()
@@ -293,9 +267,6 @@ class Piratas(Escena):
 		else:
 			if(self.fade == 0): self.fade = -250
 
-		#screen.blit(self.lifebar.image, self.lifebar.rect)
-		self.lifebar.draw(pantalla)
-		
 		if DEBUG:
 			for elem in self.grupoPlataformas.sprites():
 				elem.draw(pantalla)
@@ -303,12 +274,27 @@ class Piratas(Escena):
 		for animacion in self.animacionOlas:
 			animacion.dibujar(pantalla)
 
+		##GUI
+		self.lifebar.draw(pantalla)
+
+		#Tiempo
+		tiempo = self.nivel
+		tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 18)
+		texto = tipoLetra.render("Time: " + str(tiempo), True, (255,0,0))
+		rect = texto.get_rect()
+		rect.center = (ANCHO_PANTALLA/2, 50)
+		
+		pantalla.blit(texto, rect)
+		texto = tipoLetra.render("Goal: " + str(self.nivel_max), True, (255,0,0))
+		rect = texto.get_rect()
+		rect.center = (ANCHO_PANTALLA/2, 75)
+		pantalla.blit(texto, rect)
+
 		#Efecto fundido, para entrar a la escena, y para terminarla
 		if(self.fade != 0):
 			time = pygame.time.get_ticks()
 			if(time > self.time_fade + 1):
 				self.time_fade = time
-
 				black = pygame.Surface((ANCHO_PANTALLA,ALTO_PANTALLA))
 				black.fill((0,0,0))
 
@@ -316,6 +302,8 @@ class Piratas(Escena):
 					self.fade-=10
 					black.set_alpha(self.fade)
 					pantalla.blit(black, (0,0))
+					self.clock_start = pygame.time.get_ticks()
+
 				else:	#Cuando se hace el fundido a negro por si pasamos la mision o morimos
 					if(self.fade < -10):
 						self.fade+=8

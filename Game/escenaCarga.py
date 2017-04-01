@@ -9,6 +9,7 @@ from pygame.locals import *
 from animacionesPygame import *
 from piratas import Piratas
 from dinosaurios import Dinosaurios
+from piratas_arcade import Piratas_Arcade
 
 # -------------------------------------------------
 # Clase EscenaCarga
@@ -19,19 +20,25 @@ class EscenaCarga(Escena):
         self.tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 40)
         self.fase = fase;
 
-        if(self.fase == 1):
-            recursos = "piratas.conf"
-            title = '#Loading mision 2: PIRATAS'
-        else:
+        if(self.fase == 0):
             recursos = "dinosaurios.conf"
             title = '#Loading mision 1: DINOSAURIOS'
+            title2 = "!Localiza y acaba con el hombre misterioso!"
+        elif(self.fase == 1):
+            recursos = "piratas.conf"
+            title = '#Loading mision 2: PIRATAS'
+            title2 = "!Localiza y acaba con el hombre misterioso!"
+        elif(self.fase == 2):
+            recursos = "piratas.conf"
+            title = '#Loading ARCADE: Piratas'
+            title2 = "!Sobrevive todo el tiempo que puedas!"
 
         self.texto = self.tipoLetra.render(title, True, (0,238,255), (0,0,0))
         self.rect = self.texto.get_rect()
         self.rect.center = (ANCHO_PANTALLA/2, ALTO_PANTALLA/2)
 
         self.tipoLetra2 = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 18)
-        self.texto2 = self.tipoLetra2.render("!Localiza y acaba con el hombre misterioso!", True, (0,175,200), (0,0,0))
+        self.texto2 = self.tipoLetra2.render(title2, True, (0,175,200), (0,0,0))
         self.rect2 = self.texto2.get_rect()
         self.rect2.center = (ANCHO_PANTALLA/2, ALTO_PANTALLA/1.5)
         
@@ -52,12 +59,16 @@ class EscenaCarga(Escena):
             # Entra después de cargar todas las lineas del iterador. No se puede
             # hacer len() de un tipo None. Ahora carga la escena del juego.
             
-            if(self.fase == 1):
-                escenaPiratas = Piratas(self.director)
-                self.director.cambiarEscena(escenaPiratas)
-            else:
+            if(self.fase == 0):
                 escenaDinosauros= Dinosaurios(self.director)
                 self.director.cambiarEscena(escenaDinosauros)
+            elif(self.fase == 1):
+                escenaPiratas = Piratas(self.director)
+                self.director.cambiarEscena(escenaPiratas)
+            elif(self.fase == 2):
+                escenaPiratasA = Piratas_Arcade(self.director)
+                self.director.cambiarEscena(escenaPiratasA)    
+
             return
 
     def dibujar(self, pantalla):

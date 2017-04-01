@@ -38,6 +38,10 @@ class ElementoGUI:
 class Portal(ElementoGUI):
     def __init__(self, pantalla, fase):
         self.fase = fase
+
+        self.block = imagen = GestorRecursos.CargarImagen("pirate_block.png", -1)
+        self.block = pygame.transform.scale(self.block, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
+
         if fase == 0:
             self.animPortal = AnimacionMenuDino()
             self.animPortal.posicionx = 0.75*ANCHO_PANTALLA
@@ -45,16 +49,22 @@ class Portal(ElementoGUI):
             pyganim.PygAnimation.scale(self.animPortal, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
             self.sound_bso = GestorRecursos.CargarSonido('dino_bso_jp.ogg')
             self.lvl = 'DINOS_LVL'
-        else:
+        elif fase == 1:
             self.animPortal = AnimacionMenuPirata()
             self.animPortal.posicionx = 0.75*ANCHO_PANTALLA
             self.animPortal.posiciony = 0.5*ALTO_PANTALLA
             pyganim.PygAnimation.scale(self.animPortal, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
             self.sound_bso = GestorRecursos.CargarSonido('pirata_bso_pc.ogg')
             self.lvl = 'PIRATAS_LVL'
+        elif fase == 2:
+            self.animPortal = AnimacionMenuPirataArcade()
+            self.animPortal.posicionx = 0.4*ANCHO_PANTALLA
+            self.animPortal.posiciony = 0.3*ALTO_PANTALLA
+            pyganim.PygAnimation.scale(self.animPortal, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
+            self.sound_bso = GestorRecursos.CargarSonido('arcade_menu.ogg')
+            self.lvl = 'PIRATAS_ARCADE'
 
-        self.block = imagen = GestorRecursos.CargarImagen("pirate_block.png", -1)
-        self.block = pygame.transform.scale(self.block, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
+
 
         self.animPortal.pause()
         self.channel_bso = self.sound_bso.play(-1)
@@ -64,19 +74,38 @@ class Portal(ElementoGUI):
 
     def dibujar(self, pantalla):
 
-        if(self.fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') == 0):
-            pantalla.blit(self.block, (0.75*ANCHO_PANTALLA, 0.5*ALTO_PANTALLA))
+        if(self.fase == 2 and not self.available(1)): return
+        
+        if(not self.available()):
+            pantalla.blit(self.block, (self.animPortal.posicionx, self.animPortal.posiciony))
         else:
             self.animPortal.dibujar(pantalla)
             lvl = GestorRecursos.getConfigParam(self.lvl)
-            text = "Nivel: " + str(lvl)
-            texto = pygame.font.SysFont('arial', 20).render(text, True, (0,238,255))
-            rect = texto.get_rect()
-            rect.center = (ANCHO_PANTALLA/1.4, self.animPortal.posiciony + 105)
-            pantalla.blit(texto, rect)
+
+            if self.fase < 2:
+                text = "Nivel: " + str(lvl)
+                texto = pygame.font.SysFont('arial', 20).render(text, True, (0,238,255))
+                rect = texto.get_rect()
+                rect.center = (ANCHO_PANTALLA/1.4, self.animPortal.posiciony + 105)
+                pantalla.blit(texto, rect)
+            else:
+                text = "Max Time: " + str(lvl)
+                texto = pygame.font.SysFont('arial', 20).render(text, True, (0,238,255))
+                rect = texto.get_rect()
+                rect.center = (ANCHO_PANTALLA/2-5, self.animPortal.posiciony + 220)
+                pantalla.blit(texto, rect) 
+
+
+    def available(self, fase = -1):
+        if fase == -1: fase = self.fase
+        if (self.fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') < 2) or (self.fase == 2 and GestorRecursos.getConfigParam('PIRATAS_LVL') < 3):
+            return False
+        else:
+            return True
 
     def accion(self):
-        self.pantalla.menu.ejecutarJuego(self.fase)
+        if(self.available()):
+            self.pantalla.menu.ejecutarJuego(self.fase)
 
     def posicionEnElemento(self, posicion):
         (posicionx, posiciony) = posicion
@@ -86,7 +115,7 @@ class Portal(ElementoGUI):
             return False
 
     def focus(self,over):
-        if over and not (self.fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') == 0 ):
+        if over and self.available():
             self.animPortal.play()
             if self.channel_bso.get_busy() == False: self.channel_bso = self.sound_bso.play(-1)
             self.channel_bso.set_volume(0.75)
@@ -213,11 +242,14 @@ class PantallaInicialGUI(PantallaGUI):
         textoSalir = TextoSalir(self)
         #self.elementosGUI.append(textoJugar)
         self.elementosGUI.append(textoSalir)
-        # Animacion
+        # Animacion Portales
         animDino = Portal(self, 0)
         self.elementosGUI.append(animDino)
 
         animPirata = Portal(self, 1)
+        self.elementosGUI.append(animPirata)
+
+        animPirata = Portal(self, 2)
         self.elementosGUI.append(animPirata)
 
 # -------------------------------------------------

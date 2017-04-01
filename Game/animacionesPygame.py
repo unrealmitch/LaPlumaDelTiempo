@@ -91,3 +91,11 @@ class AnimacionMenuDino(Animacion):
 			array_animation.append(('animations/menu_dino/frame (' + str(i) + ').png', 0.1))
 
 		pyganim.PygAnimation.__init__(self,array_animation)
+
+class AnimacionMenuPirataArcade(Animacion):
+	def __init__(self):
+		array_animation = []
+		for i in range(1,25):
+			array_animation.append(('animations/menu_pirata_arcade/frame (' + str(i) + ').png', 0.1))
+
+		pyganim.PygAnimation.__init__(self,array_animation)

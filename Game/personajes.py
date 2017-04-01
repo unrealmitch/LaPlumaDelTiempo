@@ -386,8 +386,8 @@ class NoJugador(Personaje):
 # Clase Pirata
 
 class Enemigo(NoJugador):
-	"El enemigo 'Pirata'"
-	def __init__(self, clase=1):
+	
+	def __init__(self, clase=1, free=False):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
 		if clase == EPIRATA1: 
 			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 4000, 1);
@@ -401,12 +401,12 @@ class Enemigo(NoJugador):
 			NoJugador.__init__(self,EDINO1,'dino_Velociraptor.gif','dino_velociraptor.txt', [5, 4, 4, 5, 4], VELOCIDAD_EDINO, VELOCIDAD_SALTO_EDINO, RETARDO_ANIMACION_EDINO, 4000, 1);
 		else:
 			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 5000, 2);
-	# Aqui vendria la implementacion de la IA segun las posiciones de los jugadores
-	# La implementacion de la inteligencia segun este personaje particular
+
+		self.free = free
 
 	def mover_cpu(self, jugador1, grupoPlataformas):
 		# Movemos solo a los enemigos que esten en la pantalla
-		if self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA and jugador1.alive():
+		if (self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA and jugador1.alive()) or self.free:
 
 			# Y nos movemos andando hacia el protagonista, si estamos muy cerca atacamos
 			if jugador1.rect.right<self.rect.left:

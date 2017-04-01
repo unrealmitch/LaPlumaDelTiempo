@@ -332,7 +332,9 @@ class Dinosaurios(Escena):
 		for evento in lista_eventos:
 			if evento.type == KEYDOWN:
 				if evento.key == K_ESCAPE:
-					self.director.salirPrograma()
+					self.jugador1.vida = 0;
+					self.jugador1.kill()
+					self.fade = -200;
 				if evento.key == K_F11:
 					pygame.display.toggle_fullscreen()
 			if evento.type == pygame.QUIT:

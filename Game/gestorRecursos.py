@@ -12,7 +12,7 @@ from pygame.locals import *
 # En este caso se implementa como una clase vacía, solo con métodos de clase
 class GestorRecursos(object):
 	recursos = {}
-	config = {'ARRIBA': K_UP, 'ABAJO': K_DOWN, 'IZQUIERDA': K_LEFT, 'DERECHA': K_RIGHT, 'ATAQUE1': K_SPACE, 'SOUND': 100, 'DINOS_LVL': 0, 'PIRATAS_LVL': 0, 'RATIO': (16,9), 'RES': 600}
+	config = {'ARRIBA': K_UP, 'ABAJO': K_DOWN, 'IZQUIERDA': K_LEFT, 'DERECHA': K_RIGHT, 'ATAQUE1': K_SPACE, 'SOUND': 100, 'DINOS_LVL': 0, 'PIRATAS_LVL': 0, 'PIRATAS_ARCADE': 0, 'RATIO': (16,9), 'RES': 600}
 
 	@classmethod
 	def CargarImagen(cls, nombre, colorkey=None):
