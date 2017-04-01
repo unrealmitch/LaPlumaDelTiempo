@@ -398,7 +398,7 @@ class Enemigo(NoJugador):
 		elif clase == EPIRATA4: 
 			NoJugador.__init__(self,EPIRATA4,'Pirate_b.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.15, VELOCIDAD_SALTO_EPIRATA+0.1, RETARDO_ANIMACION_EPIRATA, 1500, 4);
 		elif clase == EDINO1:
-			NoJugador.__init__(self,EDINO1,'dino_Velociraptor.gif','dino_Velociraptor.txt', [5, 4, 4, 5, 4], VELOCIDAD_EDINO, VELOCIDAD_SALTO_EDINO, RETARDO_ANIMACION_EDINO, 4000, 1);
+			NoJugador.__init__(self,EDINO1,'dino_Velociraptor.gif','dino_velociraptor.txt', [5, 4, 4, 5, 4], VELOCIDAD_EDINO, VELOCIDAD_SALTO_EDINO, RETARDO_ANIMACION_EDINO, 4000, 1);
 		else:
 			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 5000, 2);
 	# Aqui vendria la implementacion de la IA segun las posiciones de los jugadores
