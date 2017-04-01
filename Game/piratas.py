@@ -72,7 +72,7 @@ class Piratas(Escena):
 		self.scroll_waves = 0.01
 
 		### JUGADORES ###
-		self.jugador1 = Jugador()
+		self.jugador1 = Jugador(PLAYER_PIRATA)
 		self.jugador1.establecerPosicion((0, 555*ESCALA))
 		self.grupoJugadores = pygame.sprite.Group( self.jugador1 )
 		self.lifebar = LifeBar()
@@ -81,8 +81,8 @@ class Piratas(Escena):
 		random.seed()
 		self.grupoEnemigos = pygame.sprite.Group()
 
-		n_enemigos=8
-		dist_enemigos = self.decorado.rect.width/n_enemigos
+		n_enemigos=1
+		dist_enemigos = self.decorado.rect.width/(n_enemigos+1)
 		piratas = []
 
 		for i in range(0,n_enemigos):
@@ -91,16 +91,16 @@ class Piratas(Escena):
 
 		for posicion in piratas:
 			if random.randint(0,100) > 90:
-				pirata = Pirata(2)
+				pirata = Enemigo(EPIRATA3)
 			elif random.randint(0,100) > 60:
-				pirata = Pirata(1)
+				pirata = Enemigo(EPIRATA2)
 			else:
-				pirata = Pirata(0)
+				pirata = Enemigo(EPIRATA1)
 
 			pirata.establecerPosicion(posicion)
 			self.grupoEnemigos.add(pirata)
 
-		self.final = Pirata(3)
+		self.final = Enemigo(EPIRATA4)
 		self.final.establecerPosicion((7000*ESCALA, 400))
 		self.grupoEnemigos.add(self.final)
 		### PLATAFORMAS ###
@@ -160,8 +160,11 @@ class Piratas(Escena):
 			if self.scroll[0]*ESCALA + ANCHO_PANTALLA + 10 >= self.decorado.rect.right:
 				#if self.fade == 0: self.fade = -250
 				#if self.jugador1.rect.centerx > ANCHO_PANTALLA + 100: self.salir(True)
+
 				if self.fade == 0:
-					if self.jugador1.rect.right > self.decorado.rect.right: jugador.establecerPosicion((self.decorado.right-self.jugador1.rect.width, jugador.posicion[1]))
+					if jugador.posicion[0] > self.decorado.rect.right-jugador.rect.width:
+						jugador.establecerPosicion((self.decorado.rect.right-jugador.rect.width, jugador.posicion[1]))
+				
 
 				#self.scroll = (self.decorado.rect.right*ESCALA - ANCHO_PANTALLA, self.scroll[1])
 				#jugador.establecerPosicion((self.scroll[0]*ESCALA + MAXIMO_X_JUGADOR*ESCALA, jugador.posicion[1]))
@@ -227,7 +230,7 @@ class Piratas(Escena):
 		if(not self.jugador1.alive()):
 			if(self.fade == 0): self.fade = -250
 
-		if ( not self.final.alive() ):
+		if ( not self.final.alive()):
 			if self.fade == 0: self.fade = -250
 
 		if(self.fade < 0):
@@ -245,13 +248,12 @@ class Piratas(Escena):
 		self.decorado.draw(pantalla)
 		# Luego los Sprites
 		self.grupoSprites.draw(pantalla)
+		self.jugador1.draw(pantalla)
 
+		'''
 		# Vida enemigos
 		corazon_img = GestorRecursos.CargarImagen("corazon.png")
 		corazon_rect = corazon_img.get_rect()
-
-		self.jugador1.draw(pantalla)
-		'''
 		for enemigo in self.grupoEnemigos:
 			for i in range(enemigo.vida):
 				corazon_rect.top = enemigo.rect.top + corazon_rect.height

@@ -12,12 +12,18 @@ from gestorRecursos import *
 # -------------------------------------------------
 # -------------------------------------------------
 
+#Protagonista
+PLAYER_PIRATA = 0
+PLAYER_DINO = 1
 #Tipo Personaje
 PLAYER = 0
 EPIRATA1 = 1
 EPIRATA2 = 2
 EPIRATA3 = 3
 EPIRATA4 = 4
+
+EDINO1 = 10
+
 
 # Movimientos
 QUIETO = 0
@@ -42,11 +48,13 @@ VELOCIDAD_SALTO_JUGADOR = 0.3 # Pixeles por milisegundo
 RETARDO_ANIMACION_JUGADOR = 1 # updates que durará cada imagen del personaje
 							  # debería de ser un valor distinto para cada postura
 
-VELOCIDAD_EPIRATA = 0.10 # Pixeles por milisegundo
-VELOCIDAD_SALTO_EPIRATA = 0.15 # Pixeles por milisegundo
-RETARDO_ANIMACION_EPIRATA = 1 # updates que durará cada imagen del personaje
-							 # debería de ser un valor distinto para cada postura
-# El Sniper camina un poco más lento que el jugador, y salta menos
+VELOCIDAD_EPIRATA = 0.10
+VELOCIDAD_SALTO_EPIRATA = 0.15
+RETARDO_ANIMACION_EPIRATA = 1
+
+VELOCIDAD_EDINO = 0.20
+VELOCIDAD_SALTO_EDINO = 0.1
+RETARDO_ANIMACION_EDINO = 3
 
 GRAVEDAD = 0.0003 # Píxeles / ms2
 
@@ -201,7 +209,7 @@ class Personaje(MiSprite):
 		if(time > self.invulnerable_clock + self.invulnerable_delay):
 			self.invulnerable_clock = time
 			if vida == 0:
-				GestorRecursos.CargarSonido('espadas.ogg').play()
+				GestorRecursos.CargarSonido('piratas_espadas.ogg').play()
 			elif(self.vida == 1):
 				self.vida = 0
 				self.audio[P_MURIENDO].play()
@@ -330,10 +338,13 @@ class Personaje(MiSprite):
 
 class Jugador(Personaje):
 	"Cualquier personaje del juego"
-	def __init__(self):
+	def __init__(self, fase):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
-		Personaje.__init__(self,PLAYER,'pirata_Player_v3.png','pirata_Player_v3.txt', [6, 7, 5, 7, 6], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR, 1250, 6);
-
+		if fase==PLAYER_DINO:
+			Personaje.__init__(self,PLAYER,'dino_Player.png','dino_Player.txt', [6, 7, 4, 5, 6], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR, 1250, 6);
+		else:
+			Personaje.__init__(self,PLAYER,'pirata_Player_v3.png','pirata_Player_v3.txt', [6, 7, 5, 7, 6], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR, 1250, 6);
+	
 	def mover(self, teclasPulsadas, teclasConfig):
 		#Miramos si la tecla para cada movimiento esta pulsada o no
 		movimientos = {}
@@ -369,18 +380,20 @@ class NoJugador(Personaje):
 # -------------------------------------------------
 # Clase Pirata
 
-class Pirata(NoJugador):
+class Enemigo(NoJugador):
 	"El enemigo 'Pirata'"
-	def __init__(self, clase=0):
+	def __init__(self, clase=1):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
-		if clase == 0: 
+		if clase == EPIRATA1: 
 			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 4000, 1);
-		elif clase == 1: 
+		elif clase == EPIRATA2: 
 			NoJugador.__init__(self,EPIRATA2,'Pirate_r.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.05, VELOCIDAD_SALTO_EPIRATA+0.05, RETARDO_ANIMACION_EPIRATA, 3000, 2);
-		elif clase == 2: 
+		elif clase == EPIRATA3: 
 			NoJugador.__init__(self,EPIRATA3,'Pirate_w.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.1, VELOCIDAD_SALTO_EPIRATA+0.08, RETARDO_ANIMACION_EPIRATA, 2000, 3);
-		elif clase == 3: 
+		elif clase == EPIRATA4: 
 			NoJugador.__init__(self,EPIRATA4,'Pirate_b.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.15, VELOCIDAD_SALTO_EPIRATA+0.1, RETARDO_ANIMACION_EPIRATA, 1500, 4);
+		elif clase == EDINO1:
+			NoJugador.__init__(self,EPIRATA1,'dino_Velociraptor.gif','dino_Velociraptor.txt', [5, 4, 4, 5, 4], VELOCIDAD_EDINO, VELOCIDAD_SALTO_EDINO, RETARDO_ANIMACION_EDINO, 4000, 1);
 		else:
 			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 5000, 2);
 	# Aqui vendria la implementacion de la IA segun las posiciones de los jugadores

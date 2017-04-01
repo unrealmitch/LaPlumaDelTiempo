@@ -52,7 +52,7 @@ class Dinosaurios(Escena):
 		self.scroll_waves = 0.01
 
 		### JUGADORES ###
-		self.jugador1 = Jugador()
+		self.jugador1 = Jugador(PLAYER_DINO)
 		self.jugador1.establecerPosicion((0, 300*ESCALA))
 		self.grupoJugadores = pygame.sprite.Group( self.jugador1 )
 		self.lifebar = LifeBar()
@@ -61,27 +61,27 @@ class Dinosaurios(Escena):
 		random.seed()
 		self.grupoEnemigos = pygame.sprite.Group()
 
-		n_enemigos=1
-		dist_enemigos = self.decorado.rect.width/n_enemigos
-		piratas = []
+		n_enemigos=10
+		dist_enemigos = self.decorado.rect.width/(n_enemigos+1)
+		dinos = []
 
 		for i in range(0,n_enemigos):
 			#piratas.append((dist_enemigos*ESCALA*(i+1) + random.randint(-dist_enemigos/2, dist_enemigos/2), 500*ESCALA))
-			piratas.append((dist_enemigos*(i+1) + random.randint(-100, 100), 500*ESCALA))
+			dinos.append((dist_enemigos*(i+1) + random.randint(-50, 50), 500*ESCALA))
 
-		for posicion in piratas:
+		for posicion in dinos:
 			if random.randint(0,100) > 90:
-				pirata = Pirata(2)
+				dino = Enemigo(10)
 			elif random.randint(0,100) > 60:
-				pirata = Pirata(1)
+				dino = Enemigo(10)
 			else:
-				pirata = Pirata(0)
+				dino = Enemigo(10)
 
-			pirata.establecerPosicion(posicion)
-			self.grupoEnemigos.add(pirata)
+			dino.establecerPosicion(posicion)
+			self.grupoEnemigos.add(dino)
 
-		self.final = Pirata(3)
-		self.final.establecerPosicion((7000*ESCALA, 400))
+		self.final = Enemigo(EPIRATA4)
+		self.final.establecerPosicion((5100*ESCALA, 400))
 		self.grupoEnemigos.add(self.final)
 		### PLATAFORMAS ###
 		file_plataformas = GestorRecursos.CargarMapaPlataformas("dino_plataform.txt")
@@ -99,21 +99,9 @@ class Dinosaurios(Escena):
 		self.grupoSprites.add(self.grupoEnemigos)
 		self.grupoSprites.add(self.grupoPlataformas)
 
-		### ANIMACIONES ###
-		self.animacionOlas = []
-		for i in range(int(ANCHO_PANTALLA/(400*ESCALA))):
-			animacionOla = AnimacionOlas()
-			pyganim.PygAnimation.scale(animacionOla, (int(510*ESCALA), int(390*ESCALA)))
-			animacionOla.posicionx = 509*i*ESCALA
-			animacionOla.posiciony = 420*ESCALA
-			self.animacionOlas.append(animacionOla)
-		
-		for elem in self.animacionOlas:
-			elem.play()
-
 		### Sonido ###
-		sound_bso = GestorRecursos.CargarSonido('pirata_bso.ogg')
-		sound_ambient = GestorRecursos.CargarSonido('pirata_ambient.ogg')
+		sound_bso = GestorRecursos.CargarSonido('dino_bso.ogg')
+		sound_ambient = GestorRecursos.CargarSonido('dino_ambient.ogg')
 		self.channel_bso = sound_bso.play(-1)
 		self.channel_bso.set_volume(0)
 		self.channel_ambient = sound_ambient.play(-1)
@@ -138,10 +126,11 @@ class Dinosaurios(Escena):
 			desplazamiento = (jugador.rect.right - MAXIMO_X_JUGADOR)
 
 			if self.scroll[0]*ESCALA + ANCHO_PANTALLA + 10 >= self.decorado.rect.right:
-				if self.fade == 0: self.fade = -250
+				#if self.fade == 0: self.fade = -250
 				#if self.jugador1.rect.centerx > ANCHO_PANTALLA + 100: self.salir(True)
 				if self.fade == 0:
-					if self.jugador1.rect.right + 100 > self.decorado.rect.right: jugador.establecerPosicion((self.decorado.right-self.jugador1.rect.width, jugador.posicion[1]))
+					if jugador.posicion[0] > self.decorado.rect.right-jugador.rect.width:
+						jugador.establecerPosicion((self.decorado.rect.right-jugador.rect.width, jugador.posicion[1]))
 
 				#self.scroll = (self.decorado.rect.right*ESCALA - ANCHO_PANTALLA, self.scroll[1])
 				#jugador.establecerPosicion((self.scroll[0]*ESCALA + MAXIMO_X_JUGADOR*ESCALA, jugador.posicion[1]))
@@ -172,7 +161,7 @@ class Dinosaurios(Escena):
 		self.capaEscenario.establecerPosicionPantalla(self.virtual_scroll)
 
 		if(self.fade == 0):
-			sound_lvl = float(self.scroll[0])/float(self.background.rect.width)/2
+			sound_lvl = float(self.jugador1.posicion[0])/float(self.background.rect.width)
 			self.channel_bso.set_volume(sound_lvl)
 
 	def update(self, tiempo):
@@ -227,11 +216,13 @@ class Dinosaurios(Escena):
 		self.grupoSprites.draw(pantalla)
 
 		# Vida enemigos
-		corazon_img = GestorRecursos.CargarImagen("corazon.png")
-		corazon_rect = corazon_img.get_rect()
+
 
 		self.jugador1.draw(pantalla)
+
 		'''
+		corazon_img = GestorRecursos.CargarImagen("corazon.png")
+		corazon_rect = corazon_img.get_rect()
 		for enemigo in self.grupoEnemigos:
 			for i in range(enemigo.vida):
 				corazon_rect.top = enemigo.rect.top + corazon_rect.height
@@ -250,9 +241,6 @@ class Dinosaurios(Escena):
 		if DEBUG:
 			for elem in self.grupoPlataformas.sprites():
 				elem.draw(pantalla)
-
-		for animacion in self.animacionOlas:
-			animacion.dibujar(pantalla)
 
 		#Efecto fundido, para entrar a la escena, y para terminarla
 		if(self.fade != 0):
