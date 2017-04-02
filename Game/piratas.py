@@ -25,10 +25,10 @@ MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 # -------------------------------------------------
 # Clase Piratas
 
-class Piratas(Escena):
+class Piratas(EscenaPygame):
 	def __init__(self, director):
 
-		Escena.__init__(self, director)
+		EscenaPygame.__init__(self, director)
 
 		#Cargamos la configuracion
 		self.teclasConfig = {ARRIBA: GestorRecursos.getConfigParam('ARRIBA'), ABAJO: GestorRecursos.getConfigParam('ABAJO'), 

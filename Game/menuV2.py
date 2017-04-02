@@ -6,6 +6,7 @@ from escena import *
 from gestorRecursos import *
 from escenaCarga import EscenaCarga
 from animacionesPygame import *
+from escenaAnim1 import EscenaAnimacion1
 
 # -------------------------------------------------
 # Clase abstracta ElementoGUI
@@ -255,11 +256,11 @@ class PantallaInicialGUI(PantallaGUI):
 # -------------------------------------------------
 # Clase Menu, la escena en sí
 
-class Menu(Escena):
+class Menu(EscenaPygame):
 
     def __init__(self, director):
         # Llamamos al constructor de la clase padre
-        Escena.__init__(self, director);
+        EscenaPygame.__init__(self, director);
         # Creamos la lista de pantallas
         self.listaPantallas = []
         self.song = GestorRecursos.CargarSonido('menu_bso.ogg')
@@ -305,7 +306,10 @@ class Menu(Escena):
         self.director.salirPrograma()
 
     def ejecutarJuego(self,fase):
-        escena = EscenaCarga(self.director, fase)
+        pygame.mixer.stop();
+        escena = EscenaAnimacion1(self.director)
+        #escena = EscenaCarga(self.director, fase)
+        #escena = EscenaCarga(self.director, fase)
         self.director.apilarEscena(escena)
 
     def mostrarPantallaInicial(self):

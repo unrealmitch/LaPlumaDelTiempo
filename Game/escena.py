@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+import pygame
 
 ALTO_PANTALLA = 600
 ANCHO_PANTALLA = int((ALTO_PANTALLA*16)/9)
@@ -23,3 +24,19 @@ class Escena:
 
     def dibujar(self, pantalla):
         raise NotImplemented("Tiene que implementar el metodo dibujar.")
+
+
+class EscenaPygame(Escena):
+
+    def __init__(self, director):
+        Escena.__init__(self, director)
+        # Inicializamos la libreria de pygame (si no esta inicializada ya)
+        pygame.init()
+        # Creamos la pantalla (si no esta creada ya)
+        self.screen = pygame.display.set_mode((ANCHO_PANTALLA, ALTO_PANTALLA))
+
+
+class EscenaPyglet(Escena):
+
+    def __init__(self, director):
+        Escena.__init__(self, director)
