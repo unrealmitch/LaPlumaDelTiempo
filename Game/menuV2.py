@@ -307,8 +307,10 @@ class Menu(EscenaPygame):
 
     def ejecutarJuego(self,fase):
         pygame.mixer.stop();
-        escena = EscenaAnimacion1(self.director)
-        #escena = EscenaCarga(self.director, fase)
+        if fase == 0:
+                escena = EscenaAnimacion1(self.director)
+        else:
+                escena = EscenaCarga(self.director, fase)
         #escena = EscenaCarga(self.director, fase)
         self.director.apilarEscena(escena)
 
