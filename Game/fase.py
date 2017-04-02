@@ -228,9 +228,9 @@ class Fase(EscenaPygame):
 					enemy.quitarVida(0)
 				else:
 					if enemy.posturas[P_ATACANDO1]: 
-						vida = self.jugador1.quitarVida(1)
-						self.lifebar.actualizarVida(vida)
-						self.hurt = 150
+						if self.jugador1.quitarVida(1): self.hurt = 150
+						self.lifebar.actualizarVida(self.jugador1.vida)
+						
 					if player.posturas[P_ATACANDO1]: enemy.quitarVida(1)
 
 		self.check_end()

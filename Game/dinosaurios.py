@@ -60,7 +60,7 @@ class Dinosaurios(Fase):
 	def setEnemigos(self):
 		random.seed()
 
-		n_enemigos = 2 + self.nivel*2
+		n_enemigos = 3 + self.nivel*2
 		dist_enemigos = self.max_x/(n_enemigos+1)
 		dinos = []
 

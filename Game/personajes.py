@@ -221,11 +221,13 @@ class Personaje(MiSprite):
 				self.posturas[P_MURIENDO] = True
 				self.numPostura = P_MURIENDO
 				self.numImagenPostura = 0
+				return True
 			elif(self.vida>0):
 				self.vida-=vida
 				self.audio[P_HERIDO].play()
-
-		return self.vida
+				return True
+				
+		return False
 
 	def addVida(self):
 		if self.vida > 0 and self.vida <11: self.vida += 1

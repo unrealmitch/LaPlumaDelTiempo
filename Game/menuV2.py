@@ -100,7 +100,7 @@ class Portal(ElementoGUI):
 
     def available(self, fase = -1):
         if fase == -1: fase = self.fase
-        if (fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') < 2) or (fase == 2 and GestorRecursos.getConfigParam('PIRATAS_LVL') < 3):
+        if (fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') < 1) or (fase == 2 and GestorRecursos.getConfigParam('PIRATAS_LVL') < 2):
             return False
         else:
             return True
