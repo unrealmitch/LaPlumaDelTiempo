@@ -55,6 +55,8 @@ class Fase(EscenaPygame):
 		#Atenuado [Valor reutilizado para terminar la fase]
 		self.fade = 250
 		self.time_fade = pygame.time.get_ticks()
+		#Atenuado Vida
+		self.hurt = 0
 
 		###SCROLL### Que parte del decorado estamos visualizando
 		self.scroll = (0,0.)
@@ -228,12 +230,20 @@ class Fase(EscenaPygame):
 					if enemy.posturas[P_ATACANDO1]: 
 						vida = self.jugador1.quitarVida(1)
 						self.lifebar.actualizarVida(vida)
+						self.hurt = 150
 					if player.posturas[P_ATACANDO1]: enemy.quitarVida(1)
 
 		self.check_end()
 				
 	def dibujar_fundido(self, pantalla):
 		#Efecto fundido, para entrar a la escena, y para terminarla
+		if(self.hurt > 0):
+			red = pygame.Surface((ANCHO_PANTALLA,ALTO_PANTALLA))
+			red.fill((255,0,0))
+			red.set_alpha(self.hurt)
+			pantalla.blit(red, (0,0))
+			self.hurt -= 30
+
 		if(self.fade != 0):
 			time = pygame.time.get_ticks()
 			if(time > self.time_fade + 1):

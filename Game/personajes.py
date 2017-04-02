@@ -411,9 +411,9 @@ class Enemigo(NoJugador):
 		if (self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA and jugador1.alive()) or self.free:
 
 			# Y nos movemos andando hacia el protagonista, si estamos muy cerca atacamos
-			if jugador1.rect.right<self.rect.left:
+			if jugador1.rect.right+1<self.rect.left:
 				Personaje.mover_wreset(self,{IZQUIERDA:True})
-			elif(jugador1.rect.left>self.rect.right):
+			elif(jugador1.rect.left-1>self.rect.right):
 				Personaje.mover_wreset(self,{DERECHA:True})
 			else:
 				Personaje.mover_wreset(self,{ATAQUE1:True})
