@@ -123,6 +123,29 @@ class Fase(EscenaPygame):
 		pygame.mixer.stop();
 		self.director.salirEscena();
 
+	def check_end(self):
+		#Cuando hacemos el fundido a negro (Salímos) [Si morimos o muere el jefe final]
+		if(not self.jugador1.alive()):
+			if(self.fade == 0): 
+				self.fade = -250
+				GestorRecursos.CargarSonido('game_over.ogg').play()
+
+		if ( not self.final.alive()):
+			if self.fade == 0: 
+				self.fade = -250
+				GestorRecursos.CargarSonido('mision_complete_long.ogg').play()
+
+		#Si estamos saliendo de la escena:
+		if(self.fade < 0):
+			self.channel_bso.set_volume(-self.fade/300)
+			self.channel_ambient.set_volume(-self.fade/300)
+			if(self.jugador1.alive()):
+				self.jugador1.avanzar(self.grupoPlataformas)
+				GestorRecursos.setConfigParam(self.clave_nivel, self.nivel + 1)
+
+			if(self.fade>-10):
+				self.salir()
+
 	def actualizarScrollOrdenados(self, jugador):
 		if (jugador.rect.left<MINIMO_X_JUGADOR):
 			desplazamiento = (MINIMO_X_JUGADOR - jugador.rect.left)
@@ -200,31 +223,7 @@ class Fase(EscenaPygame):
 						self.lifebar.actualizarVida(vida)
 					if player.posturas[P_ATACANDO1]: enemy.quitarVida(1)
 
-
-
-		#Cuando hacemos el fundido a negro (Salímos) [Si morimos o muere el jefe final]
-		if(not self.jugador1.alive()):
-			if(self.fade == 0): 
-				self.fade = -250
-				GestorRecursos.CargarSonido('game_over.ogg').play()
-
-
-		if ( not self.final.alive()):
-			if self.fade == 0: 
-				self.fade = -250
-				GestorRecursos.CargarSonido('mision_complete_long.ogg').play()
-
-
-		#Si estamos saliendo de la escena:
-		if(self.fade < 0):
-			self.channel_bso.set_volume(-self.fade/300)
-			self.channel_ambient.set_volume(-self.fade/300)
-			if(self.jugador1.alive()):
-				self.jugador1.avanzar(self.grupoPlataformas)
-				GestorRecursos.setConfigParam(self.clave_nivel, self.nivel + 1)
-
-			if(self.fade>-10):
-				self.salir()
+		self.check_end()
 				
 	def dibujar_fundido(self, pantalla):
 		#Efecto fundido, para entrar a la escena, y para terminarla
@@ -284,12 +283,13 @@ class Fase(EscenaPygame):
 				pantalla.blit(corazon_img, corazon_rect)
 		'''
 
-		self.lifebar.draw(pantalla)
+		
 		
 		if DEBUG:
 			for elem in self.grupoPlataformas.sprites():
 				elem.draw(pantalla)
 
+		self.lifebar.draw(pantalla)
 		self.dibujar_frontal(pantalla)
 		self.dibujar_fundido(pantalla)
 					
