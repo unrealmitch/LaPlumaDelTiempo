@@ -3,7 +3,7 @@ import pygame
 from miSprite import *
 from pygame.locals import *
 
-class LifeBar(MiSprite):
+class Gui(MiSprite):
 
 	def __init__(self, vidas=6, tipo=1):
 		# Primero invocamos al constructor de la clase padre
@@ -11,6 +11,10 @@ class LifeBar(MiSprite):
 
 		self.vida = vidas
 		self.tipo = tipo
+
+		self.velocidad = 1
+		self.salto = 1
+		self.ataque = 1
 
 		if tipo == 0:
 			self.hoja = GestorRecursos.CargarImagen("gui_lifebar.png",-1)
@@ -42,6 +46,12 @@ class LifeBar(MiSprite):
 			self.death = pygame.transform.scale(self.death,(int(x*0.3*ESCALA), int(y*0.3*ESCALA)))
 			self.rect = self.corazon.get_rect()
 
+			self.espada = GestorRecursos.CargarImagen("gui_espada.png",-1)
+			self.botas = GestorRecursos.CargarImagen("gui_botas.png",-1)
+			self.muelle = GestorRecursos.CargarImagen("gui_muelle.png",-1)
+
+
+
 	def actualizarVida(self, vida):
 
 		if self.tipo == 0:
@@ -53,6 +63,11 @@ class LifeBar(MiSprite):
 		else:
 			self.vida = vida
 
+	def actualizarPsj(self, personaje):
+		self.velocidad = int(personaje.velocidadCarrera*100-24)
+		self.salto = int(personaje.velocidadSalto*100-29)
+		self.ataque = personaje.ataque
+
 	def draw(self,pantalla):
 		if self.tipo == 0:
 			MiSprite.draw(self, pantalla)
@@ -62,5 +77,20 @@ class LifeBar(MiSprite):
 			else:
 				for i in range(self.vida):
 					pantalla.blit(self.corazon, (30*ESCALA + (self.rect.width+15*ESCALA)*i,ALTO_PANTALLA*0.9))
+
+				pantalla.blit(self.espada, (0, 20))
+				pantalla.blit(self.botas, (20, 70))
+				pantalla.blit(self.muelle, (20, 135))
+
+				tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 50)
+				texto1 = tipoLetra.render(str(self.ataque), True, (255,255,255))
+				texto2 = tipoLetra.render(str(self.velocidad), True, (255,255,255))
+				texto3 = tipoLetra.render(str(self.salto), True, (255,255,255))
+
+				pantalla.blit(texto1, (120, 20))
+				pantalla.blit(texto2, (120, 80))
+				pantalla.blit(texto3, (120, 150))
+
+
 
 

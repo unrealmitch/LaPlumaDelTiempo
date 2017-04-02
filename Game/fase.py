@@ -7,7 +7,7 @@ from escena import *
 from personajes import *
 from escenario import *
 from capa import *
-from lifeBar import *
+from gui import *
 from pygame.locals import *
 from animacionesPygame import *
 from fase import *
@@ -66,8 +66,9 @@ class Fase(EscenaPygame):
 
 		### JUGADORES ###
 		self.jugador1 = None
-		self.lifebar = LifeBar(6,0)
+		self.gui = Gui(6,0)
 		self.final = None
+		self.playerDrunk = False
 
 		### Grupos Sprites y Capas ###
 		self.capaEscenario = Capa()
@@ -224,14 +225,38 @@ class Fase(EscenaPygame):
 		for player,enemys in collitions.items():
 			for enemy in enemys:
 				if (enemy.posturas[P_ATACANDO1] and player.posturas[P_ATACANDO1]):
-					self.jugador1.quitarVida(0)
+					player.quitarVida(0)
 					enemy.quitarVida(0)
 				else:
 					if enemy.posturas[P_ATACANDO1]: 
-						if self.jugador1.quitarVida(1): self.hurt = 150
-						self.lifebar.actualizarVida(self.jugador1.vida)
+						if player.quitarVida(enemy.ataque): self.hurt = 150
+						self.gui.actualizarVida(player.vida)
 						
-					if player.posturas[P_ATACANDO1]: enemy.quitarVida(1)
+					if player.posturas[P_ATACANDO1]: enemy.quitarVida(player.ataque)
+
+		#Comprobamos si el prota coge un objeto. Lo elimina y hace el efecto de dicho objeto
+		objetos = pygame.sprite.spritecollide(self.jugador1, self.grupoObjetos, False)
+		for objeto in objetos:
+			GestorRecursos.CargarSonido(objeto.sound_pick).play()
+			objeto.kill()
+			if objeto.tipo == CORAZON:
+				vida = self.jugador1.addVida()
+				self.gui.actualizarVida(vida)
+			elif objeto.tipo == RON:
+				tmp = self.teclasConfig[IZQUIERDA]
+				self.teclasConfig[IZQUIERDA] = self.teclasConfig[DERECHA]
+				self.teclasConfig[DERECHA] = tmp
+				if self.playerDrunk:
+					self.playerDrunk = False
+					self.jugador1.hoja = GestorRecursos.CargarImagen("pirata_Player.png",-1)
+				else:
+					self.playerDrunk = True
+					self.jugador1.hoja = GestorRecursos.CargarImagen("pirata_Player_drunk.png",-1)
+			else:
+				if objeto.tipo == ESPADA: self.jugador1.subirAtaque(1)
+				if objeto.tipo == BOTAS: self.jugador1.subirVel(0.01)
+				if objeto.tipo == MUELLE: self.jugador1.subirSalto(0.01)
+				self.gui.actualizarPsj(self.jugador1)
 
 		self.check_end()
 				
@@ -307,7 +332,7 @@ class Fase(EscenaPygame):
 				elem.draw(pantalla)
 		
 		self.dibujar_frontal(pantalla)
-		self.lifebar.draw(pantalla)
+		self.gui.draw(pantalla)
 		self.dibujar_fundido(pantalla)
 					
 	def eventos(self, lista_eventos):

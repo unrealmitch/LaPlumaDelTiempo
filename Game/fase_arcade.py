@@ -7,7 +7,7 @@ from escena import *
 from personajes import *
 from escenario import *
 from capa import *
-from lifeBar import *
+from gui import *
 from pygame.locals import *
 from animacionesPygame import *
 from fase import *
@@ -34,10 +34,10 @@ class Fase_arcade(Fase):
 		self.time = 0
 		self.clock_start = pygame.time.get_ticks()
 		self.nextEnemy = 0
-		self.nextHearth = 0
-		self.playerDrunk = False
+		self.nextObject = 0
 
-		self.lifebar = LifeBar(5,1)
+		self.gui = Gui(5,1)
+		self.gui.actualizarPsj(self.jugador1)
 
 
 	###FUNCIONES CONFIGURACION FASE###
@@ -73,7 +73,7 @@ class Fase_arcade(Fase):
 		if pygame.time.get_ticks() > self.nextEnemy:
 			random.seed()
 
-			dificultad = (self.time / 10) + 1
+			dificultad = (self.time / 15) + 1
 
 			nextTime = 10000/dificultad
 			nextTime = random.randint(nextTime, nextTime*2)
@@ -81,15 +81,17 @@ class Fase_arcade(Fase):
 			self.nextEnemy = pygame.time.get_ticks() + nextTime
 
 			if random.randint(0,100) > 101-1*dificultad:
+				pirata = Enemigo(EPIRATA5, True)
+			elif random.randint(0,100) > 102-2*dificultad:
 				pirata = Enemigo(EPIRATA4, True)
-			elif random.randint(0,100) > 100-5*dificultad:
+			elif random.randint(0,100) > 100-4*dificultad:
 				pirata = Enemigo(EPIRATA3, True)
 			elif random.randint(0,100) >= 80-10*dificultad:
 				pirata = Enemigo(EPIRATA2, True)
 			else:
 				pirata = Enemigo(EPIRATA1, True)
 
-			distancia = (300*ESCALA + random.randint(0,1000)) * random.choice([1,-1])
+			distancia = (300*ESCALA + random.randint(0,500+dificultad*100)) * random.choice([1,-1])
 			pirata.establecerPosicion( (distancia+self.jugador1.posicion[0] , random.randint(0,400)*ESCALA))
 			#pirata.establecerPosicion( (self.jugador1.posicion[0] , 50) )
 			self.grupoEnemigos.add(pirata)
@@ -101,7 +103,7 @@ class Fase_arcade(Fase):
 			return False
 
 	def addObjects(self):
-		if pygame.time.get_ticks() > self.nextHearth:
+		if pygame.time.get_ticks() > self.nextObject:
 			random.seed()
 
 			dificultad = (self.time / 15) + 1
@@ -109,7 +111,7 @@ class Fase_arcade(Fase):
 			nextTime = 15000/dificultad
 			nextTime = random.randint(nextTime, nextTime*3)
 			if nextTime < 1000: nextTime = 1000
-			self.nextHearth = pygame.time.get_ticks() + nextTime
+			self.nextObject = pygame.time.get_ticks() + nextTime
 
 
 			distancia = random.randint(0,self.max_x)
@@ -119,13 +121,21 @@ class Fase_arcade(Fase):
 
 			if randomitem > 30:
 				tobjeto = CORAZON
+			elif randomitem > 7:
+				tobjeto = random.choice([RON,BOTAS,MUELLE])
 			else:
-				tobjeto = RON
+				tobjeto = ESPADA
 
 			if tobjeto == CORAZON:
 				objeto = Objeto(CORAZON, 'arcade_hearth_little.png', 'arcade_life.ogg')
 			elif tobjeto == RON:
 				objeto = Objeto(RON, 'arcade_ron.png', 'arcade_eructo.ogg')
+			elif tobjeto == ESPADA:
+				objeto = Objeto(ESPADA, 'arcade_espada.png', 'arcade_powerup.ogg')
+			elif tobjeto == BOTAS:
+				objeto = Objeto(BOTAS, 'arcade_botas.png', 'arcade_powerup.ogg')
+			elif tobjeto == MUELLE:
+				objeto = Objeto(MUELLE, 'arcade_up.png', 'arcade_powerup.ogg')
 
 			objeto.establecerPosicion( (distancia, random.randint(0,200)*ESCALA))
 			#objeto.establecerPosicion( (self.jugador1.posicion[0] , 50) )
@@ -162,29 +172,8 @@ class Fase_arcade(Fase):
 			self.time = (pygame.time.get_ticks() - self.clock_start) / 1000
 			self.addEnemy()
 			self.addObjects()
-		Fase.update(self, tiempo)
-
-		objetos = pygame.sprite.spritecollide(self.jugador1, self.grupoObjetos, False)
-		for objeto in objetos:
-			GestorRecursos.CargarSonido(objeto.sound_pick).play()
-			objeto.kill()
-			if objeto.tipo == CORAZON:
-				vida = self.jugador1.addVida()
-				self.lifebar.actualizarVida(vida)
-			elif objeto.tipo == RON:
-				tmp = self.teclasConfig[IZQUIERDA]
-				self.teclasConfig[IZQUIERDA] = self.teclasConfig[DERECHA]
-				self.teclasConfig[DERECHA] = tmp
-				if self.playerDrunk:
-					self.playerDrunk = False
-					self.jugador1.hoja = GestorRecursos.CargarImagen("pirata_Player.png",-1)
-				else:
-					self.playerDrunk = True
-					self.jugador1.hoja = GestorRecursos.CargarImagen("pirata_Player_drunk.png",-1)
-
-				
-
-		self.channel_bso.set_volume(0.1 + (self.time/100.))
+		Fase.update(self, tiempo)				
+		self.channel_bso.set_volume(float(self.time)/200.)
 
 	def dibujar(self, pantalla):
 		Fase.dibujar(self,pantalla)

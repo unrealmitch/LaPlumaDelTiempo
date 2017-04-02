@@ -15,6 +15,9 @@ from gestorRecursos import *
 #Objetos
 CORAZON = 1
 RON = 2
+ESPADA = 3
+BOTAS = 4
+MUELLE = 5
 #Protagonista
 PLAYER_PIRATA = 0
 PLAYER_DINO = 1
@@ -25,6 +28,7 @@ EPIRATA1 = 1
 EPIRATA2 = 2
 EPIRATA3 = 3
 EPIRATA4 = 4
+EPIRATA5 = 5
 
 EDINO1 = 10
 
@@ -220,7 +224,7 @@ class Personaje(MiSprite):
 			self.invulnerable_clock = time
 			if vida == 0:
 				GestorRecursos.CargarSonido('piratas_espadas.ogg').play()
-			elif(self.vida - vida< 1):
+			elif(self.vida - vida< 1 and self.vida != 0):
 				self.vida = 0
 				self.audio[P_MURIENDO].play()
 				self.posturas[P_MURIENDO] = True
@@ -237,6 +241,15 @@ class Personaje(MiSprite):
 	def addVida(self):
 		if self.vida > 0 and self.vida <11: self.vida += 1
 		return self.vida
+
+	def subirVel(self,speed):
+		self.velocidadCarrera += speed
+
+	def subirSalto(self,speed):
+		self.velocidadSalto += speed
+
+	def subirAtaque(self,ataque):
+		self.ataque += ataque
 
 	def update(self, grupoPlataformas, tiempo):
 		if(tiempo > 1000): return	#Fix para cuando un fotograma consume mucho tiempo, normalmente al inicio de la escena, se descarte, ya que haría movimientos incosistentes dado la larga duración que se aplicaría a los movimientos
@@ -406,6 +419,8 @@ class Enemigo(NoJugador):
 			NoJugador.__init__(self,EPIRATA3,'Pirate_w.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.1, VELOCIDAD_SALTO_EPIRATA+0.08, RETARDO_ANIMACION_EPIRATA, 2000, 3);
 		elif clase == EPIRATA4: 
 			NoJugador.__init__(self,EPIRATA4,'Pirate_b.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.15, VELOCIDAD_SALTO_EPIRATA+0.1, RETARDO_ANIMACION_EPIRATA, 1500, 4);
+		elif clase == EPIRATA5: 
+			NoJugador.__init__(self,EPIRATA5,'Pirate_star.png','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA+0.3, VELOCIDAD_SALTO_EPIRATA+0.3, RETARDO_ANIMACION_EPIRATA, 1250, 5);
 		elif clase == EDINO1:
 			NoJugador.__init__(self,EDINO1,'dino_Velociraptor.gif','dino_velociraptor.txt', [5, 4, 4, 5, 4], VELOCIDAD_EDINO, VELOCIDAD_SALTO_EDINO, RETARDO_ANIMACION_EDINO, 4000, 1);
 		else:
