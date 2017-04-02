@@ -121,7 +121,7 @@ class Piratas_Arcade(EscenaPygame):
 			self.nextEnemy = pygame.time.get_ticks() + nextTime
 
 			if random.randint(0,100) >= 101-1*dificultad:
-				pirata = Enemigo(EPIRATA3, True)
+				pirata = Enemigo(EPIRATA4, True)
 			if random.randint(0,100) >= 100-5*dificultad:
 				pirata = Enemigo(EPIRATA3, True)
 			elif random.randint(0,100) >= 80-10*dificultad:
