@@ -19,7 +19,7 @@ from fase import *
 # -------------------------------------------------
 
 # Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = True
+DEBUG = False
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -64,16 +64,18 @@ class Fase(EscenaPygame):
 
 		### JUGADORES ###
 		self.jugador1 = None
-		self.lifebar = LifeBar()
+		self.lifebar = LifeBar(6,0)
 		self.final = None
 
 		### Grupos Sprites y Capas ###
 		self.capaEscenario = Capa()
 		self.grupoJugadores = pygame.sprite.Group()
 		self.grupoEnemigos = pygame.sprite.Group()
+		self.grupoObjetos = pygame.sprite.Group()
 		self.grupoPlataformas = pygame.sprite.Group()
 		self.grupoSpritesDinamicos = pygame.sprite.Group()
 		self.grupoSprites = pygame.sprite.Group()
+
 		self.animacion = []
 
 		### Sonido ###
@@ -110,11 +112,11 @@ class Fase(EscenaPygame):
 
 	def refreshSprites(self):
 		self.grupoJugadores.add(self.jugador1)
+		self.grupoSpritesDinamicos.add(self.grupoObjetos)
 		self.grupoSpritesDinamicos.add(self.grupoJugadores)
 		self.grupoSpritesDinamicos.add(self.grupoEnemigos)
 
 		self.grupoSprites.add(self.grupoSpritesDinamicos)
-		self.grupoSprites.add(self.grupoEnemigos)
 		self.grupoSprites.add(self.grupoPlataformas)
 
 	###FUNCIONES DE ACCION###
@@ -203,6 +205,10 @@ class Fase(EscenaPygame):
 		self.capaEscenario.update(tiempo)
 		self.actualizarScroll(self.jugador1)
 
+		#Se mueven los objetos
+		for objeto in iter(self.grupoObjetos):
+			objeto.mover(self.grupoPlataformas)
+
 		#IA -> Se indican que hacen los enemigos
 		if self.fade == 0:
 			for enemigo in iter(self.grupoEnemigos):
@@ -212,6 +218,7 @@ class Fase(EscenaPygame):
 
 		#Miramos todas las colision de los enemios con los jugadores, si uno de ellos está atacando, daña al otro
 		collitions = pygame.sprite.groupcollide(self.grupoJugadores, self.grupoEnemigos, False, False)
+		#podría hacerse mejor con el parametro collided
 		for player,enemys in collitions.items():
 			for enemy in enemys:
 				if (enemy.posturas[P_ATACANDO1] and player.posturas[P_ATACANDO1]):
@@ -288,9 +295,9 @@ class Fase(EscenaPygame):
 		if DEBUG:
 			for elem in self.grupoPlataformas.sprites():
 				elem.draw(pantalla)
-
-		self.lifebar.draw(pantalla)
+		
 		self.dibujar_frontal(pantalla)
+		self.lifebar.draw(pantalla)
 		self.dibujar_fundido(pantalla)
 					
 	def eventos(self, lista_eventos):

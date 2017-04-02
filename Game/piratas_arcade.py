@@ -29,7 +29,7 @@ MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 class Piratas_Arcade(Fase_arcade):
 	def __init__(self, director):
 
-		Fase_arcade.__init__(self, director, 'PIRATAS_LVL')
+		Fase_arcade.__init__(self, director, 'PIRATAS_ARCADE')
 		self.scroll = (1100*ESCALA,0.)
 
 	def setEscenario(self):

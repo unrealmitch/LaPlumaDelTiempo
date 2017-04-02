@@ -18,13 +18,7 @@ from fase import *
 # -------------------------------------------------
 # -------------------------------------------------
 
-# Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = True
-MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
-MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
-
-# -------------------------------------------------
-# Clase Piratas
+# Clase Fase_Arcade
 
 class Fase_arcade(Fase):
 	def __init__(self, director, nivel):
@@ -40,6 +34,10 @@ class Fase_arcade(Fase):
 		self.time = 0
 		self.clock_start = pygame.time.get_ticks()
 		self.nextEnemy = 0
+		self.nextHearth = 0
+
+		self.lifebar = LifeBar(5,1)
+
 
 	###FUNCIONES CONFIGURACION FASE###
 	def setEscenario(self):
@@ -101,6 +99,30 @@ class Fase_arcade(Fase):
 		else:
 			return False
 
+	def addObjects(self):
+		if pygame.time.get_ticks() > self.nextHearth:
+			random.seed()
+
+			dificultad = (self.time / 20) + 1
+
+			nextTime = 10000/dificultad
+			nextTime = random.randint(nextTime, nextTime*3)
+			if nextTime < 1000: nextTime = 1000
+			self.nextHearth = pygame.time.get_ticks() + nextTime
+
+
+			distancia = random.randint(0,self.max_x)
+			objeto = Objeto(1, 'arcade_hearth_little.png', 'arcade_life.ogg')
+			objeto.establecerPosicion( (distancia, random.randint(0,200)*ESCALA))
+			#objeto.establecerPosicion( (self.jugador1.posicion[0] , 50) )
+			self.grupoObjetos.add(objeto)
+			self.grupoSpritesDinamicos.add(self.grupoObjetos)
+			self.grupoSprites.add(self.grupoObjetos)
+
+			return True
+		else:
+			return False
+
 	###FUNCIONES DE ACCION###
 	def check_end(self):
 		#Cuando hacemos el fundido a negro (Salímos) [Si morimos o muere el jefe final]
@@ -125,7 +147,15 @@ class Fase_arcade(Fase):
 		if(self.fade == 0):
 			self.time = (pygame.time.get_ticks() - self.clock_start) / 1000
 			self.addEnemy()
+			self.addObjects()
 		Fase.update(self, tiempo)
+
+		corazones = pygame.sprite.spritecollide(self.jugador1, self.grupoObjetos, False)
+		for corazon in corazones:
+			GestorRecursos.CargarSonido(corazon.sound_pick).play()
+			corazon.kill()
+			vida = self.jugador1.addVida()
+			self.lifebar.actualizarVida(vida)
 
 	def dibujar(self, pantalla):
 		Fase.dibujar(self,pantalla)
