@@ -117,12 +117,12 @@ class Piratas_Arcade(EscenaPygame):
 
 			nextTime = 10000/dificultad
 			nextTime = random.randint(nextTime, nextTime*2)
-			if nextTime < 200: nextTime = 200
+			if nextTime < 500: nextTime = 500
 			self.nextEnemy = pygame.time.get_ticks() + nextTime
 
-			if random.randint(0,100) >= 101-1*dificultad:
+			if random.randint(0,100) > 101-1*dificultad:
 				pirata = Enemigo(EPIRATA4, True)
-			if random.randint(0,100) >= 100-5*dificultad:
+			elif random.randint(0,100) > 100-5*dificultad:
 				pirata = Enemigo(EPIRATA3, True)
 			elif random.randint(0,100) >= 80-10*dificultad:
 				pirata = Enemigo(EPIRATA2, True)
@@ -228,8 +228,12 @@ class Piratas_Arcade(EscenaPygame):
 		if(not self.jugador1.alive()):
 			if(self.fade == 0): 
 				self.fade = -250
-				GestorRecursos.CargarSonido('game_over.ogg').play()
-				GestorRecursos.setConfigParam('PIRATAS_ARCADE', self.nivel + 1)
+				if self.nivel > self.nivel_max:
+					GestorRecursos.CargarSonido('mision_complete_long.ogg').play()
+					GestorRecursos.setConfigParam('PIRATAS_ARCADE', self.nivel + 1)
+				else:
+					GestorRecursos.CargarSonido('game_over.ogg').play()
+				
 
 		if(self.fade < 0):
 			self.channel_bso.set_volume(-self.fade/300)
@@ -310,7 +314,7 @@ class Piratas_Arcade(EscenaPygame):
 					else:
 						self.fade=-1
 
-					if(self.jugador1.alive()):
+					if(self.nivel > self.nivel_max):
 						image = GestorRecursos.CargarImagen("complete.png",-1)
 					else:
 						image = GestorRecursos.CargarImagen("game_over.png",-1)

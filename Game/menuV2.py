@@ -99,7 +99,7 @@ class Portal(ElementoGUI):
 
     def available(self, fase = -1):
         if fase == -1: fase = self.fase
-        if (self.fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') < 2) or (self.fase == 2 and GestorRecursos.getConfigParam('PIRATAS_LVL') < 3):
+        if (fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') < 2) or (fase == 2 and GestorRecursos.getConfigParam('PIRATAS_LVL') < 3):
             return False
         else:
             return True
@@ -119,7 +119,7 @@ class Portal(ElementoGUI):
         if over and self.available():
             self.animPortal.play()
             if self.channel_bso.get_busy() == False: self.channel_bso = self.sound_bso.play(-1)
-            self.channel_bso.set_volume(0.75)
+            self.channel_bso.set_volume(1)
             return True
         else:
             self.animPortal.pause()
@@ -265,7 +265,7 @@ class Menu(EscenaPygame):
         self.listaPantallas = []
         self.song = GestorRecursos.CargarSonido('menu_bso.ogg')
         self.channel_bso = self.song.play(-1)
-        self.channel_bso.set_volume(0.4)
+        self.channel_bso.set_volume(0.3)
         # Creamos las pantallas que vamos a tener
         #   y las metemos en la lista
         self.listaPantallas.append(PantallaInicialGUI(self))
@@ -279,7 +279,7 @@ class Menu(EscenaPygame):
         self.channel_bso.set_volume(0)
 
     def unmute(self):
-        self.channel_bso.set_volume(0.4)
+        self.channel_bso.set_volume(0.3)
 
     def eventos(self, lista_eventos):
         # Se mira si se quiere salir de esta escena
