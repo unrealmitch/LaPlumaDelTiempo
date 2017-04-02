@@ -25,7 +25,7 @@ MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 # -------------------------------------------------
 # Clase Piratas
 
-class Piratas_Arcade(Escena):
+class Piratas_Arcade(EscenaPygame):
 	def __init__(self, director):
 
 		Escena.__init__(self, director)
