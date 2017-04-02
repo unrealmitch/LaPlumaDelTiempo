@@ -8,6 +8,7 @@ from escenaCarga import EscenaCarga
 from animacionesPygame import *
 from escenaAnim1 import EscenaAnimacion1
 
+
 # -------------------------------------------------
 # Clase abstracta ElementoGUI
 
@@ -307,7 +308,7 @@ class Menu(EscenaPygame):
 
     def ejecutarJuego(self,fase):
         pygame.mixer.stop();
-        if fase == 0:
+        if fase == 0 and GestorRecursos.getConfigParam('DINOS_LVL') == 0:
                 escena = EscenaAnimacion1(self.director)
         else:
                 escena = EscenaCarga(self.director, fase)

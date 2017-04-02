@@ -10,6 +10,7 @@ from animacionesPygame import *
 from piratas import Piratas
 from dinosaurios import Dinosaurios
 from piratas_arcade import Piratas_Arcade
+from gestorRecursos import *
 
 # -------------------------------------------------
 # Clase EscenaCarga
@@ -24,14 +25,25 @@ class EscenaCarga(EscenaPygame):
             recursos = "dinosaurios.conf"
             title = '#Loading mision 1: DINOSAURIOS'
             title2 = "!Localiza y acaba con el hombre misterioso!"
+            if(GestorRecursos.getConfigParam('DINOS_LVL') > 3):
+                title3 = "Cuidado: Has bebido mucho ron y quizas no te muevas bien"
+            else:
+                title3 = None
+
         elif(self.fase == 1):
             recursos = "piratas.conf"
             title = '#Loading mision 2: PIRATAS'
             title2 = "!Localiza y acaba con el hombre misterioso!"
+            if(GestorRecursos.getConfigParam('PIRATAS_LVL') > 3):
+                title3 = "Cuidado: Has bebido mucho ron y quizas no te muevas bien"
+            else:
+                title3 = None
+
         elif(self.fase == 2):
             recursos = "piratas.conf"
             title = '#Loading ARCADE: Piratas'
             title2 = "!Sobrevive todo el tiempo que puedas!"
+            title3 = None
 
         self.texto = self.tipoLetra.render(title, True, (0,238,255), (0,0,0))
         self.rect = self.texto.get_rect()
@@ -41,6 +53,11 @@ class EscenaCarga(EscenaPygame):
         self.texto2 = self.tipoLetra2.render(title2, True, (0,175,200), (0,0,0))
         self.rect2 = self.texto2.get_rect()
         self.rect2.center = (ANCHO_PANTALLA/2, ALTO_PANTALLA/1.5)
+
+        self.tipoLetra3 = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 18)
+        self.texto3 = self.tipoLetra2.render(title3, True, (255,100,0), (0,0,0))
+        self.rect3 = self.texto3.get_rect()
+        self.rect3.center = (ANCHO_PANTALLA/2, ALTO_PANTALLA/1.25)
         
         recursos = os.path.join('others', recursos)
         self.conf_file = open(recursos, "r")
@@ -76,6 +93,7 @@ class EscenaCarga(EscenaPygame):
         pantalla.fill((0,0,0))
         pantalla.blit(self.texto, self.rect)
         pantalla.blit(self.texto2, self.rect2)
+        if self.texto3 != None: pantalla.blit(self.texto3, self.rect3)
 
     def eventos(self, lista_eventos):
         for evento in lista_eventos:

@@ -10,9 +10,6 @@ class Capa():
 	def __init__(self):
 		self.objects = []
 
-	def __init__(self,object):
-		self.objects = []
-		self.objects.append(object)
 
 	def add(self,object):
 		self.objects.append(object)
