@@ -35,6 +35,7 @@ class Fase_arcade(Fase):
 		self.clock_start = pygame.time.get_ticks()
 		self.nextEnemy = 0
 		self.nextHearth = 0
+		self.playerDrunk = False
 
 		self.lifebar = LifeBar(5,1)
 
@@ -103,16 +104,29 @@ class Fase_arcade(Fase):
 		if pygame.time.get_ticks() > self.nextHearth:
 			random.seed()
 
-			dificultad = (self.time / 20) + 1
+			dificultad = (self.time / 15) + 1
 
-			nextTime = 10000/dificultad
+			nextTime = 15000/dificultad
 			nextTime = random.randint(nextTime, nextTime*3)
 			if nextTime < 1000: nextTime = 1000
 			self.nextHearth = pygame.time.get_ticks() + nextTime
 
 
 			distancia = random.randint(0,self.max_x)
-			objeto = Objeto(1, 'arcade_hearth_little.png', 'arcade_life.ogg')
+			objetos = [CORAZON]
+
+			randomitem = random.randint(0,100)
+
+			if randomitem > 30:
+				tobjeto = CORAZON
+			else:
+				tobjeto = RON
+
+			if tobjeto == CORAZON:
+				objeto = Objeto(CORAZON, 'arcade_hearth_little.png', 'arcade_life.ogg')
+			elif tobjeto == RON:
+				objeto = Objeto(RON, 'arcade_ron.png', 'arcade_eructo.ogg')
+
 			objeto.establecerPosicion( (distancia, random.randint(0,200)*ESCALA))
 			#objeto.establecerPosicion( (self.jugador1.posicion[0] , 50) )
 			self.grupoObjetos.add(objeto)
@@ -150,12 +164,27 @@ class Fase_arcade(Fase):
 			self.addObjects()
 		Fase.update(self, tiempo)
 
-		corazones = pygame.sprite.spritecollide(self.jugador1, self.grupoObjetos, False)
-		for corazon in corazones:
-			GestorRecursos.CargarSonido(corazon.sound_pick).play()
-			corazon.kill()
-			vida = self.jugador1.addVida()
-			self.lifebar.actualizarVida(vida)
+		objetos = pygame.sprite.spritecollide(self.jugador1, self.grupoObjetos, False)
+		for objeto in objetos:
+			GestorRecursos.CargarSonido(objeto.sound_pick).play()
+			objeto.kill()
+			if objeto.tipo == CORAZON:
+				vida = self.jugador1.addVida()
+				self.lifebar.actualizarVida(vida)
+			elif objeto.tipo == RON:
+				tmp = self.teclasConfig[IZQUIERDA]
+				self.teclasConfig[IZQUIERDA] = self.teclasConfig[DERECHA]
+				self.teclasConfig[DERECHA] = tmp
+				if self.playerDrunk:
+					self.playerDrunk = False
+					self.jugador1.hoja = GestorRecursos.CargarImagen("pirata_Player.png",-1)
+				else:
+					self.playerDrunk = True
+					self.jugador1.hoja = GestorRecursos.CargarImagen("pirata_Player_drunk.png",-1)
+
+				
+
+		self.channel_bso.set_volume(0.1 + (self.time/100.))
 
 	def dibujar(self, pantalla):
 		Fase.dibujar(self,pantalla)

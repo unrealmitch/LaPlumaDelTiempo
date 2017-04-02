@@ -12,9 +12,13 @@ from gestorRecursos import *
 # -------------------------------------------------
 # -------------------------------------------------
 
+#Objetos
+CORAZON = 1
+RON = 2
 #Protagonista
 PLAYER_PIRATA = 0
 PLAYER_DINO = 1
+
 #Tipo Personaje
 PLAYER = 0
 EPIRATA1 = 1
@@ -23,7 +27,6 @@ EPIRATA3 = 3
 EPIRATA4 = 4
 
 EDINO1 = 10
-
 
 # Movimientos
 QUIETO = 0
@@ -106,6 +109,8 @@ class Personaje(MiSprite):
 		self.vida = vida
 		self.ataque_clock = 0
 		self.ataque_retardo = delayAtaque
+
+		self.ataque = 1
 
 		self.invulnerable_clock = 0
 		self.invulnerable_delay = 500
@@ -215,7 +220,7 @@ class Personaje(MiSprite):
 			self.invulnerable_clock = time
 			if vida == 0:
 				GestorRecursos.CargarSonido('piratas_espadas.ogg').play()
-			elif(self.vida == 1):
+			elif(self.vida - vida< 1):
 				self.vida = 0
 				self.audio[P_MURIENDO].play()
 				self.posturas[P_MURIENDO] = True
@@ -226,7 +231,7 @@ class Personaje(MiSprite):
 				self.vida-=vida
 				self.audio[P_HERIDO].play()
 				return True
-				
+
 		return False
 
 	def addVida(self):
@@ -352,7 +357,7 @@ class Jugador(Personaje):
 		if fase==PLAYER_DINO:
 			Personaje.__init__(self,PLAYER,'dino_Player.png','dino_Player.txt', [6, 7, 4, 5, 6], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR, 1250, 6);
 		else:
-			Personaje.__init__(self,PLAYER,'pirata_Player_v3.png','pirata_Player_v3.txt', [6, 7, 5, 7, 6], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR, 1250, 6);
+			Personaje.__init__(self,PLAYER,'pirata_Player.png','pirata_Player.txt', [6, 7, 5, 7, 6], VELOCIDAD_JUGADOR, VELOCIDAD_SALTO_JUGADOR, RETARDO_ANIMACION_JUGADOR, 1250, 6);
 	
 	def mover(self, teclasPulsadas, teclasConfig):
 		#Miramos si la tecla para cada movimiento esta pulsada o no
