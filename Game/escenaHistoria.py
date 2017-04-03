@@ -26,7 +26,7 @@ class EscenaHistoria(EscenaPygame):
 		self.fase = fase
 		self.actual = [0,0]
 		self.fade = 0
-		self.audio = None
+		#self.audio = None
 		if fase == 0:
 			GestorRecursos.CargarSonido('intro_1.ogg').play()
 			self.imagenes = [[],[],[]]
@@ -39,7 +39,7 @@ class EscenaHistoria(EscenaPygame):
 		elif fase == 1:
 			GestorRecursos.CargarSonido('intro_1.ogg').play()
 			self.imagenes = [[]]
-			self.delay = [[4,10,8,18]]
+			self.delay = [[5,10,8,18]]
 			for i in range(14,18):
 				self.imagenes[0].append('dialogo' + str(i) + '.png')
 			#self.imagenes[0].append('dialogo14.png')
@@ -49,7 +49,8 @@ class EscenaHistoria(EscenaPygame):
 			for i in range(18,21):
 				self.imagenes[0].append('dialogo' + str(i) + '.png')
 			self.imagenes[1].append('final.jpg')
-			self.delay = [[10,6,4],[6]]
+			self.delay = [[10,6,4],[60]]
+			GestorRecursos.CargarSonido('final.ogg').play() 
 		else:
 			raise 'Not implemented yet'
 
@@ -68,9 +69,11 @@ class EscenaHistoria(EscenaPygame):
 		else:
 			self.imagen = None
 
+		'''
 		if self.audio != None and self.audio[self.actual] != [] and self.audio[self.actual[0]][self.actual[1]] != None:
 			pygame.mixer.stop()
 			GestorRecursos.CargarSonido(self.audio[self.actual[0]][self.actual[1]]).play() 
+		'''
 
 	def update(self, tiempo):
 		#Comprobamos si ha pasado el tiempo de retado y cambias a la siguiente escena de diálogo, o en caso de que termine, la siguiente escena [diferente fondo]

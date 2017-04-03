@@ -42,10 +42,10 @@ class Dinosaurios(Fase):
 		self.decorado = StaticScenario('dino_escenario.png',(1,0))
 		
 
-		self.capaEscenario.add(autonomeSprite('dino2.png',(ANCHO_PANTALLA/1.2,10,5000,0,0,0),(1.2,1.2,1,1,0,0),(0.1,-0.2)))
+		#self.capaEscenario.add(autonomeSprite('dino2.png',(ANCHO_PANTALLA/1.2,10,5000,0,0,0),(1.2,1.2,1,1,0,0),(0.1,-0.2)))
 		for i in range(10):
 			random.seed()
-			self.capaEscenario.add(autonomeSprite('dino_ave.png',(random.randint(400,7000),random.randint(10,300),7000,0,-float(random.randint(1,100))/1000.,0),(0.5,0.5,1,1,0,0),(float(random.randint(10,100))/100.,float(random.randint(-200,200))/100.)))
+			#self.capaEscenario.add(autonomeSprite('dino_ave.png',(random.randint(400,7000),random.randint(10,300),7000,0,-float(random.randint(1,100))/1000.,0),(0.5,0.5,1,1,0,0),(float(random.randint(10,100))/100.,float(random.randint(-200,200))/100.)))
 
 		self.capaEscenario.add(background2)
 		self.capaEscenario.add(autonomeSprite('dino1.png',(0,320*ESCALA,5000,0,0.01,0),(1.5,1.5,1,1,0,0),(0.3,1)))

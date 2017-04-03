@@ -22,7 +22,7 @@ import mando
 
 # Los bordes de la pantalla para hacer scroll horizontal
 DEBUG = False
-MANDO = True
+MANDO = False
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
