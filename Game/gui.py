@@ -16,7 +16,7 @@ class Gui(MiSprite):
 		self.salto = 1
 		self.ataque = 1
 
-		if tipo == 0:
+		if tipo == 0:	#Gui normal para las fases normales (no arcade)
 			self.hoja = GestorRecursos.CargarImagen("gui_lifebar.png",-1)
 			self.hoja = self.hoja.convert_alpha()
 			datos = GestorRecursos.CargarArchivoCoordenadas("gui_lifebar.txt")
@@ -37,7 +37,7 @@ class Gui(MiSprite):
 			self.image = self.hoja.subsurface(self.coordenadasHoja[0][6])
 			x,y=self.image.get_size()
 			self.image = pygame.transform.scale(self.image,(int(x*0.7), int(y*0.7)))
-		else:
+		else:	#GUI para el arcade, con x corazones según vida, y las cualidades del personaje
 			self.corazon = GestorRecursos.CargarImagen("gui_corazon.png",-1)
 			self.death =  GestorRecursos.CargarImagen("gui_death.png",-1)
 			x,y=self.corazon.get_size()
@@ -55,7 +55,7 @@ class Gui(MiSprite):
 	def actualizarVida(self, vida):
 
 		if self.tipo == 0:
-			if vida > 6: vida = 6
+			if vida > 6: vida = 6#Para que no se pete el sprite
 			self.rect = pygame.Rect(0,20,self.coordenadasHoja[0][vida][2],self.coordenadasHoja[0][vida][3])
 			self.image = self.hoja.subsurface(self.coordenadasHoja[0][vida])
 			x,y=self.image.get_size()

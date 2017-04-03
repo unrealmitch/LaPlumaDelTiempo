@@ -78,20 +78,20 @@ class EscenaHistoria(EscenaPygame):
 	def update(self, tiempo):
 		#Comprobamos si ha pasado el tiempo de retado y cambias a la siguiente escena de diálogo, o en caso de que termine, la siguiente escena [diferente fondo]
 		time = pygame.time.get_ticks()
-		if time > self.contador:
-				if(self.actual[1] == len(self.imagenes[self.actual[0]]) - 1):
-					if self.fade < 50:
-						if(self.actual[0] == len(self.imagenes) -1):
+		if time > self.contador:	#Si ha pasado el tiempo de la escena
+				if(self.actual[1] == len(self.imagenes[self.actual[0]]) - 1):	#Si es la ultima escena antes de un fundido
+					if self.fade < 50:	#Si ya ha terminado el fundido
+						if(self.actual[0] == len(self.imagenes) -1):	#Su es la última escena
 							self.director.salirEscena();
-						else:
+						else:	#Sino cargamos el siguiente arrat de escenas
 							self.fade = 0
 							self.actual[0]+=1
 							self.actual[1]=0
 							self.change_image()
 							self.contador = time + self.delay[self.actual[0]][self.actual[1]] * 1000
-					else:
+					else:	#Realizamos el fundido
 						self.fade -= 20
-				else:
+				else:	#Actualizamos la foto
 					self.actual[1]+=1
 					self.change_image()
 					self.contador = time + self.delay[self.actual[0]][self.actual[1]] * 1000
@@ -116,6 +116,7 @@ class EscenaHistoria(EscenaPygame):
 		pantalla.blit(texto, rect)
 		
 	def eventos(self, lista_eventos):
+		#Pulsando ESC terminamos la escena completa de diálogo, con SPACE pasamos al siguiente diálogo sin esperar
 		for evento in lista_eventos:
 			if evento.type == KEYDOWN:
 				if evento.key == K_SPACE and not self.space_blocked:

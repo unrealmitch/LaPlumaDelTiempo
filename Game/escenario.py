@@ -12,7 +12,7 @@ class Plataforma(MiSprite):
 		'''
 		@params:
 			rectangulo(left,top,ancho,alto)
-			tipo: 0-> suelo 1-> muro 2->rampa
+			tipo: 0-> suelo 1-> muro 2,3->rampa
 		'''
 		# Primero invocamos al constructor de la clase padre
 		MiSprite.__init__(self)
