@@ -39,12 +39,14 @@ class EscenaHistoria(EscenaPygame):
 		elif fase == 1:
 			GestorRecursos.CargarSonido('intro_1.ogg').play()
 			self.imagenes = [[]]
-			self.delay = [[18]]
-			self.imagenes[0].append('dialogo14.png')
+			self.delay = [[4,10,8,18]]
+			for i in range(14,18):
+				self.imagenes[0].append('dialogo' + str(i) + '.png')
+			#self.imagenes[0].append('dialogo14.png')
 		elif fase == 2:
 			GestorRecursos.CargarSonido('intro_1.ogg').play()
 			self.imagenes = [[],[]]
-			for i in range(15,18):
+			for i in range(18,21):
 				self.imagenes[0].append('dialogo' + str(i) + '.png')
 			self.imagenes[1].append('final.jpg')
 			self.delay = [[10,6,4],[6]]

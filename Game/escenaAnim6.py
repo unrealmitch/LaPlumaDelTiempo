@@ -40,9 +40,9 @@ class Animacion(pyglet.window.Window):
 
         # La animacion de texto
         self.animacionTextoFrames = [
-            pyglet.image.AnimationFrame(pyglet.image.load('images/menu_animacion1/texto15.png'), 7.5),
-            pyglet.image.AnimationFrame(pyglet.image.load('images/menu_animacion1/texto16.png'), 7.5),
-            pyglet.image.AnimationFrame(pyglet.image.load('images/menu_animacion1/texto17.png'), 4.5),
+            pyglet.image.AnimationFrame(pyglet.image.load('images/menu_animacion1/texto18.png'), 7.5),
+            pyglet.image.AnimationFrame(pyglet.image.load('images/menu_animacion1/texto19.png'), 7.5),
+            pyglet.image.AnimationFrame(pyglet.image.load('images/menu_animacion1/texto20.png'), 4.5),
             ]
 
         # Por ahora no creamos la animacion, porque se empezaria a reproducir,
@@ -53,13 +53,23 @@ class Animacion(pyglet.window.Window):
 
         self.animacionPrincipalFrames = [pyglet.image.AnimationFrame(pyglet.image.load('images/dibujo1.png'),20)]
         
-        pyglet.clock.schedule_once(self.aparecerPrincipal, 1)
+        pyglet.clock.schedule_once(self.aparecerPrincipal, 8)
 
-        self.animacionMisteriosoFrames = [pyglet.image.AnimationFrame(pyglet.image.load('images/misterioso.png'),13)]
+        self.animacionMisteriosoFrames = [pyglet.image.AnimationFrame(pyglet.image.load('images/misterioso.png'),7)]
         
         pyglet.clock.schedule_once(self.aparecerMisterioso, 1)
+        
+        self.animacionLiderFrames = [pyglet.image.AnimationFrame(pyglet.image.load('images/lider.png'),20)]
+        
+        pyglet.clock.schedule_once(self.aparecerLider, 8)
 
-
+     # Metodo para hacer aparecer la animacion del lider
+    def aparecerLider(self, tiempo):
+        animacionLider = pyglet.sprite.Sprite(pyglet.image.Animation(self.animacionLiderFrames), batch=self.batch, group=self.grupoMedio)
+        animacionLider.scale = 0.4
+        animacionLider.set_position(750,10)
+        # Programamos que se elimine la animacion cuando termine
+        pyglet.clock.schedule_once(self.eliminarAnimacion, animacionLider.image.get_duration(), animacionLider)
 
 
     # El metodo para eliminar una animacion determinada
