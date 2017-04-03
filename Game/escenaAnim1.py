@@ -4,7 +4,6 @@ import pyglet
 import random
 from escena import *
 from escenaCarga import EscenaCarga
-from escenaAnim3 import EscenaAnimacion3
 
 
 

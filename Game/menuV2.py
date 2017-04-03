@@ -7,6 +7,7 @@ from gestorRecursos import *
 from escenaCarga import EscenaCarga
 from animacionesPygame import *
 from escenaAnim1 import EscenaAnimacion1
+from escenaTexto import EscenaTexto
 
 
 # -------------------------------------------------
@@ -317,7 +318,7 @@ class Menu(EscenaPygame):
     def ejecutarJuego(self,fase):
         pygame.mixer.stop();
         if fase == 0 and GestorRecursos.getConfigParam('DINOS_LVL') == 0:
-                escena = EscenaAnimacion1(self.director)
+                escena = EscenaTexto(self.director, fase)
         else:
                 escena = EscenaCarga(self.director, fase)
         #escena = EscenaCarga(self.director, fase)
