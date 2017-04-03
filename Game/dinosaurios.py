@@ -17,6 +17,15 @@ class Dinosaurios(Fase):
 	def __init__(self, director):
 
 		Fase.__init__(self, director, 'DINOS_LVL')
+		
+		###FUNCIONES DE ACCION###
+	def salir(self):
+		pygame.time.delay(3000)	#Retardo para terminar el audio
+		pygame.mixer.stop();
+		self.director.salirEscena();
+		if GestorRecursos.getConfigParam('DINOS_LVL') == 0 :
+			for i in range (1,6):
+				self.director.salirEscena()
 
 	def setEscenario(self):
 		### ESCENARIO ###
