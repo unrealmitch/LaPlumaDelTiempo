@@ -206,7 +206,7 @@ class Fase(EscenaPygame):
 
 		if(self.fade == 0):
 			sound_lvl = float(self.scroll[0])/float(self.max_x)
-			self.channel_bso.set_volume(sound_lvl)
+			if(self.final != None): self.channel_bso.set_volume(sound_lvl)
 
 	def update(self, tiempo):
 		#Actualizaciar el mapa y el scroll

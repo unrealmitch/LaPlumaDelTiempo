@@ -244,9 +244,11 @@ class Personaje(MiSprite):
 
 	def subirVel(self,speed):
 		self.velocidadCarrera += speed
+		if self.velocidadCarrera > 10: self.velocidadCarrera= 10
 
 	def subirSalto(self,speed):
 		self.velocidadSalto += speed
+		if self.velocidadSalto > 10: self.velocidadSalto= 10
 
 	def subirAtaque(self,ataque):
 		self.ataque += ataque

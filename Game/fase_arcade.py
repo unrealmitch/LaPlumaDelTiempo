@@ -37,7 +37,7 @@ class Fase_arcade(Fase):
 		self.time = 0
 		self.clock_start = pygame.time.get_ticks()
 		self.nextEnemy = 0
-		self.nextObject = 0
+		self.nextObject = pygame.time.get_ticks() + 3000
 		self.level = 1
 		self.round = 5
 
@@ -85,11 +85,11 @@ class Fase_arcade(Fase):
 			if nextTime < 750: nextTime = 750
 			self.nextEnemy = pygame.time.get_ticks() + nextTime
 
-			if random.randint(0,100) >= 105-1*dificultad:
+			if random.randint(0,100) > 105-1*dificultad:
 				pirata = Enemigo(EPIRATA5, True)
-			elif random.randint(0,100) >= 102-2*dificultad:
+			elif random.randint(0,100) > 103-2*dificultad:
 				pirata = Enemigo(EPIRATA4, True)
-			elif random.randint(0,100) >= 100-4*dificultad:
+			elif random.randint(0,100) > 100-4*dificultad:
 				pirata = Enemigo(EPIRATA3, True)
 			elif random.randint(0,100) >= 60-10*dificultad:
 				pirata = Enemigo(EPIRATA2, True)
@@ -114,7 +114,7 @@ class Fase_arcade(Fase):
 			dificultad = self.level
 
 			nextTime = 15000/dificultad
-			nextTime = random.randint(nextTime, nextTime*3)
+			nextTime = random.randint(nextTime, nextTime*4)
 			if nextTime < 1500: nextTime = 1500
 			self.nextObject = pygame.time.get_ticks() + nextTime
 
@@ -183,11 +183,19 @@ class Fase_arcade(Fase):
 			if  self.time >= self.round:
 				GestorRecursos.CargarSonido('arcade_nextlvl.ogg').play()
 				self.level += 1
-				self.round = self.time + self.level*5
+				self.round = self.time + 5 + self.level*2
 
+				if self.level % 2 == 1:
+					objeto = Objeto(CORAZON, 'arcade_hearth_little.png', 'arcade_life.ogg')
+					objeto.establecerPosicion( (self.jugador1.posicion[0] , 50) )
+					self.grupoObjetos.add(objeto)
+					self.grupoSpritesDinamicos.add(self.grupoObjetos)
+					self.grupoSprites.add(self.grupoObjetos)
+				#self.round = self.time + self.level*5 Mu Largo
 
-		Fase.update(self, tiempo)				
-		self.channel_bso.set_volume(float(self.time)/200.)
+		Fase.update(self, tiempo)
+		self.channel_bso.set_volume(float(self.time)/200.)		
+		
 
 	def dibujar(self, pantalla):
 		Fase.dibujar(self,pantalla)
