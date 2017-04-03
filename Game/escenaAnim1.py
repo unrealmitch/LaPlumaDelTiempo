@@ -234,7 +234,7 @@ class EscenaAnimacion1(EscenaPyglet, pyglet.window.Window):
     def eliminarAnimacion(self, tiempo, animacion):
         animacion.delete()
 
-    def terminarEscena(self, tiempo):
+    def terminarEscena(self):
         # Creamos la nueva escena
         escena = EscenaCarga(self.director, 0)
         # Y cambiamos la actual por la nueva
