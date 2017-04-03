@@ -7,6 +7,8 @@ from gestorRecursos import *
 from escenaCarga import EscenaCarga
 from animacionesPygame import *
 from escenaAnim1 import EscenaAnimacion1
+from escenaTexto import EscenaTexto
+from escenaHistoria import EscenaHistoria
 
 
 # -------------------------------------------------
@@ -316,12 +318,39 @@ class Menu(EscenaPygame):
 
     def ejecutarJuego(self,fase):
         pygame.mixer.stop();
+        ocultas = False
+        if fase == 0 and GestorRecursos.getConfigParam('DINOS_LVL') == 0:
+            i = 18
+            ocultas = True
+            while i >0:
+            #escena = EscenaTexto(self.director, fase, 1)
+                escena = EscenaTexto(self.director, fase, i)
+                self.director.apilarEscena(escena)
+                i-=1
+        elif fase == 1 and GestorRecursos.getConfigParam('PIRATAS_LVL') == 0 and not ocultas:
+            i = 18
+            while i >14:
+            #escena = EscenaTexto(self.director, fase, 1)
+                escena = EscenaTexto(self.director, fase, i)
+                self.director.apilarEscena(escena)
+                i-=1
+        else:
+            escena = EscenaCarga(self.director, fase)
+            #escena = EscenaCarga(self.director, fase)
+            self.director.apilarEscena(escena)
+    '''
         if fase == 0 and GestorRecursos.getConfigParam('DINOS_LVL') == 0:
                 escena = EscenaAnimacion1(self.director)
+        #if fase == 0 and GestorRecursos.getConfigParam('DINOS_LVL') == 0:
+        if fase == 0:
+            escena = EscenaCarga(self.director, fase)
+            self.director.apilarEscena(escena)
+            escena = EscenaHistoria(self.director, fase)
         else:
-                escena = EscenaCarga(self.director, fase)
+            escena = EscenaCarga(self.director, fase)
         #escena = EscenaCarga(self.director, fase)
         self.director.apilarEscena(escena)
+'''
 
     def mostrarPantallaInicial(self):
         self.pantallaActual = 0
