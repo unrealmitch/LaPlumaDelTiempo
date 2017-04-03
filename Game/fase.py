@@ -20,9 +20,10 @@ import mando
 # -------------------------------------------------
 # -------------------------------------------------
 
+DEBUG = False	#Pintamos plataformas?
+MANDO = False	#Activa el mando, si no hay ninguno conectado peta!
+
 # Los bordes de la pantalla para hacer scroll horizontal
-DEBUG = False
-MANDO = False
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -369,13 +370,16 @@ class Fase(EscenaPygame):
 			if evento.type == pygame.QUIT:
 				self.director.salirPrograma()
 
-		# Indicamos la acción a realizar segun la tecla pulsada para cada jugador
-		# Las teclas se cargan al prinipio de la configuracion guardada
+		#Si existe atenuado, el personaje no se puede mover
 		if(self.fade == 0):
+			# Indicamos la acción a realizar segun la tecla pulsada para cada jugador
+			# Las teclas se cargan al prinipio de la configuracion guardada
 			teclasPulsadas = pygame.key.get_pressed()
 			self.jugador1.mover(teclasPulsadas, self.teclasConfig)
 
+			#Implementacion del mando, suplementa el teclado [No borra lo que hace este]
 			if MANDO:
+				#Pendiente configuracion de mapeado de joystcik
 				movimientos = {}
 				pulsado = self.mando.get_buttons()
 				pad = self.mando.get_pad()

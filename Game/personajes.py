@@ -111,12 +111,12 @@ class Personaje(MiSprite):
 
 		###ATAQUE###
 		self.vida = vida
-		self.ataque_clock = 0
+		self.ataque_clock = 0				#Espera para poder volver a atacar
 		self.ataque_retardo = delayAtaque
 
 		self.ataque = 1
 
-		self.invulnerable_clock = 0
+		self.invulnerable_clock = 0			#Tiempo invulnerable tras ser herido
 		self.invulnerable_delay = 500
 
 		###SONIDOS###
@@ -196,7 +196,9 @@ class Personaje(MiSprite):
 			# Si ha pasado, actualizamos la postura
 			self.numImagenPostura += 1
 			if self.numImagenPostura >= len(self.coordenadasHoja[self.numPostura]):
+				#Terminar de atacar al terminar la animacion
 				if self.numPostura == P_ATACANDO1: self.posturas[P_ATACANDO1] = False
+				#Matar el sprite una vez ha terminado la animacion de morir
 				if self.numPostura == P_MURIENDO:
 					self.numImagenPostura -= 1
 					self.kill()
@@ -207,6 +209,7 @@ class Personaje(MiSprite):
 
 			self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
 
+			#Giramos para el lado que mire la hoja de sprites
 			if (self.tipo == PLAYER):
 				if  self.mirando != IZQUIERDA:
 					self.image = self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura])
@@ -219,19 +222,20 @@ class Personaje(MiSprite):
 					self.image = pygame.transform.flip(self.hoja.subsurface(self.coordenadasHoja[self.numPostura][self.numImagenPostura]), 1, 0)
 
 	def quitarVida(self,vida):
+		#Quitar x vida al personaje, establece invulnerabilidad
 		time = pygame.time.get_ticks()
 		if(time > self.invulnerable_clock + self.invulnerable_delay):
 			self.invulnerable_clock = time
-			if vida == 0:
+			if vida == 0: #Caso en el que atacan los dos a la vez,
 				GestorRecursos.CargarSonido('piratas_espadas.ogg').play()
-			elif(self.vida - vida< 1 and self.vida != 0):
+			elif(self.vida - vida< 1 and self.vida != 0):	#Si la vida baja a 0 o menos, lo ponemos "muriendo"
 				self.vida = 0
 				self.audio[P_MURIENDO].play()
 				self.posturas[P_MURIENDO] = True
 				self.numPostura = P_MURIENDO
 				self.numImagenPostura = 0
 				return True
-			elif(self.vida>0):
+			elif(self.vida>0):	#Quitamos vida
 				self.vida-=vida
 				self.audio[P_HERIDO].play()
 				return True
@@ -290,38 +294,40 @@ class Personaje(MiSprite):
 		floor_detected = None
 
 		for plataforma in plataformas:
-			if(plataforma.tipo != 1):
+			if(plataforma.tipo != 1): #Si no es una pared
 				if( (self.rect.bottom) < plataforma.rect.bottom): #Sobre una plataforma (si es suelo ignoramos si la cogemos de lado)
 					if(self.rect.centerx + 10 > plataforma.rect.left and self.rect.centerx - 10 < plataforma.rect.right and velocidady>=0): #Plataforma sobre la que estamos (si realmente estamos sobre ella)
-						
-						if(floor_detected == None or floor_detected.rect.left > plataforma.rect.left):
-							self.posturas[P_SALTANDO] = False
+						#Comparamos con las plataformas anteriores detectadas, si las hay, para establecer prioridad en cual elegir para el cálculo
+						if(floor_detected == None or floor_detected.rect.left > plataforma.rect.left): 
+							self.posturas[P_SALTANDO] = False #Detecado suelo, dejar de saltar
 							floor_detected = plataforma
 							if (plataforma.tipo == 0): #Suelo
 									self.establecerPosicion((self.posicion[0], plataforma.posicion[1]-plataforma.rect.height+1))							
-							else: #Rampa
+							else: #Rampa [Segun donde se esté en la rampa, establece la altura del personaje]
 								percent_ramp = (float(self.rect.centerx) - float(plataforma.rect.left))/float(plataforma.rect.width);
 								if percent_ramp < 0: 
 									percent_ramp = 0
 								elif percent_ramp > 1:
 									percent_ramp = 1
 
-								if(plataforma.tipo == 2):
+								if(plataforma.tipo == 2):	#Si es rampa de subida o de bajada [3=Bajada | 2=Subida]
 									new_y = plataforma.rect.bottom - float(percent_ramp)*plataforma.rect.height
 								else:
 									new_y = plataforma.rect.top + float(percent_ramp)*plataforma.rect.height
 								self.establecerPosicion((self.posicion[0], (new_y)))
 
+			#Si son paredes, se compruba si intenta atraversarlas para restringir el movimiento y dejar de avanzar
 			elif(self.rect.bottom > plataforma.rect.top + 15 and plataforma.tipo == 1): #Paredes [No atravesarlas]
 				if( self.mirando == DERECHA and self.rect.right > plataforma.rect.left and self.rect.left < plataforma.rect.left and self.rect.right < plataforma.rect.right): velocidadx = 0
 				if( self.mirando == IZQUIERDA and self.rect.left < plataforma.rect.right and self.rect.right > plataforma.rect.right and self.rect.left > plataforma.rect.left): velocidadx = 0
 					
 
+		#Si se determina que no está sobre ninguna plataforma [suelo o rampa], lo establece en caida
 		if floor_detected == None : self.posturas[P_SALTANDO] = True
 		
 		###SALTO###
 		if self.movimientos[ARRIBA]:
-			# La postura actual sera estar saltando
+			# Si se pulsa saltar, se mira si ya se esta saltando [y no vuelve a saltar], en case negativo se salta
 			if not self.posturas[P_SALTANDO] : 
 				velocidady = -self.velocidadSalto
 				self.audio[P_SALTANDO].play()
@@ -346,9 +352,8 @@ class Personaje(MiSprite):
 
 		###POSTURA FINAL###
 		self.numPostura = QUIETO
-		for postura,value in self.posturas.items():
+		for postura,value in self.posturas.items():	#[Prioridad, las ultimas en el dic, predominan]
 			if value: self.numPostura = postura
-
 
 		# Actualizamos la imagen a mostrar
 		self.actualizarPostura()
@@ -384,9 +389,11 @@ class Jugador(Personaje):
 		Personaje.mover(self,movimientos)
 
 	def mover_mando(self, movimientos):
+		#No borra el movimiento actual (lo hace el teclado), este solo añade en case de haberlo
 		Personaje.mover(self,movimientos)
 
 	def avanzar(self, grupoPlataformas):
+		#El personaje avanza automaticamente hacia la derecha [Para cuando pasa una fase]
 		Personaje.mover_wreset(self,{DERECHA:True})
 		plataformas = pygame.sprite.spritecollide(self, grupoPlataformas, False)
 		for plataforma in plataformas:
@@ -417,6 +424,8 @@ class Enemigo(NoJugador):
 	
 	def __init__(self, clase=1, free=False):
 		# Invocamos al constructor de la clase padre con la configuracion de este personaje concreto
+		# Segun la clase del enemigo, elegimos su aspecto, y sus cualidades.
+		# El free indica si puede moverse aunque el personaje no esté en pantalla
 		if clase == EPIRATA1: 
 			NoJugador.__init__(self,EPIRATA1,'Pirate.gif','pirate.txt', [4, 6, 5, 6, 6], VELOCIDAD_EPIRATA, VELOCIDAD_SALTO_EPIRATA, RETARDO_ANIMACION_EPIRATA, 4000, 1);
 		elif clase == EPIRATA2: 
@@ -435,7 +444,7 @@ class Enemigo(NoJugador):
 		self.free = free
 
 	def mover_cpu(self, jugador1, grupoPlataformas):
-		# Movemos solo a los enemigos que esten en la pantalla
+		# Movemos solo a los enemigos que esten en la pantalla o tiene movimiento libre
 		if (self.rect.left>0 and self.rect.right<ANCHO_PANTALLA and self.rect.bottom>0 and self.rect.top<ALTO_PANTALLA and jugador1.alive()) or self.free:
 
 			# Y nos movemos andando hacia el protagonista, si estamos muy cerca atacamos

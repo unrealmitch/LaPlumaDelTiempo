@@ -121,8 +121,8 @@ class EscenaHistoria(EscenaPygame):
 				if evento.key == K_SPACE and not self.space_blocked:
 					self.contador = 0
 					self.space_blocked = True
-				if evento.key == K_ESCAPE:
-					self.director.salirEscena();
+				if evento.key == K_ESCAPE: self.director.salirEscena();
+				if evento.key == K_F11: pygame.display.toggle_fullscreen()
 
 			if evento.type == KEYUP:
 				if evento.key == K_SPACE:

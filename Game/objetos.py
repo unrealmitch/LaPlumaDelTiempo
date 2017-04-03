@@ -14,6 +14,8 @@ ESPADA = 3
 BOTAS = 4
 MUELLE = 5
 
+#Clase objeto, un simple misprite que almacena el tipo de objeto, el sonido que hace al cogerse
+#y permite al objeto caer mientras no está sobre una plataforma
 class Objeto(MiSprite):
 	def __init__(self, tipo, image, sound_pick = 'arcade_life.ogg'):
 		MiSprite.__init__(self);

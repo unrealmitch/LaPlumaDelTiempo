@@ -41,9 +41,11 @@ class Portal(ElementoGUI):
 	def __init__(self, pantalla, fase):
 		self.fase = fase
 
+		#Cuando está bloqueada
 		self.block = imagen = GestorRecursos.CargarImagen("pirate_block.png", -1)
 		self.block = pygame.transform.scale(self.block, (int(400*ESCALA*0.7), int(400*ESCALA*0.7)))
 
+		#Creamos la animacion del portal segun la fase a la que correspoda, y asignamos varios parametros segun esta
 		if fase == 0:
 			self.animPortal = AnimacionMenuDino()
 			self.animPortal.posicionx = 0.75*ANCHO_PANTALLA
@@ -66,8 +68,7 @@ class Portal(ElementoGUI):
 			self.sound_bso = GestorRecursos.CargarSonido('arcade_menu.ogg')
 			self.lvl = 'PIRATAS_ARCADE'
 
-
-
+		#Inicialmente Desactivado
 		self.animPortal.pause()
 		self.channel_bso = self.sound_bso.play(-1)
 		self.channel_bso.set_volume(0)
@@ -76,6 +77,7 @@ class Portal(ElementoGUI):
 
 	def dibujar(self, pantalla):
 
+		#Dibujamos cuando esté disponible
 		if(self.fase == 2 and not self.available(1)): return
 		
 		if(not self.available()):
@@ -103,10 +105,8 @@ class Portal(ElementoGUI):
 				rect.center = (ANCHO_PANTALLA/2-5, self.animPortal.posiciony + 240)
 				pantalla.blit(texto, rect)
 
-
-
-
 	def available(self, fase = -1):
+		#Cuando está disponible cada fase
 		if fase == -1: fase = self.fase
 		if (fase == 1 and GestorRecursos.getConfigParam('DINOS_LVL') < 1) or (fase == 2 and GestorRecursos.getConfigParam('PIRATAS_LVL') < 2):
 			return False
@@ -125,6 +125,7 @@ class Portal(ElementoGUI):
 			return False
 
 	def focus(self,over):
+		#Reproducir audio y animacion cuando se está sobre encima
 		if over and self.available():
 			self.animPortal.play()
 			if self.channel_bso.get_busy() == False: self.channel_bso = self.sound_bso.play(-1)
@@ -149,13 +150,6 @@ class Boton(ElementoGUI):
 		self.establecerPosicion(posicion)
 	def dibujar(self, pantalla):
 		pantalla.blit(self.imagen, self.rect)
-
-class BotonJugar(Boton):
-	def __init__(self, pantalla):
-		Boton.__init__(self, pantalla, 'menu_boton_comenzar.png', 
-			(ANCHO_PANTALLA*0.5 ,ALTO_PANTALLA*0.90))
-	def accion(self):
-		self.pantalla.menu.ejecutarJuego(0)
 
 class BotonSalir(Boton):
 	def __init__(self, pantalla):
@@ -183,14 +177,6 @@ class TextoGUI(ElementoGUI):
 # tamaño se indexa comentando en 0, como los arrays.
 # Una vez cargada la fuente, si se usa el método fuente.get_height() nos devuelve
 # height-1 respento a los valores del constructor.
-class TextoJugar(TextoGUI):
-	def __init__(self, pantalla):
-		fuente = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 29)
-		TextoGUI.__init__(self, pantalla, fuente, (0, 238, 255), 'Comenzar', 
-			(ANCHO_PANTALLA*0.5, ALTO_PANTALLA*0.87))
-	def accion(self):
-		self.pantalla.menu.ejecutarJuego(0)
-
 class TextoSalir(TextoGUI):
 	def __init__(self, pantalla):
 		# La fuente la debería cargar el estor de recursos
@@ -243,12 +229,10 @@ class PantallaInicialGUI(PantallaGUI):
 	def __init__(self, menu):
 		PantallaGUI.__init__(self, menu, 'portada.jpg')
 		# Creamos los botones y los metemos en la lista
-		botonJugar = BotonJugar(self)
 		botonSalir = BotonSalir(self)
 		#self.elementosGUI.append(botonJugar)
 		self.elementosGUI.append(botonSalir)
 		# Creamos el texto y lo metemos en la lista
-		textoJugar = TextoJugar(self)
 		textoSalir = TextoSalir(self)
 		#self.elementosGUI.append(textoJugar)
 		self.elementosGUI.append(textoSalir)
@@ -317,6 +301,7 @@ class Menu(EscenaPygame):
 	def ejecutarJuego(self,fase):
 		pygame.mixer.stop();
 
+		#Añadimos la escena de juego de carga de la fase [que esta misma cargará la fase en si], y por encima de la pila situa la escena de 
 		if fase == 0:
 			escena = EscenaCarga(self.director, fase)
 			self.director.apilarEscena(escena)

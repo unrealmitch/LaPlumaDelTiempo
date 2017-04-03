@@ -8,6 +8,7 @@ import random,math
 
 class Capa():
 	def __init__(self):
+		#Permite imprimir por orden segun se anhaden, necesario para profundidad
 		self.objects = []
 
 
