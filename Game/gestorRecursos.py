@@ -216,3 +216,28 @@ class GestorRecursos(object):
 		cls.config[param] = value
 		cls.SaveConfig()
 
+	@classmethod
+	def CargarImagenH(cls, nombre, colorkey=None):
+		# Si el nombre de archivo está entre los recursos ya cargados
+		if nombre in cls.recursos:
+			# Se devuelve ese recurso
+			return cls.recursos[nombre]
+		# Si no ha sido cargado anteriormente
+		else:
+			# Se carga la imagen indicando la carpeta en la que está
+			fullname = os.path.join('imagesh', nombre)
+			try:
+				imagen = pygame.image.load(fullname)
+			except pygame.error, message:
+				print 'Cannot load image:', fullname
+				raise SystemExit, message
+			imagen = imagen.convert()
+			if colorkey is not None:
+				if colorkey is -1:
+					colorkey = imagen.get_at((0,0))
+				imagen.set_colorkey(colorkey, RLEACCEL)
+			# Se almacena
+			imagen = pygame.transform.scale(imagen, (int(imagen.get_size()[0]*ESCALA), int(imagen.get_size()[1]*ESCALA)))
+			cls.recursos[nombre] = imagen
+			# Se devuelve
+			return imagen
