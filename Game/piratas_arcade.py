@@ -67,6 +67,11 @@ class Piratas_Arcade(Fase_arcade):
 
 	def setEnemigos(self):
 		self.final = None
+		pirata = Enemigo(EPIRATA1, True)
+		pirata.establecerPosicion( (random.randint(200,500)+self.jugador1.posicion[0] , random.randint(0,400)*ESCALA) )
+		self.grupoEnemigos.add(pirata)
+		self.grupoSpritesDinamicos.add(self.grupoEnemigos)
+		self.grupoSprites.add(self.grupoEnemigos)
 
 	def setAnim(self):
 		for i in range(int(ANCHO_PANTALLA/(400*ESCALA))):

@@ -85,6 +85,9 @@ class Fase(EscenaPygame):
 		self.channel_bso = None
 		self.channel_ambient = None
 
+		#Otros
+		self.score = 0
+
 		# Configuramos la fase #
 		self.setEscenario()
 		self.setPlataformas()
@@ -93,6 +96,8 @@ class Fase(EscenaPygame):
 		self.setAnim()
 		self.setAudio()
 		self.refreshSprites()
+
+
 
 	###FUNCIONES CONFIGURACION FASE###
 	def setEscenario(self):
@@ -232,7 +237,8 @@ class Fase(EscenaPygame):
 						if player.quitarVida(enemy.ataque): self.hurt = 150
 						self.gui.actualizarVida(player.vida)
 						
-					if player.posturas[P_ATACANDO1]: enemy.quitarVida(player.ataque)
+					if player.posturas[P_ATACANDO1]:
+						if enemy.quitarVida(player.ataque) and enemy.vida <= 0: self.score += enemy.tipo 
 
 		#Comprobamos si el prota coge un objeto. Lo elimina y hace el efecto de dicho objeto
 		objetos = pygame.sprite.spritecollide(self.jugador1, self.grupoObjetos, False)

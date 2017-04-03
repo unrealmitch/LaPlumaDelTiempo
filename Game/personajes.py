@@ -250,6 +250,7 @@ class Personaje(MiSprite):
 
 	def subirAtaque(self,ataque):
 		self.ataque += ataque
+		if self.ataque > 3: self.ataque = 3
 
 	def update(self, grupoPlataformas, tiempo):
 		if(tiempo > 1000): return	#Fix para cuando un fotograma consume mucho tiempo, normalmente al inicio de la escena, se descarte, ya que haría movimientos incosistentes dado la larga duración que se aplicaría a los movimientos

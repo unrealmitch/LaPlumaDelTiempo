@@ -95,7 +95,15 @@ class Portal(ElementoGUI):
                 texto = pygame.font.SysFont('arial', 20).render(text, True, (0,238,255))
                 rect = texto.get_rect()
                 rect.center = (ANCHO_PANTALLA/2-5, self.animPortal.posiciony + 220)
-                pantalla.blit(texto, rect) 
+                pantalla.blit(texto, rect)
+
+                text = "S:" + str(GestorRecursos.getConfigParam('PIRATAS_ARCADE_score')) +" R: " + str(GestorRecursos.getConfigParam('PIRATAS_ARCADE_round'))
+                texto = pygame.font.SysFont('arial', 20).render(text, True, (0,200,255))
+                rect = texto.get_rect()
+                rect.center = (ANCHO_PANTALLA/2-5, self.animPortal.posiciony + 240)
+                pantalla.blit(texto, rect)
+
+
 
 
     def available(self, fase = -1):

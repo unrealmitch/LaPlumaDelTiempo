@@ -30,11 +30,16 @@ class Fase_arcade(Fase):
 		IZQUIERDA: GestorRecursos.getConfigParam('IZQUIERDA'), DERECHA: GestorRecursos.getConfigParam('DERECHA'), 
 		ATAQUE1: GestorRecursos.getConfigParam('ATAQUE1')}
 
+		self.max_round = GestorRecursos.getConfigParam(self.clave_nivel+'_round')
+		self.max_score = GestorRecursos.getConfigParam(self.clave_nivel+'_score')
+
 		#Variabables control tiempo de la fase
 		self.time = 0
 		self.clock_start = pygame.time.get_ticks()
 		self.nextEnemy = 0
 		self.nextObject = 0
+		self.level = 1
+		self.round = 5
 
 		self.gui = Gui(5,1)
 		self.gui.actualizarPsj(self.jugador1)
@@ -73,20 +78,20 @@ class Fase_arcade(Fase):
 		if pygame.time.get_ticks() > self.nextEnemy:
 			random.seed()
 
-			dificultad = (self.time / 15) + 1
+			dificultad = self.level
 
-			nextTime = 10000/dificultad
+			nextTime = 15000/dificultad
 			nextTime = random.randint(nextTime, nextTime*2)
-			if nextTime < 500: nextTime = 500
+			if nextTime < 750: nextTime = 750
 			self.nextEnemy = pygame.time.get_ticks() + nextTime
 
-			if random.randint(0,100) > 101-1*dificultad:
+			if random.randint(0,100) >= 105-1*dificultad:
 				pirata = Enemigo(EPIRATA5, True)
-			elif random.randint(0,100) > 102-2*dificultad:
+			elif random.randint(0,100) >= 102-2*dificultad:
 				pirata = Enemigo(EPIRATA4, True)
-			elif random.randint(0,100) > 100-4*dificultad:
+			elif random.randint(0,100) >= 100-4*dificultad:
 				pirata = Enemigo(EPIRATA3, True)
-			elif random.randint(0,100) >= 80-10*dificultad:
+			elif random.randint(0,100) >= 60-10*dificultad:
 				pirata = Enemigo(EPIRATA2, True)
 			else:
 				pirata = Enemigo(EPIRATA1, True)
@@ -106,11 +111,11 @@ class Fase_arcade(Fase):
 		if pygame.time.get_ticks() > self.nextObject:
 			random.seed()
 
-			dificultad = (self.time / 15) + 1
+			dificultad = self.level
 
 			nextTime = 15000/dificultad
 			nextTime = random.randint(nextTime, nextTime*3)
-			if nextTime < 1000: nextTime = 1000
+			if nextTime < 1500: nextTime = 1500
 			self.nextObject = pygame.time.get_ticks() + nextTime
 
 
@@ -124,7 +129,7 @@ class Fase_arcade(Fase):
 			elif randomitem > 7:
 				tobjeto = random.choice([RON,BOTAS,MUELLE])
 			else:
-				tobjeto = ESPADA
+				tobjeto = random.choice([RON,ESPADA])
 
 			if tobjeto == CORAZON:
 				objeto = Objeto(CORAZON, 'arcade_hearth_little.png', 'arcade_life.ogg')
@@ -154,10 +159,13 @@ class Fase_arcade(Fase):
 			if(self.fade == 0): 
 				self.fade = -250
 				if self.time > self.nivel:
-					GestorRecursos.CargarSonido('mision_complete_long.ogg').play()
 					GestorRecursos.setConfigParam(self.clave_nivel, self.time)
+					GestorRecursos.CargarSonido('mision_complete_long.ogg').play()
 				else:
 					GestorRecursos.CargarSonido('game_over.ogg').play()
+
+				if self.level > self.max_round: GestorRecursos.setConfigParam(self.clave_nivel+'_round', self.level)
+				if self.score > self.max_score: GestorRecursos.setConfigParam(self.clave_nivel+'_score', self.score)
 				
 
 		if(self.fade < 0):
@@ -172,6 +180,12 @@ class Fase_arcade(Fase):
 			self.time = (pygame.time.get_ticks() - self.clock_start) / 1000
 			self.addEnemy()
 			self.addObjects()
+			if  self.time >= self.round:
+				GestorRecursos.CargarSonido('arcade_nextlvl.ogg').play()
+				self.level += 1
+				self.round = self.time + self.level*5
+
+
 		Fase.update(self, tiempo)				
 		self.channel_bso.set_volume(float(self.time)/200.)
 
@@ -180,14 +194,30 @@ class Fase_arcade(Fase):
 
 		###Tiempo GUI###
 		tiempo = self.time
-		tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 18)
+		tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 24)
 		texto = tipoLetra.render("Time: " + str(self.time), True, (255,0,0))
 		rect = texto.get_rect()
 		rect.center = (ANCHO_PANTALLA/2, 50)
-		
 		pantalla.blit(texto, rect)
+
 		texto = tipoLetra.render("Goal: " + str(self.nivel), True, (255,100,0))
 		rect = texto.get_rect()
 		rect.center = (ANCHO_PANTALLA/2, 75)
 		pantalla.blit(texto, rect)
+
+		tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 18)
+
+		texto = tipoLetra.render("Score: " + str(self.score), True, (100,255,0))
+		pantalla.blit(texto, (ANCHO_PANTALLA/1.2, 25))
+
+		texto = tipoLetra.render("Round: " + str(self.level), True, (100,255,0))
+		pantalla.blit(texto, (ANCHO_PANTALLA/1.2, 50))
+
+		texto = tipoLetra.render("Max S.: " + str(self.max_score ), True, (255,20,255))
+		pantalla.blit(texto, (ANCHO_PANTALLA/1.2, 100))
+
+		texto = tipoLetra.render("Max R.: " + str(self.max_round ), True, (255,0,255))
+		pantalla.blit(texto, (ANCHO_PANTALLA/1.2, 125))
+
+
 

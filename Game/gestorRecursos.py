@@ -204,9 +204,15 @@ class GestorRecursos(object):
     
 	@classmethod
 	def getConfigParam(cls, param):
-		return cls.config[param]
+		if param in cls.config:
+			return cls.config[param]
+		else:
+			return 0
 
 	@classmethod
 	def setConfigParam(cls, param, value):
+		if not param in cls.config:
+			cls.config.update({param: value})
 		cls.config[param] = value
 		cls.SaveConfig()
+
