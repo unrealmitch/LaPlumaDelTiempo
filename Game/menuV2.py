@@ -318,7 +318,8 @@ class Menu(EscenaPygame):
 
     def ejecutarJuego(self,fase):
         pygame.mixer.stop();
-        if fase == 0 and GestorRecursos.getConfigParam('DINOS_LVL') == 0 or True:
+        #if fase == 0 and GestorRecursos.getConfigParam('DINOS_LVL') == 0:
+        if fase == 0:
             escena = EscenaCarga(self.director, fase)
             self.director.apilarEscena(escena)
             escena = EscenaHistoria(self.director, fase)
