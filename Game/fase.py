@@ -11,7 +11,7 @@ from capa import *
 from gui import *
 from pygame.locals import *
 from animacionesPygame import *
-from fase import *
+
 
 # -------------------------------------------------
 # -------------------------------------------------
@@ -99,8 +99,6 @@ class Fase(EscenaPygame):
 		self.setAudio()
 		self.refreshSprites()
 
-
-
 	###FUNCIONES CONFIGURACION FASE###
 	def setEscenario(self):
 		raise "Fase not implemented yet"
@@ -130,17 +128,12 @@ class Fase(EscenaPygame):
 		self.grupoSprites.add(self.grupoSpritesDinamicos)
 		self.grupoSprites.add(self.grupoPlataformas)
 
-<<<<<<< HEAD
 	###FUNCIONES DE ACCION###
 	def salir(self):
 		#Salimos de la fase [Escena]
 		pygame.time.delay(3000)	#Retardo para terminar el audio
 		pygame.mixer.stop();
 		self.director.salirEscena();
-=======
-
-
->>>>>>> origin/master
 
 	def check_end(self):
 		#Cuando hacemos el fundido a negro (Salímos) [Si morimos o muere el jefe final]

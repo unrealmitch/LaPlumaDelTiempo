@@ -326,7 +326,7 @@ class Menu(EscenaPygame):
 		elif fase == 1:
 			escena = EscenaCarga(self.director, fase)
 			self.director.apilarEscena(escena)
-			escena = EscenaCarga(self.director, fase)
+			escena = EscenaHistoria(self.director, fase)
 		else:
 			escena = EscenaCarga(self.director, fase)
 

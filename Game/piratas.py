@@ -10,6 +10,8 @@ from capa import *
 from pygame.locals import *
 from animacionesPygame import *
 from fase import *
+from escenaHistoria import EscenaHistoria
+import escenaCarga
 
 # -------------------------------------------------
 # -------------------------------------------------
@@ -27,14 +29,12 @@ class Piratas(Fase):
 	def __init__(self, director):
 		Fase.__init__(self, director, 'PIRATAS_LVL')
 		
-			###FUNCIONES DE ACCION###
+	###FUNCIONES DE ACCION###
 	def salir(self):
-		pygame.time.delay(3000)	#Retardo para terminar el audio
-		pygame.mixer.stop();
-		self.director.salirEscena();
-		if GestorRecursos.getConfigParam('PIRATAS_LVL') == 0:
-			for i in range (1,5):
-				self.director.salirEscena()
+		Fase.salir(self)
+		if self.jugador1.alive():
+			escena = EscenaHistoria(self.director, 2)
+			self.director.apilarEscena(escena)
 
 	def setEscenario(self):
 		### ESCENARIO ###
@@ -123,7 +123,7 @@ class Piratas(Fase):
 	def setAudio(self):
 		sound_bso = GestorRecursos.CargarSonido('pirata_bso.ogg')
 		sound_ambient = GestorRecursos.CargarSonido('pirata_ambient.ogg')
-		pygame.mixer.stop();
+		pygame.mixer.stop()
 		self.channel_bso = sound_bso.play(-1)
 		self.channel_bso.set_volume(0)
 		self.channel_ambient = sound_ambient.play(-1)

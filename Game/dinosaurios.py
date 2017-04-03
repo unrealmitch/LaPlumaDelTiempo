@@ -10,7 +10,8 @@ from capa import *
 from pygame.locals import *
 from animacionesPygame import *
 from fase import *
-
+from escenaHistoria import EscenaHistoria
+import escenaCarga
 
 # Clase Dinosaurios
 class Dinosaurios(Fase):
@@ -20,15 +21,16 @@ class Dinosaurios(Fase):
 		
 		###FUNCIONES DE ACCION###
 	def salir(self):
-		pygame.time.delay(3000)	#Retardo para terminar el audio
-		pygame.mixer.stop();
-		self.director.salirEscena();
-		if GestorRecursos.getConfigParam('DINOS_LVL') == 0 :
-			for i in range (1,6):
-				self.director.salirEscena()
+		Fase.salir(self)
+		if self.jugador1.alive():
+			escena = escenaCarga.EscenaCarga(self.director, 1)
+			self.director.apilarEscena(escena)
+			escena = EscenaHistoria(self.director, 1)
+			self.director.apilarEscena(escena)
+
 
 	def setEscenario(self):
-		### ESCENARIO ###
+		### ESCENARIO ### 
 		if DEBUG:
 			background = StaticScenario('dino_fondo.png',(0.3,0))
 		else:
