@@ -7,7 +7,6 @@ from escena import *
 from personajes import *
 from escenario import *
 from capa import *
-from lifeBar import *
 from pygame.locals import *
 from animacionesPygame import *
 from fase_arcade import *

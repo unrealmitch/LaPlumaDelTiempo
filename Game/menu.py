@@ -6,8 +6,6 @@ from escena import *
 from gestorRecursos import *
 from escenaCarga import EscenaCarga
 from animacionesPygame import *
-from escenaAnim1 import EscenaAnimacion1
-from escenaTexto import EscenaTexto
 from escenaHistoria import EscenaHistoria
 
 
