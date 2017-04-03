@@ -11,6 +11,7 @@ from escenaTexto import EscenaTexto
 from escenaHistoria import EscenaHistoria
 
 
+
 # -------------------------------------------------
 # Clase abstracta ElementoGUI
 
@@ -272,6 +273,7 @@ class Menu(EscenaPygame):
     def __init__(self, director):
         # Llamamos al constructor de la clase padre
         EscenaPygame.__init__(self, director);
+        self.entrado = False
         # Creamos la lista de pantallas
         self.listaPantallas = []
         self.song = GestorRecursos.CargarSonido('menu_bso.ogg')
@@ -318,19 +320,22 @@ class Menu(EscenaPygame):
 
     def ejecutarJuego(self,fase):
         pygame.mixer.stop();
-        ocultas = False
-        if fase == 0 and GestorRecursos.getConfigParam('DINOS_LVL') == 0:
+        if fase == 0 and GestorRecursos.getConfigParam('DINOS_LVL') == 0 and not self.entrado:
+            self.entrado = True
             i = 18
-            ocultas = True
             while i >0:
-            #escena = EscenaTexto(self.director, fase, 1)
                 escena = EscenaTexto(self.director, fase, i)
                 self.director.apilarEscena(escena)
                 i-=1
-        elif fase == 1 and GestorRecursos.getConfigParam('PIRATAS_LVL') == 0 and not ocultas:
+        elif fase == 0 and GestorRecursos.getConfigParam('DINOS_LVL') == 0 and self.entrado:
             i = 18
-            while i >14:
-            #escena = EscenaTexto(self.director, fase, 1)
+            while i >12:
+                escena = EscenaTexto(self.director, fase, i)
+                self.director.apilarEscena(escena)
+                i-=1
+        elif fase == 1 and GestorRecursos.getConfigParam('PIRATAS_LVL') == 0:
+            i = 18
+            while i >13:
                 escena = EscenaTexto(self.director, fase, i)
                 self.director.apilarEscena(escena)
                 i-=1

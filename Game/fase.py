@@ -127,11 +127,8 @@ class Fase(EscenaPygame):
 		self.grupoSprites.add(self.grupoSpritesDinamicos)
 		self.grupoSprites.add(self.grupoPlataformas)
 
-	###FUNCIONES DE ACCION###
-	def salir(self):
-		pygame.time.delay(3000)	#Retardo para terminar el audio
-		pygame.mixer.stop();
-		self.director.salirEscena();
+
+
 
 	def check_end(self):
 		#Cuando hacemos el fundido a negro (Salímos) [Si morimos o muere el jefe final]
@@ -139,6 +136,8 @@ class Fase(EscenaPygame):
 			if(self.fade == 0): 
 				self.fade = -250
 				GestorRecursos.CargarSonido('game_over.ogg').play()
+				
+				
 
 		if ( not self.final.alive()):
 			if self.fade == 0: 
