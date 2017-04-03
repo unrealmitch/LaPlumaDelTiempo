@@ -4,10 +4,10 @@ Videojuego en 2D realizado en python bajo la libreria de PyGame para la asignatu
 
 ***Capturas***
 
-	![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Game-Menu.PNG?raw=true)
-	![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Game-Dino.PNG?raw=true)
-	![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Game-Pirata.PNG?raw=true)
-	![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Game-Arcade.PNG?raw=true)
+![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Game-Menu.PNG?raw=true)
+![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Game-Dino.PNG?raw=true)
+![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Game-Pirata.PNG?raw=true)
+![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Game-Arcade.PNG?raw=true)
 
 
 ***Python: 2.7***
@@ -33,5 +33,5 @@ Videojuego en 2D realizado en python bajo la libreria de PyGame para la asignatu
 
 ***Bocetos***
 
-	![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Boceto-Dino.jpg?raw=true)
-	![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Boceto-Piratas.jpg?raw=true)
+![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Boceto-Dino.jpg?raw=true)
+![Screenshot](https://github.com/unrealmitch/LaPlumaDelTiempo/blob/master/Screenshot/Boceto-Piratas.jpg?raw=true)
