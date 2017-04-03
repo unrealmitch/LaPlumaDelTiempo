@@ -12,11 +12,10 @@ from escenaCarga import EscenaCarga
 # Clase para las animaciones que solo ocurriran una vez
 #  (sin bucles)
 
-class EscenaAnimacion5(EscenaPyglet, pyglet.window.Window):
+class Animacion( pyglet.window.Window):
 
-    def __init__(self, director):
+    def __init__(self):
         # Constructores de las clases padres
-        EscenaPyglet.__init__(self, director)
         pyglet.window.Window.__init__(self, ANCHO_PANTALLA, ALTO_PANTALLA)
 
 
@@ -133,5 +132,11 @@ class EscenaAnimacion5(EscenaPyglet, pyglet.window.Window):
         escena = EscenaCarga(self.director, 0)
         # Y cambiamos la actual por la nueva
         self.director.cambiarEscena(escena)
+        
 
+if __name__ == '__main__':
 
+    animacion = Animacion()
+
+    # Ejecutamos la aplicacion de pyglet
+    pyglet.app.run()
