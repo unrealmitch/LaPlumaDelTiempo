@@ -383,6 +383,9 @@ class Jugador(Personaje):
 
 		Personaje.mover(self,movimientos)
 
+	def mover_mando(self, movimientos):
+		Personaje.mover(self,movimientos)
+
 	def avanzar(self, grupoPlataformas):
 		Personaje.mover_wreset(self,{DERECHA:True})
 		plataformas = pygame.sprite.spritecollide(self, grupoPlataformas, False)

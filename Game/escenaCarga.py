@@ -102,3 +102,5 @@ class EscenaCarga(EscenaPygame):
             if evento.type == pygame.QUIT:
                 self.director.salirPrograma()
 
+        #pygame.event.pump() #Sino se quda colgado y pone que no responde! Nada, no es de esto, que ya hay evenros 'o.o
+

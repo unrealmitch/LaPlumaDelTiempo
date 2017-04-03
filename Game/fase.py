@@ -11,6 +11,7 @@ from capa import *
 from gui import *
 from pygame.locals import *
 from animacionesPygame import *
+import mando
 
 
 # -------------------------------------------------
@@ -21,6 +22,7 @@ from animacionesPygame import *
 
 # Los bordes de la pantalla para hacer scroll horizontal
 DEBUG = False
+MANDO = True
 MINIMO_X_JUGADOR = (ANCHO_PANTALLA  / 3)
 MAXIMO_X_JUGADOR = ANCHO_PANTALLA - MINIMO_X_JUGADOR
 
@@ -39,6 +41,11 @@ class Fase(EscenaPygame):
 
 		self.clave_nivel = nivel
 		self.nivel = GestorRecursos.getConfigParam(self.clave_nivel)
+
+		#Control por mando de la xbox 360
+		if MANDO:
+			#self.mando = xbox360_controller.Controller(0)
+			self.mando = mando.Mando(0)
 
 		#Intercambiamos teclas apra aumentar dificultad
 		if self.nivel > 3:
@@ -368,3 +375,25 @@ class Fase(EscenaPygame):
 			teclasPulsadas = pygame.key.get_pressed()
 			self.jugador1.mover(teclasPulsadas, self.teclasConfig)
 
+			if MANDO:
+				movimientos = {}
+				pulsado = self.mando.get_buttons()
+				pad = self.mando.get_pad()
+				mov = self.mando.get_stick_izquierdo()
+
+				if pad[0] or pulsado[0] or mov[1] > 0.5: movimientos.update({ARRIBA: True})
+				if pad[2]: movimientos.update({ABAJO: True})
+
+				if pad[1] or mov[0] > 0.5: movimientos.update({DERECHA: True})
+				if pad[3] or mov[0] < -0.5: movimientos.update({IZQUIERDA: True})
+				
+				if pulsado[1] or pulsado[4] or pulsado[5] or abs(self.mando.get_gatillos())> 0.4: movimientos.update({ATAQUE1: True})
+					
+				if pulsado[6]:
+					#Salimos de la fase matando al personaje
+					GestorRecursos.CargarSonido('game_over.ogg').play()
+					self.jugador1.vida = 0;
+					self.jugador1.kill()
+					self.fade = -200;
+
+				self.jugador1.mover_mando(movimientos)
