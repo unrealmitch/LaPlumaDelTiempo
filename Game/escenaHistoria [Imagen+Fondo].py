@@ -30,11 +30,12 @@ class EscenaHistoria(EscenaPygame):
 			GestorRecursos.CargarSonido('intro_1.ogg').play()
 			self.imagenes = [[],[],[]]
 			self.delay = [[8,3,10,14,3],[8],[8,10,14,14,12,3]]
+			self.fondos = ['f1.jpg', 'f2.png', 'f3.jpg']
 			for i in range(1,6):
-				self.imagenes[0].append('dialogo' + str(i) + '.png')
-			self.imagenes[1].append('dialogo6.png')
+				self.imagenes[0].append('texto' + str(i) + '.png')
+			self.imagenes[1].append('texto6.png')
 			for i in range(7,13):
-				self.imagenes[2].append('dialogo' + str(i) + '.png')
+				self.imagenes[2].append('texto' + str(i) + '.png')
 		else:
 			raise 'Not implemented yet'
 
@@ -42,15 +43,20 @@ class EscenaHistoria(EscenaPygame):
 		self.rect = None
 		self.imagen_fondo = None
 		self.change_image()
-
+		self.change_fondo()
 		self.contador = pygame.time.get_ticks() + self.delay[0][0] * 1000
 		self.space_blocked = False
+
+	def change_fondo(self):
+		self.imagen_fondo = GestorRecursos.CargarImagenH(self.fondos[self.actual[0]])
+		self.imagen_fondo = pygame.transform.scale(self.imagen_fondo, (ANCHO_PANTALLA, ALTO_PANTALLA))
 		
 	def change_image(self):
-		if self.imagenes[self.actual[0]][self.actual[1]] != None:
+		if self.imagenes[self.actual[0]][self.actual[1]] != None
 			self.imagen = GestorRecursos.CargarImagenH(self.imagenes[self.actual[0]][self.actual[1]])
-			self.imagen = pygame.transform.scale(self.imagen, (ANCHO_PANTALLA, ALTO_PANTALLA))
-		else:
+			self.rect = self.imagen.get_rect()
+			self.rect.center = (ANCHO_PANTALLA/2, ALTO_PANTALLA/2)
+		else
 			self.imagen = None
 
 	def update(self, tiempo):
@@ -65,6 +71,7 @@ class EscenaHistoria(EscenaPygame):
 							self.fade = 0
 							self.actual[0]+=1
 							self.actual[1]=0
+							self.change_fondo()
 							self.change_image()
 							self.contador = time + self.delay[self.actual[0]][self.actual[1]] * 1000
 					else:
@@ -82,10 +89,12 @@ class EscenaHistoria(EscenaPygame):
 
 	def dibujar(self, pantalla):
 		pantalla.fill((0,0,0))
-		if self.imagen != None:
+		self.imagen_fondo.set_alpha(self.fade)
+		pantalla.blit(self.imagen_fondo, (0,0))
+		if self.imagen != None
 			self.imagen.set_alpha(self.fade)
 			#pantalla.blit(self.imagen, self.imagen.get_rect())
-			pantalla.blit(self.imagen, (0,0))
+			pantalla.blit(self.imagen, self.rect)
 
 		tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 24)
 		texto = tipoLetra.render("SPACE: Siguiente - ESC: Omitir", True, (255,255,255))

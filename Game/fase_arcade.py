@@ -34,14 +34,14 @@ class Fase_arcade(Fase):
 		self.max_score = GestorRecursos.getConfigParam(self.clave_nivel+'_score')
 
 		#Variabables control tiempo de la fase
-		self.time = 0
-		self.clock_start = pygame.time.get_ticks()
-		self.nextEnemy = 0
-		self.nextObject = pygame.time.get_ticks() + 3000
-		self.level = 1
-		self.round = 5
+		self.time = 0								#Tiempo alcanzado en modo arcade
+		self.clock_start = pygame.time.get_ticks()	#Inicio del modo arcade
+		self.nextEnemy = 0							#Cuando se crea un nuevo enemigo
+		self.nextObject = pygame.time.get_ticks() + 3000	#Cuando se crea un nuevo objeto
+		self.level = 1								#Nivel de dificultad de la fase
+		self.round = 5								#Cuanto durará la fase actual
 
-		self.gui = Gui(5,1)
+		self.gui = Gui(5,1)							#UTILIZAMOS UNA GUI DIFERENTE!
 		self.gui.actualizarPsj(self.jugador1)
 
 
@@ -85,13 +85,13 @@ class Fase_arcade(Fase):
 			if nextTime < 750: nextTime = 750
 			self.nextEnemy = pygame.time.get_ticks() + nextTime
 
-			if random.randint(0,100) > 105-1*dificultad:
+			if random.randint(0,100) > 108-1*dificultad:
 				pirata = Enemigo(EPIRATA5, True)
-			elif random.randint(0,100) > 103-2*dificultad:
+			elif random.randint(0,100) > 105-2*dificultad:
 				pirata = Enemigo(EPIRATA4, True)
 			elif random.randint(0,100) > 100-4*dificultad:
 				pirata = Enemigo(EPIRATA3, True)
-			elif random.randint(0,100) >= 60-10*dificultad:
+			elif random.randint(0,100) >= 70-8*dificultad:
 				pirata = Enemigo(EPIRATA2, True)
 			else:
 				pirata = Enemigo(EPIRATA1, True)
@@ -176,16 +176,17 @@ class Fase_arcade(Fase):
 				self.salir()
 
 	def update(self, tiempo):
+		#Añadimos la lógica del modo arcade [Dificultad por nivel, añadir aleatoriamente enemigos y objetos]
 		if(self.fade == 0):
 			self.time = (pygame.time.get_ticks() - self.clock_start) / 1000
 			self.addEnemy()
 			self.addObjects()
-			if  self.time >= self.round:
+			if  self.time >= self.round:	#Alcanzado proximo nivel
 				GestorRecursos.CargarSonido('arcade_nextlvl.ogg').play()
 				self.level += 1
 				self.round = self.time + 5 + self.level*2
 
-				if self.level % 2 == 1:
+				if self.level % 2 == 1:	#Cada 2 fases lanzamos un corazon sobre el psj
 					objeto = Objeto(CORAZON, 'arcade_hearth_little.png', 'arcade_life.ogg')
 					objeto.establecerPosicion( (self.jugador1.posicion[0] , 50) )
 					self.grupoObjetos.add(objeto)
@@ -213,6 +214,7 @@ class Fase_arcade(Fase):
 		rect.center = (ANCHO_PANTALLA/2, 75)
 		pantalla.blit(texto, rect)
 
+		###Puntuacion###
 		tipoLetra = GestorRecursos.CargarFuente('menu_font_space_age.ttf', 18)
 
 		texto = tipoLetra.render("Score: " + str(self.score), True, (100,255,0))

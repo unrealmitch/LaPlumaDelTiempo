@@ -5,7 +5,7 @@
 import pygame
 import director
 from director import *
-from menuV2 import Menu
+from menu import Menu
 
 if __name__ == '__main__':
 

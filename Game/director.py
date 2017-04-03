@@ -42,7 +42,6 @@ class Director():
         self.screen.blit(texto, rect)
         pygame.display.flip()
 
-
     def buclePygame(self, escena):
 
         # Cogemos el reloj de pygame
@@ -122,8 +121,6 @@ class Director():
                 pyglet.app.exit()
             else:
                 raise Exception('No se que tipo de escena es')
-
-
 
     def salirEscena(self):
         self.pararEscena()

@@ -5,6 +5,7 @@ import pygame, escena
 
 from escena import *
 from personajes import *
+from objetos import *
 from escenario import *
 from capa import *
 from gui import *
@@ -52,15 +53,16 @@ class Fase(EscenaPygame):
 		##Escenario [Máxima distancia x]
 		self.max_x = 0
 		
-		#Atenuado [Valor reutilizado para terminar la fase]
+		#Atenuado [Valor reutilizado para terminar la fase: Cuando es <0, se está terminando la fase, y atenuandola]
 		self.fade = 250
 		self.time_fade = pygame.time.get_ticks()
-		#Atenuado Vida
+
+		#Atenuado Vida [Para destello rojo tras ser herido, valor de atenuado]
 		self.hurt = 0
 
 		###SCROLL### Que parte del decorado estamos visualizando
 		self.scroll = (0,0.)
-		self.virtual_scroll = (0.,0.)
+		self.virtual_scroll = (0.,0.)	#Variable auxiliar para guardar el scroll de las olas
 		self.scrolly_speed = 0.03
 		self.scrolly_amplitude = 30
 
@@ -119,6 +121,7 @@ class Fase(EscenaPygame):
 		raise "Fase not implemented yet"
 
 	def refreshSprites(self):
+		#Actualizamos todos los grupos de sprites
 		self.grupoJugadores.add(self.jugador1)
 		self.grupoSpritesDinamicos.add(self.grupoObjetos)
 		self.grupoSpritesDinamicos.add(self.grupoJugadores)
@@ -129,6 +132,7 @@ class Fase(EscenaPygame):
 
 	###FUNCIONES DE ACCION###
 	def salir(self):
+		#Salimos de la fase [Escena]
 		pygame.time.delay(3000)	#Retardo para terminar el audio
 		pygame.mixer.stop();
 		self.director.salirEscena();
@@ -157,7 +161,9 @@ class Fase(EscenaPygame):
 				self.salir()
 
 	def actualizarScrollOrdenados(self, jugador):
-		if (jugador.rect.left<MINIMO_X_JUGADOR):
+		#Actualizamos el scroll de la pantalla segun donde esté el jugador
+
+		if (jugador.rect.left<MINIMO_X_JUGADOR):	#Max a la izq
 			desplazamiento = (MINIMO_X_JUGADOR - jugador.rect.left)
 
 			if self.scroll[0] <= 0:
@@ -168,18 +174,17 @@ class Fase(EscenaPygame):
 				self.scroll = (self.scroll[0] - desplazamiento, self.scroll[1])
 				return True;
 
-		if (jugador.rect.right > MAXIMO_X_JUGADOR):
+		if (jugador.rect.right > MAXIMO_X_JUGADOR):	#Max a la der pantalla
 			desplazamiento = (jugador.rect.right - MAXIMO_X_JUGADOR)
 
-			if self.scroll[0]*ESCALA + ANCHO_PANTALLA + 10 >= self.max_x:
+			if self.scroll[0]*ESCALA + ANCHO_PANTALLA + 10 >= self.max_x:	#Max a la der del escenario
 				#if self.fade == 0: self.fade = -250
 				#if self.jugador1.rect.centerx > ANCHO_PANTALLA + 100: self.salir(True)
 
-				if self.fade == 0:
+				if self.fade == 0:	#Si la fase no esta teminando, no deja sobrepasar a la derecha
 					if jugador.posicion[0] > self.max_x-jugador.rect.width:
 						jugador.establecerPosicion((self.max_x-jugador.rect.width, jugador.posicion[1]))
 				
-
 				#self.scroll = (self.decorado.rect.right*ESCALA - ANCHO_PANTALLA, self.scroll[1])
 				#jugador.establecerPosicion((self.scroll[0]*ESCALA + MAXIMO_X_JUGADOR*ESCALA, jugador.posicion[1]))
 				return False;
@@ -191,6 +196,7 @@ class Fase(EscenaPygame):
 
 
 	def actualizarScroll(self, jugador):
+		#Actualizamos el scroll de todos los elementos
 		if (self.scroll[1] > 1 or self.scroll[1] < 0):
 			self.scrolly_speed = -self.scrolly_speed
 
@@ -267,15 +273,15 @@ class Fase(EscenaPygame):
 		self.check_end()
 				
 	def dibujar_fundido(self, pantalla):
-		#Efecto fundido, para entrar a la escena, y para terminarla
-		if(self.hurt > 0):
+		#Efecto fundido, para entrar a la escena, o para terminarla
+		if(self.hurt > 0):	#Efecto para cuando hieren al personaje
 			red = pygame.Surface((ANCHO_PANTALLA,ALTO_PANTALLA))
 			red.fill((255,0,0))
 			red.set_alpha(self.hurt)
 			pantalla.blit(red, (0,0))
 			self.hurt -= 30
 
-		if(self.fade != 0):
+		if(self.fade != 0):	#Si se está haciendo fundido [Entrando o saliendo de la escena]
 			time = pygame.time.get_ticks()
 			if(time > self.time_fade + 1):
 				self.time_fade = time
@@ -283,7 +289,7 @@ class Fase(EscenaPygame):
 				black = pygame.Surface((ANCHO_PANTALLA,ALTO_PANTALLA))
 				black.fill((0,0,0))
 
-				if(self.fade>0):
+				if(self.fade>0): #Si estamos entrando a la fase, vamos quitando el fundido
 					self.fade-=10
 					black.set_alpha(self.fade)
 					pantalla.blit(black, (0,0))
@@ -293,9 +299,9 @@ class Fase(EscenaPygame):
 					else:
 						self.fade=-1
 
-					if(self.jugador1.alive()):
+					if(self.jugador1.alive()):	#Si ganamos
 						image = GestorRecursos.CargarImagen("complete.png",-1)
-					else:
+					else:	#Si morimos
 						image = GestorRecursos.CargarImagen("game_over.png",-1)
 
 					rect = image.get_rect()
@@ -332,11 +338,12 @@ class Fase(EscenaPygame):
 		'''
 
 		
-		
+		#Modo debug para dibujar tb las plataformas
 		if DEBUG:
 			for elem in self.grupoPlataformas.sprites():
 				elem.draw(pantalla)
 		
+		#Dibujamos la capa frontal, la gui y finalmente el fundido de haberlo
 		self.dibujar_frontal(pantalla)
 		self.gui.draw(pantalla)
 		self.dibujar_fundido(pantalla)
@@ -345,6 +352,7 @@ class Fase(EscenaPygame):
 		for evento in lista_eventos:
 			if evento.type == KEYDOWN:
 				if evento.key == K_ESCAPE:
+					#Salimos de la fase matando al personaje
 					GestorRecursos.CargarSonido('game_over.ogg').play()
 					self.jugador1.vida = 0;
 					self.jugador1.kill()
@@ -355,6 +363,7 @@ class Fase(EscenaPygame):
 				self.director.salirPrograma()
 
 		# Indicamos la acción a realizar segun la tecla pulsada para cada jugador
+		# Las teclas se cargan al prinipio de la configuracion guardada
 		if(self.fade == 0):
 			teclasPulsadas = pygame.key.get_pressed()
 			self.jugador1.mover(teclasPulsadas, self.teclasConfig)
